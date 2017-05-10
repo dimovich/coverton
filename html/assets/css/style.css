@@ -1,0 +1,39 @@
+@font-face {
+    font-family: 'GothaPro';
+    src:url('../fonts/GothaProReg.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html {
+    background-color: #ffffff;
+}
+
+
+/*455 x 90*/
+.content {
+    padding: 80px;
+    margin: auto;
+    width: 455px;
+    font-family : 'GothaPro';
+    font-size : 23px;
+    font-weight: normal;
+    font-style: normal;
+}
+
+.vcenter {
+    padding-top: calc((100vh - 150px) / 2);
+    min-height: 100px;
+}
+
+.logo {
+    height: 20px;
+    width: 20px;
+    margin-bottom: 0.5em;
+}
+
+.text {
+    color : #1A1A1A;
+    color : rgb(26, 26, 26);
+    margin: 0;
+}
