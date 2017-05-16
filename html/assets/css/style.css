@@ -9,7 +9,6 @@ html {
     background-color: #ffffff;
 }
 
-
 /*455 x 90*/
 .content {
     padding: 80px;
@@ -19,6 +18,36 @@ html {
     font-size : 23px;
     font-weight: normal;
     font-style: normal;
+}
+
+.wrap {
+    margin: auto;
+    padding: 80px;
+}
+
+.app {
+    width: 100%;
+}
+
+.editor {
+    width: 600px;
+    margin: auto;
+    border: 1px solid green;
+    position: relative;
+}
+
+.editor-control {
+    width: 50%;
+    border: 1px solid red;
+    margin: 1em;
+}
+
+
+.editor-image {
+    width: 480px;
+    height: 480px;
+    border: 1px solid black;
+    margin: auto;
 }
 
 .vcenter {
