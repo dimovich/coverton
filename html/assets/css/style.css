@@ -30,22 +30,37 @@ html {
 }
 
 .editor {
-    width: 600px;
+    width: 480px;
     margin: auto;
-    border: 1px solid yellow;
+    border: 1px solid green;
     position: relative;
+    text-align: center;
 }
 
 .editor-control {
-    width: 50%;
+    width: 40%;
     border: 1px solid red;
-    margin: 1em;
+    margin: 0;
+    display: inline-block;
+}
+
+.editor-label {
+    position: absolute;
+    border: 0;
+}
+
+.editor-label input {
+    background-color: transparent;
+    color: yellow;
+    font-family : 'GothaPro';
+    font-size: 30px;
+    border: 0;
 }
 
 
 .editor-image {
-    width: 480px;
-    height: 480px;
+    width: 330px;
+    height: 330px;
     border: 1px solid black;
     margin: auto;
 }

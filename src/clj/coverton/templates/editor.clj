@@ -10,7 +10,8 @@
     (include-js "main.js")]
    [:body
     [:div.wrap
-     [:div.app]]]))
+     [:div.app]]
+    [:script "coverton.core.init();"]]))
 
 
 

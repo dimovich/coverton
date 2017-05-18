@@ -1,7 +1,10 @@
 (set-env!
  :source-paths    #{"src/cljs" "src/clj"}
  :resource-paths  #{"html"}
- :dependencies '[[adzerk/boot-cljs          "2.0.0"  :scope "test"]
+ :dependencies '[[org.clojure/clojure "1.8.0" :scope "provided"]
+                 [org.clojure/clojurescript "1.9.293"]
+
+                 [adzerk/boot-cljs          "2.0.0"  :scope "test"]
                  [adzerk/boot-cljs-repl     "0.3.3"      :scope "test"]
                  [adzerk/boot-reload        "0.5.1"      :scope "test"]
                  [pandeiro/boot-http        "0.8.3"      :scope "test"]
@@ -9,20 +12,24 @@
                  [org.clojure/tools.nrepl   "0.2.12"     :scope "test"]
                  [weasel                    "0.7.0"      :scope "test"]
 
-                 [org.clojure/clojurescript "1.9.293"]
-                 
                  [compojure "1.6.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
                  [hiccup "1.0.5"]
+                 
                  [prismatic/dommy "1.1.0"]
                  [reagent "0.6.1"]
-                 [hipo "0.5.2"]])
+                 [hipo "0.5.2"]
+                 [cljsjs/react "15.5.0-0"]
+                 [cljsjs/react-select "1.0.0-rc.3"]
+                 [cljsjs/react-input-autosize "1.1.0-0"]])
+
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload    :refer [reload]]
  '[pandeiro.boot-http    :refer [serve]])
+
 
 (swap! boot.repl/*default-dependencies*
        concat '[[cider/cider-nrepl "0.15.0-SNAPSHOT"]])
@@ -31,19 +38,19 @@
        conj 'cider.nrepl/cider-middleware)
 
 
-
 (deftask build []
-  (comp (speak)
-        (cljs)))
+  (comp (cljs :compiler-options {:out-file "main.js"})
+        (target :dir #{"target"})))
 
 (deftask run []
   (comp (serve :resource-root "target"
-               :handler 'coverton.core/app)
+               :handler 'coverton.core/app
+               :reload true
+               :httpkit true)
         (watch)
-        (cljs-repl)
         (reload)
-        (build)
-        (target :dir #{"target"})))
+        (cljs-repl)
+        (build)))
 
 (deftask production []
   (task-options! cljs {:optimizations :advanced})
@@ -55,8 +62,12 @@
   identity)
 
 (deftask dev
-  
-  "Simple alias to run application in development mode"
   []
   (comp (development)
         (run)))
+
+
+(deftask prod
+  []
+  (comp (production)
+        (build)))
