@@ -21,7 +21,7 @@
                   [:div.editor-control (:text c)]))])
 
 
-(defn ^:export init []
+(defn init []
   (when js/document
     (do
-      (r/render [editor app-state] (sel1 :.app)))))
+      (r/render-component [editor app-state] (sel1 :.app)))))
