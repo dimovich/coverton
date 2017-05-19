@@ -18,10 +18,7 @@
                  
                  [prismatic/dommy "1.1.0"]
                  [reagent "0.6.1"]
-                 [hipo "0.5.2"]
-                 [cljsjs/react "15.5.0-0"]
-                 [cljsjs/react-select "1.0.0-rc.3"]
-                 [cljsjs/react-input-autosize "1.1.0-0"]])
+                 [metosin/komponentit "0.3.0"]])
 
 
 (require

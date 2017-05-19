@@ -47,14 +47,10 @@ html {
 .editor-label {
     position: absolute;
     border: 0;
-}
-
-.editor-label input {
     background-color: transparent;
     color: yellow;
     font-family : 'GothaPro';
-    font-size: 30px;
-    border: 0;
+    font-size: 20px;
 }
 
 
