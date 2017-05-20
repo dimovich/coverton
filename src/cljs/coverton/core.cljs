@@ -3,6 +3,7 @@
             [dommy.core :as d :refer-macros [sel1]]
             [komponentit.autosize :as autosize]))
 
+(enable-console-print!)
 
 (defn vec-remove
   "remove elem in coll"
@@ -15,39 +16,50 @@
    (-> (sel1 el) .getBoundingClientRect .-top)])
 
 
-(defn autosize-input [{:keys [x y parent uuid] :as opts}]
-  (let [v (r/atom (assoc opts :text ""))]
+(defn autosize-input [{:keys [x y uuid]}]
+  (let [state (r/atom nil)]
     (r/create-class
-     {:reagent-render
-      (fn [{:keys [x y parent uuid] :as opts}]
-        ^{:key (:id uuid)}
-        [:div
-         [autosize/input {:value (:text @v)
-                          :on-change (fn [e] (swap! v assoc :text (.. e -target -value)))
-                          :class :editor-label
-                          :style {:left x
-                                  :top y}}]])
-      ;; focus
+     {:display-name "coverton.autosize-input"
+      :reagent-render
+      (fn []
+        [autosize/input {:value @state
+                         :on-change (fn [e]
+                                      (reset! state (.. e -target -value)))
+                         :class :editor-label
+                         :id uuid
+                         :style {:left x
+                                 :top y}}])
+      ;; put focus on input
       :component-did-mount
-      (fn [self _] (-> self r/dom-node .-firstChild .focus))})))
+      (fn [self _]
+        (-> self r/dom-node .focus))})))
+
 
 
 (defn editor []
-  (let [labels (r/atom {})]
-    (fn []
-      (into
-       [:div.editor
-        [:img.editor-image {:src "assets/img/coverton.jpg"
-                            :on-click (fn [e]
-                                        (let [[px py] (get-xy :.editor)
-                                              uuid (random-uuid)]
-                                          (swap! labels assoc
-                                                 uuid [autosize-input
-                                                       {:x (- (.-clientX e) px)
-                                                        :y (- (.-clientY e) py)
-                                                        :uuid uuid
-                                                        :parent labels}])))}]]
-       (vals @labels)))))
+  (r/with-let [labels (r/atom nil)]
+    (into
+     [:div.editor
+      ;; delete empty labels
+      {:on-blur (fn [e]
+                  (let [text (.. e -target -value)
+                        id (uuid (.. e -target -id))]
+                    (when (empty? text)
+                      (swap! labels (fn [coll]
+                                      (remove #(= id (:uuid %)) coll))))))}
+    
+      [:img.editor-image {:src "assets/img/coverton.jpg"
+                          :on-click (fn [e]
+                                      (let [[px py] (get-xy :.editor)
+                                            id (random-uuid)]
+                                        (swap! labels conj
+                                               {:x (- (.-clientX e) px)
+                                                :y (- (.-clientY e) py)
+                                                :uuid id})))}]]
+     (doall
+      (for [l @labels]
+        ^{:key (:uuid l)}
+        [autosize-input l])))))
 
 
 
