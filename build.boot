@@ -17,6 +17,7 @@
                  [hiccup "1.0.5"]
                  
                  [prismatic/dommy "1.1.0"]
+                 [cljsjs/react-drag "0.2.7-0"]
                  [reagent "0.6.1"]
                  [metosin/komponentit "0.3.0"]])
 

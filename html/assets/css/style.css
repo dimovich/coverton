@@ -33,8 +33,12 @@ html {
     width: 480px;
     margin: auto;
     border: 1px solid green;
-    position: relative;
     text-align: center;
+    position: relative;
+}
+
+.label-container {
+    position: absolute;
 }
 
 .editor-control {
@@ -45,13 +49,28 @@ html {
 }
 
 .editor-label {
-    position: absolute;
     border: 0;
     background-color: transparent;
     color: orange;
     font-family : 'GothaPro';
     font-size: 30px;
+    cursor: move;
 }
+
+.react-drag {
+  position: relative;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.react-drag, .cursor {
+    cursor: move;
+}
+
+.no-cursor { cursor: auto; }
 
 
 .editor-image {
