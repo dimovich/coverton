@@ -21,20 +21,13 @@
    (-> (sel1 el) .getBoundingClientRect .-top)])
 
 
-(defn autosize-input [{:keys [x y uuid]}]
+(defn autosize-input [{:keys [uuid]}]
   (r/with-let [state (r/atom nil)]
-    [:div.label-container
-     {:style {:left x
-              :top y}}
-     [react-drag #_{:on-start ;;get dom, and put focus on me
-                    :on-stop  ;; put focus back on child
-                    }
-      [:div
-       [autosize/input {:value @state
-                        :on-change (fn [e] (reset! state (.. e -target -value)))
-                        :class :editor-label
-                        :id uuid
-                        :auto-focus true}]]]]))
+    [autosize/input {:value @state
+                     :on-change (fn [e] (reset! state (.. e -target -value)))
+                     :class :editor-label
+                     :id uuid
+                     :auto-focus true}]))
 
 
 
@@ -62,7 +55,12 @@
      (->> @labels
           (map (fn [l]
                  ^{:key (:uuid l)}
-                 [autosize-input l]))
+                 [:div.label-container {:style {:left (:x l)
+                                                :top (:y l)}}
+                  [react-drag
+                   [:div
+                    [:div {:style {:display :inline-block}}
+                     [autosize-input l]]]]]))
           doall))))
 
 

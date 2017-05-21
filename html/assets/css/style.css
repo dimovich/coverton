@@ -39,6 +39,8 @@ html {
 
 .label-container {
     position: absolute;
+    width: 0px;
+    height: 0px;
 }
 
 .editor-control {
