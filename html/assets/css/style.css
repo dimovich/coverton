@@ -37,11 +37,6 @@ html {
     position: relative;
 }
 
-.label-container {
-    position: absolute;
-    width: 0px;
-    height: 0px;
-}
 
 .editor-control {
     width: 40%;
@@ -50,13 +45,26 @@ html {
     display: inline-block;
 }
 
+.label-container {
+    position: absolute;
+    width: 0px;
+    height: 0px;
+}
+
+
+.drag-me {
+    position: absolute;
+    border: 2px solid grey;
+    display: inline-block;
+    cursor: move;
+}
+
 .editor-label {
     border: 0;
     background-color: transparent;
     color: orange;
     font-family : 'GothaPro';
     font-size: 30px;
-    cursor: move;
 }
 
 .react-drag {

@@ -38,8 +38,13 @@
        conj 'cider.nrepl/cider-middleware)
 
 
+(def npm-packages {:react-resizable "1.7.0"})
+
+
 (deftask build []
-  (comp (cljs :compiler-options {:out-file "main.js"})
+  (comp (cljs :compiler-options {:out-file "main.js"
+                                 :npm-deps {:react-resizable "1.7.0"}
+                                 :infer-externs true})
         (target :dir #{"target"})))
 
 (deftask run []
@@ -57,7 +62,8 @@
   identity)
 
 (deftask development []
-  (task-options! cljs {:optimizations :none}
+  (task-options! cljs {:optimizations :none
+                       :source-map true}
                  reload {:on-jsload 'coverton.core/init})
   identity)
 

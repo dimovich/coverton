@@ -2,23 +2,16 @@
   (:require [reagent.core :as r]
             [dommy.core :as d :refer-macros [sel1]]
             [komponentit.autosize :as autosize]
-            [cljsjs.react-drag]))
+            [cljsjs.react-drag]
+            [react-resizable]))
 
 (enable-console-print!)
 
-;;(def draggable identity)
-
 (def react-drag (r/adapt-react-class js/ReactDrag))
 
-(defn vec-remove
-  "remove elem in coll"
-  [coll pos]
-  (vec (concat (subvec coll 0 pos) (subvec coll (inc pos)))))
-
-
 (defn get-xy [el]
-  [(-> (sel1 el) .getBoundingClientRect .-left)
-   (-> (sel1 el) .getBoundingClientRect .-top)])
+  [(.. (sel1 el) getBoundingClientRect -left)
+   (.. (sel1 el) getBoundingClientRect -top)])
 
 
 (defn autosize-input [{:keys [uuid]}]
@@ -48,8 +41,8 @@
                                       (let [[px py] (get-xy :.editor)
                                             id (random-uuid)]
                                         (swap! labels conj
-                                               {:x (- (.-clientX e) px)
-                                                :y (- (.-clientY e) py)
+                                               {:x (- (.. e -clientX) px)
+                                                :y (- (.. e -clientY) py)
                                                 :uuid id})))}]]
 
      (->> @labels
@@ -57,9 +50,11 @@
                  ^{:key (:uuid l)}
                  [:div.label-container {:style {:left (:x l)
                                                 :top (:y l)}}
-                  [react-drag
+
+                  [react-drag {:handle :.drag-me}
                    [:div
-                    [:div {:style {:display :inline-block}}
+                    [:div.drag-me {:style {:padding 10
+                                           :resize "both"}}
                      [autosize-input l]]]]]))
           doall))))
 

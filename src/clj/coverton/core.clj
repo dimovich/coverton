@@ -7,7 +7,7 @@
 
 
 (defroutes handler
-  (GET "/editor" [] (editor))
+  (GET "/" [] (editor))
   (files "/" {:root "target"})     ;; to serve static resources
   (resources "/" {:root "target"}) ;; to serve anything else
   (not-found "Page Not Found"))    ;; page not found
