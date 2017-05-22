@@ -15,12 +15,9 @@
                  [compojure "1.6.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
                  [hiccup "1.0.5"]
-                 
+
                  [prismatic/dommy "1.1.0"]
-                 ;; [cljsjs/react-drag "0.2.7-0"]
                  [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 [cljsjs/react "15.5.4-0"]
-                 [cljsjs/react-dom "15.5.4-0"]
                  [metosin/komponentit "0.3.0"]])
 
 
@@ -38,15 +35,10 @@
        conj 'cider.nrepl/cider-middleware)
 
 
-(require '[clojure.java.io :as io]
-         '[cljs.build.api :as b])
-
-
 (deftask build []
   (comp (cljs :compiler-options {:out-file "main.js"
                                  :foreign-libs [{:file "public/js/bundle.js"
-                                                 :provides ["cljsjs.react" "cljsjs.react.dom" "react-drag" "react-resizable"]}]
-                                 :infer-externs true})
+                                                 :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
         (target :dir #{"target"})))
 
 (deftask run []
@@ -65,8 +57,7 @@
 
 (deftask development []
   (task-options! cljs {:optimizations :none
-                       :source-map true
-                       :compiler-options {:verbose true}}
+                       :source-map true}
                  reload {:on-jsload 'coverton.core/init})
   identity)
 

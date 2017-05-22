@@ -67,3 +67,8 @@
     (do
       (r/render [editor] (sel1 :.app)))))
 
+
+
+;;
+;; fade-in fade-out of border
+;;

@@ -32,7 +32,7 @@ html {
 .editor {
     width: 480px;
     margin: auto;
-    border: 1px solid green;
+    border: 0px solid green;
     text-align: center;
     position: relative;
 }
@@ -62,7 +62,7 @@ html {
 .editor-label {
     border: 0;
     background-color: transparent;
-    color: orange;
+    color: white;
     font-family : 'GothaPro';
     font-size: 30px;
 }
@@ -84,8 +84,8 @@ html {
 
 
 .editor-image {
-    width: 330px;
-    height: 330px;
+    width: 500px;
+    height: 500px;
     border: 1px solid black;
     margin: auto;
 }
