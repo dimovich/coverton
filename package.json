@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "watch": "webpack -d --watch",
+    "build": "webpack -p"
+  },
+  "dependencies": {
+      "react": "15.5.4",
+      "react-dom": "15.5.4",
+      "react-resizable": "1.7.0",
+      "react-drag": "0.3.0",
+      "webpack": "2.5.1",
+      "externs-generator": "0.3.2"
+  }
+}

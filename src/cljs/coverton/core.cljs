@@ -1,13 +1,15 @@
 (ns coverton.core
   (:require [reagent.core :as r]
             [dommy.core :as d :refer-macros [sel1]]
-            [komponentit.autosize :as autosize]
-            [cljsjs.react-drag]
-            [react-resizable]))
+            [komponentit.autosize :as autosize]))
 
 (enable-console-print!)
 
-(def react-drag (r/adapt-react-class js/ReactDrag))
+;;(set! *warn-on-infer* true)
+
+
+(def react-drag (r/adapt-react-class (aget js/window "deps" "react-drag")))
+(def react-resizable (r/adapt-react-class (aget js/window "deps" "react-resizable")))
 
 (defn get-xy [el]
   [(.. (sel1 el) getBoundingClientRect -left)

@@ -17,7 +17,7 @@
                  [hiccup "1.0.5"]
                  
                  [prismatic/dommy "1.1.0"]
-                 [cljsjs/react-drag "0.2.7-0"]
+                 ;; [cljsjs/react-drag "0.2.7-0"]
                  [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [cljsjs/react "15.5.4-0"]
                  [cljsjs/react-dom "15.5.4-0"]
@@ -38,12 +38,14 @@
        conj 'cider.nrepl/cider-middleware)
 
 
-(def npm-packages {:react-resizable "1.7.0"})
+(require '[clojure.java.io :as io]
+         '[cljs.build.api :as b])
 
 
 (deftask build []
   (comp (cljs :compiler-options {:out-file "main.js"
-                                 :npm-deps {:react-resizable "1.7.0"}
+                                 :foreign-libs [{:file "public/js/bundle.js"
+                                                 :provides ["cljsjs.react" "cljsjs.react.dom" "react-drag" "react-resizable"]}]
                                  :infer-externs true})
         (target :dir #{"target"})))
 
@@ -63,7 +65,8 @@
 
 (deftask development []
   (task-options! cljs {:optimizations :none
-                       :source-map true}
+                       :source-map true
+                       :compiler-options {:verbose true}}
                  reload {:on-jsload 'coverton.core/init})
   identity)
 
