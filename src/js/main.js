@@ -1,12 +1,14 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Rnd from 'react-rnd';
+import Draggable from 'react-draggable';
+import Resizable from 'react-resizable-box';
 
 window.deps = {
-    'react' : React,
-    'react-dom' : ReactDOM,
-    'react-rnd': Rnd
+    'react' : require('react'),
+    'react-dom' : require('react-dom'),
+    'draggable': Draggable,
+    'resizable': Resizable
 };
 
 window.React = window.deps['react'];
 window.ReactDOM = window.deps['react-dom'];
+
+

@@ -7,8 +7,8 @@
 
 ;;(set! *warn-on-infer* true)
 
-
-(def rnd (r/adapt-react-class (aget js/window "deps" "react-rnd")))
+(def draggable (r/adapt-react-class (aget js/window "deps" "draggable")))
+(def resizable (r/adapt-react-class (aget js/window "deps" "resizable")))
 
 (defn get-xy [el]
   [(.. (sel1 el) getBoundingClientRect -left)
@@ -52,11 +52,10 @@
                  [:div.label-container {:style {:left (:x l)
                                                 :top (:y l)}}
 
-                  [rnd {:default {:x 0 :y 0}
-                        :bounds ".editor"}
-                   [:div.label-border
-                    ;;[autosize-input l]
-                    ]]]))
+                  [draggable {:handle ".label-border"}
+                   [:div
+                    [:div.label-border
+                     [autosize-input l]]]]]))
           doall))))
 
 
