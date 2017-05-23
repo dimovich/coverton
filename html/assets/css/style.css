@@ -52,14 +52,14 @@ html {
 }
 
 
-.drag-me {
-    position: absolute;
+.label-border {
     border: 2px solid grey;
-    display: inline-block;
-    cursor: move;
+    padding: 10px;
 }
 
 .editor-label {
+    margin: 0;
+    padding: 0;
     border: 0;
     background-color: transparent;
     color: white;
@@ -106,3 +106,4 @@ html {
     color : rgb(26, 26, 26);
     margin: 0;
 }
+

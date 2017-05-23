@@ -8,8 +8,7 @@
 ;;(set! *warn-on-infer* true)
 
 
-(def react-drag (r/adapt-react-class (aget js/window "deps" "react-drag")))
-(def react-resizable (r/adapt-react-class (aget js/window "deps" "react-resizable")))
+(def rnd (r/adapt-react-class (aget js/window "deps" "react-rnd")))
 
 (defn get-xy [el]
   [(.. (sel1 el) getBoundingClientRect -left)
@@ -53,11 +52,11 @@
                  [:div.label-container {:style {:left (:x l)
                                                 :top (:y l)}}
 
-                  [react-drag {:handle :.drag-me}
-                   [:div
-                    [:div.drag-me {:style {:padding 10
-                                           :resize "both"}}
-                     [autosize-input l]]]]]))
+                  [rnd {:default {:x 0 :y 0}
+                        :bounds ".editor"}
+                   [:div.label-border
+                    ;;[autosize-input l]
+                    ]]]))
           doall))))
 
 

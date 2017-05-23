@@ -1,8 +1,11 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Rnd from 'react-rnd';
+
 window.deps = {
-    'react' : require('react'),
-    'react-dom' : require('react-dom'),
-    'react-resizable' : require('react-resizable'),
-    'react-drag' : require('react-drag')
+    'react' : React,
+    'react-dom' : ReactDOM,
+    'react-rnd': Rnd
 };
 
 window.React = window.deps['react'];

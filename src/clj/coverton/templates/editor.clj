@@ -6,11 +6,11 @@
    {:lang "en"}
    [:head
     [:title "Coverton Editor"]
-    (include-css "assets/css/style.css")
-    (include-js "main.js")]
+    (include-css "assets/css/style.css")]
    [:body
     [:div.wrap
      [:div.app]]
+    (include-js "main.js")
     [:script "coverton.core.init();"]]))
 
 

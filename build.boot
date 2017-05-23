@@ -1,6 +1,6 @@
 (set-env!
  :source-paths    #{"src/cljs" "src/clj"}
- :resource-paths  #{"html"}
+ :resource-paths  #{"html" "public"}
  :dependencies '[[org.clojure/clojure "1.9.0-alpha16" :scope "provided"]
                  [org.clojure/clojurescript "1.9.542"]
 
