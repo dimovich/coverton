@@ -9,6 +9,8 @@
 
 (def draggable (r/adapt-react-class (aget js/window "deps" "draggable")))
 (def resizable (r/adapt-react-class (aget js/window "deps" "resizable")))
+(def dynamic-font (r/adapt-react-class (aget js/window "deps" "dynamic-font")))
+(def erd (aget js/window "deps" "erd"))
 
 (defn get-xy [el]
   [(.. (sel1 el) getBoundingClientRect -left)
@@ -16,14 +18,35 @@
 
 
 (defn autosize-input [{:keys [uuid]}]
-  (r/with-let [state (r/atom nil)]
-    [autosize/input {:value @state
-                     :on-change (fn [e] (reset! state (.. e -target -value)))
-                     :class :editor-label
-                     :id uuid
-                     :auto-focus true}]))
+  (r/with-let [state (r/atom nil)
+               delta (r/atom 0)]
+    [draggable {:handle ".label-border"}
+     [:div
+      [resizable {:class-name :label-resize
+                  :width "1em" :height "1em"
+                  :lock-aspect-ratio true
+                  :on-resize (fn [e d h n]
+                               #_(reset! delta (aget n "height")))}
+       [:div.label-border
+        [autosize/input {:value @state
+                         :on-change (fn [e] (reset! state (.. e -target -value)))
+                         :class :editor-label
+                         :id uuid
+                         :style {:font-size (+ 60 @delta)}
+                         :auto-focus true}]]]]]))
 
 
+#_(defn resizeme []
+    (let [this (r/current-component)
+          state (r/atom nil)]
+      (r/create-class
+       {:display-name "resizeme"
+        :reagent-render
+        (fn []
+          (let []
+            (println (r/props this))
+            (into [resizable (r/props this)]
+                  (r/children this))))})))
 
 (defn editor []
   (r/with-let [labels (r/atom nil)]
@@ -52,10 +75,7 @@
                  [:div.label-container {:style {:left (:x l)
                                                 :top (:y l)}}
 
-                  [draggable {:handle ".label-border"}
-                   [:div
-                    [:div.label-border
-                     [autosize-input l]]]]]))
+                  [autosize-input l]]))
           doall))))
 
 

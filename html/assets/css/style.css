@@ -15,7 +15,7 @@ html {
     margin: auto;
     width: 455px;
     font-family : 'GothaPro';
-    font-size : 23px;
+    font-size : 20px;
     font-weight: normal;
     font-style: normal;
 }
@@ -37,6 +37,10 @@ html {
     position: relative;
 }
 
+.label-resize {
+    display: inline-block;
+    border: 2px solid yellow;
+}
 
 .editor-control {
     width: 40%;
@@ -54,8 +58,8 @@ html {
 
 .label-border {
     border: 1px solid grey;
-    padding: 10px;
     display: inline-block;
+    padding: 10px;
 }
 
 
@@ -68,11 +72,16 @@ html {
 
 
 
+.editor-label { 
+    margin: 10px;
+    border: 0; 
+    background-color: transparent; 
+    color: white; 
+    font-family : 'GothaPro'; 
+    font-size: 50px;
+}
 
 
-.editor-label { margin: 0; padding: 0; border: 0; background-color:
-    transparent; color: white; font-family : 'GothaPro'; font-size:
-    30px; }
 
 .react-drag {
   position: relative;
