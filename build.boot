@@ -60,7 +60,7 @@
   (task-options! cljs {:optimizations :none
                        :source-map true}
                  reload {:on-jsload 'coverton.core/init}
-                 cljs-repl {:nrepl-opts {:port 1133}})
+                 cljs-repl {:nrepl-opts {:port 3311}})
   identity)
 
 (deftask dev

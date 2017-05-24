@@ -10,8 +10,7 @@
 
 
 (defn get-xy [el]
-  [(.. (sel1 el) getBoundingClientRect -left)
-   (.. (sel1 el) getBoundingClientRect -top)])
+  )
 
 
 (defn autosize-input [{:keys [uuid]}]
@@ -21,11 +20,10 @@
                handler #(do (d/remove-style! %3 :width)
                             (swap! size assoc
                                    :height (- (d/px %3 :height)
-                                              28)))]
+                                              26)))]
 
     [draggable {:handle ".label-border"}
      [:div
-      
       [resizable {:class-name :label-resize
                   :width "1em" :height "1em"
                   :lock-aspect-ratio true
@@ -34,11 +32,9 @@
        [:div.label-border
         [autosize/input {:value @state
                          :on-change (fn [e] (reset! state (.. e -target -value)))
-                         :on-resize (fn [e] (println "resize"))
                          :class :editor-label
                          :id uuid
-                         :style {:font-size (:height @size)
-                                 :line-height 0}
+                         :style {:font-size (:height @size)}
                          :auto-focus true}]]]]]))
 
 (defn editor []
@@ -55,7 +51,9 @@
 
       [:img.editor-image {:src "assets/img/coverton.jpg"
                           :on-click (fn [e]
-                                      (let [[px py] (get-xy :.editor)
+                                      (let [rect (.. e -target -parentElement  getBoundingClientRect)
+                                            px (.. rect -left)
+                                            py (.. rect -top)
                                             id (random-uuid)]
                                         (swap! labels conj
                                                {:x (- (.. e -clientX) px)
@@ -82,7 +80,11 @@
 
 ;;
 ;; fade-in fade-out of border
+;; del on key press
 ;;
+#_(:on-key-up (fn [e] (when (= 46 (.. e -keyCode))
+                        (do
+                          (reset! state nil)))))
 
 
 ;;[ContainerDimensions {} (fn [height] (r/as-element [my-component {:height height}]))]

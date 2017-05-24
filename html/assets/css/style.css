@@ -37,18 +37,6 @@ html {
     position: relative;
 }
 
-.label-resize {
-    display: inline-block;
-    border: 0px solid yellow;
-}
-
-.editor-control {
-    width: 40%;
-    border: 1px solid red;
-    margin: 0;
-    display: inline-block;
-}
-
 .label-container {
     position: absolute;
     width: 0px;
@@ -56,12 +44,17 @@ html {
 }
 
 
+.label-resize {
+    display: inline-block;
+    border: 0px solid yellow;
+}
+
+
 .label-border {
-    border: 1px solid grey;
+    border: 2px solid grey;
     display: inline-block;
     padding: 10px;
 }
-
 
 
 .item {
@@ -71,15 +64,14 @@ html {
 }
 
 
-
 .editor-label { 
     border: 0; 
     background-color: transparent; 
     color: orange; 
     font-family : 'GothaPro';
     font-size: 30px;
+    line-height: 10px;
 }
-
 
 
 .react-drag {
@@ -89,13 +81,8 @@ html {
     -ms-user-select: none;
     -o-user-select: none;
     user-select: none;
-}
-
-.react-drag, .cursor {
     cursor: move;
 }
-
-.no-cursor { cursor: auto; }
 
 
 .editor-image {
