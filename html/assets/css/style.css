@@ -9,6 +9,10 @@ html {
     background-color: #ffffff;
 }
 
+body {
+    margin: 0;
+}
+
 /*455 x 90*/
 .content {
     padding: 80px;
@@ -22,7 +26,7 @@ html {
 
 .wrap {
     margin: auto;
-    padding: 80px;
+    padding: 0;
 }
 
 .app {
@@ -30,7 +34,8 @@ html {
 }
 
 .editor {
-    width: 480px;
+    width: 100vw;
+    height: 100vh;
     margin: auto;
     border: 0px solid green;
     text-align: center;
@@ -46,14 +51,35 @@ html {
 
 .label-resize {
     display: inline-block;
-    border: 0px solid yellow;
+    border: 2px solid transparent;
+    padding: 10px;
+    margin: 0;
+    -webkit-transition : border 500ms ease-out;
+    -moz-transition : border 500ms ease-out;
+    -o-transition : border 500ms ease-out;
+    transition : border 500ms ease-out;
+}
+
+.label-resize:hover {
+    border: 2px solid grey;
 }
 
 
-.label-border {
-    border: 2px solid grey;
+.hovering {
+    border: 2px solid transparent;
     display: inline-block;
-    padding: 10px;
+    -webkit-transition : border 500ms ease-out;
+    -moz-transition : border 500ms ease-out;
+    -o-transition : border 500ms ease-out;
+    transition : border 500ms ease-out;
+}
+
+.hovering:hover {
+    border: 2px solid gray;
+}
+
+.label-border:hover {
+    border: 1px solid white;
 }
 
 
@@ -71,6 +97,8 @@ html {
     font-family : 'GothaPro';
     font-size: 30px;
     line-height: 10px;
+    margin: 0;
+    padding: 0;
 }
 
 

@@ -5,7 +5,7 @@ window.deps = {
     'react' : require('react'),
     'react-dom' : require('react-dom'),
     'draggable': Draggable,
-    'resizable': Resizable,
+    'resizable': Resizable
 };
 
 window.React = window.deps['react'];
