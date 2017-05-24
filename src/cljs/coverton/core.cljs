@@ -5,12 +5,9 @@
 
 (enable-console-print!)
 
+
 (def draggable (r/adapt-react-class (aget js/window "deps" "draggable")))
 (def resizable (r/adapt-react-class (aget js/window "deps" "resizable")))
-
-
-(defn get-xy [el]
-  )
 
 
 (defn autosize-input [{:keys [uuid]}]
