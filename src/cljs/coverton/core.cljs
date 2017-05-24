@@ -5,12 +5,9 @@
 
 (enable-console-print!)
 
-;;(set! *warn-on-infer* true)
-
 (def draggable (r/adapt-react-class (aget js/window "deps" "draggable")))
 (def resizable (r/adapt-react-class (aget js/window "deps" "resizable")))
-(def dynamic-font (r/adapt-react-class (aget js/window "deps" "dynamic-font")))
-(def erd (aget js/window "deps" "erd"))
+
 
 (defn get-xy [el]
   [(.. (sel1 el) getBoundingClientRect -left)
@@ -19,34 +16,30 @@
 
 (defn autosize-input [{:keys [uuid]}]
   (r/with-let [state (r/atom nil)
-               delta (r/atom 0)]
+               size (r/atom {:height 60})
+               ;; FIXME: get font size from height better
+               handler #(do (d/remove-style! %3 :width)
+                            (swap! size assoc
+                                   :height (- (d/px %3 :height)
+                                              28)))]
+
     [draggable {:handle ".label-border"}
      [:div
+      
       [resizable {:class-name :label-resize
                   :width "1em" :height "1em"
                   :lock-aspect-ratio true
-                  :on-resize (fn [e d h n]
-                               #_(reset! delta (aget n "height")))}
+                  :on-resize handler}
+       
        [:div.label-border
         [autosize/input {:value @state
                          :on-change (fn [e] (reset! state (.. e -target -value)))
+                         :on-resize (fn [e] (println "resize"))
                          :class :editor-label
                          :id uuid
-                         :style {:font-size (+ 60 @delta)}
+                         :style {:font-size (:height @size)
+                                 :line-height 0}
                          :auto-focus true}]]]]]))
-
-
-#_(defn resizeme []
-    (let [this (r/current-component)
-          state (r/atom nil)]
-      (r/create-class
-       {:display-name "resizeme"
-        :reagent-render
-        (fn []
-          (let []
-            (println (r/props this))
-            (into [resizable (r/props this)]
-                  (r/children this))))})))
 
 (defn editor []
   (r/with-let [labels (r/atom nil)]
@@ -90,3 +83,6 @@
 ;;
 ;; fade-in fade-out of border
 ;;
+
+
+;;[ContainerDimensions {} (fn [height] (r/as-element [my-component {:height height}]))]

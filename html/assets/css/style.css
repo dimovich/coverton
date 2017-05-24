@@ -39,7 +39,7 @@ html {
 
 .label-resize {
     display: inline-block;
-    border: 2px solid yellow;
+    border: 0px solid yellow;
 }
 
 .editor-control {
@@ -73,23 +73,22 @@ html {
 
 
 .editor-label { 
-    margin: 10px;
     border: 0; 
     background-color: transparent; 
-    color: white; 
-    font-family : 'GothaPro'; 
-    font-size: 50px;
+    color: orange; 
+    font-family : 'GothaPro';
+    font-size: 30px;
 }
 
 
 
 .react-drag {
-  position: relative;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+    position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
 }
 
 .react-drag, .cursor {

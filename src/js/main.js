@@ -1,14 +1,17 @@
 import Draggable from 'react-drag';
 import Resizable from 'react-resizable-box';
-import DynamicFont from 'react-dynamic-font';
+/*import DynamicFont from 'react-dynamic-font';
+import ContainerDimensions from 'react-container-dimensions';*/
 
 window.deps = {
     'react' : require('react'),
     'react-dom' : require('react-dom'),
     'draggable': Draggable,
     'resizable': Resizable,
-    "dynamic-font": DynamicFont,
-    "erd" : require("element-resize-detector")
+/*    "dynamic-font": DynamicFont,
+    "erd" : require("element-resize-detector"),
+    "dimensions" : ContainerDimensions
+*/
 };
 
 window.React = window.deps['react'];
