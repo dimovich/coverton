@@ -11,6 +11,7 @@
                  [com.cemerick/piggieback   "0.2.1"      :scope "test"]
                  [org.clojure/tools.nrepl   "0.2.12"     :scope "test"]
                  [weasel                    "0.7.0"      :scope "test"]
+                 [tolitius/boot-check       "0.1.4"]
 
                  [compojure "1.6.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
@@ -25,7 +26,8 @@
  '[adzerk.boot-cljs      :refer [cljs]]
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload    :refer [reload]]
- '[pandeiro.boot-http    :refer [serve]])
+ '[pandeiro.boot-http    :refer [serve]]
+ '[tolitius.boot-check   :as check])
 
 
 (swap! boot.repl/*default-dependencies*
@@ -73,3 +75,11 @@
   []
   (comp (production)
         (build)))
+
+
+(deftask check-sources []
+  (comp
+    (check/with-yagni)
+    (check/with-eastwood)
+    (check/with-kibit)
+    (check/with-bikeshed)))
