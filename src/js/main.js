@@ -1,4 +1,4 @@
-import Draggable from 'react-drag';
+import Draggable from 'react-draggable';
 import Resizable from 'react-resizable-box';
 
 window.deps = {

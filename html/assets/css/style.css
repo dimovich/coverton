@@ -42,6 +42,7 @@ body {
     position: relative;
 }
 
+
 .label-container {
     position: absolute;
     width: 0px;
@@ -50,36 +51,22 @@ body {
 
 
 .label-resize {
-    display: inline-block;
     border: 2px solid transparent;
-    padding: 10px;
+    transition : border .2s ease-in;
+    transition-delay: 1.3s;
     margin: 0;
-    -webkit-transition : border 500ms ease-out;
-    -moz-transition : border 500ms ease-out;
-    -o-transition : border 500ms ease-out;
-    transition : border 500ms ease-out;
+    padding: 10px;
+    font-size: 60px;
 }
 
-.label-resize:hover {
+
+.react-draggable:hover .label-resize {
     border: 2px solid grey;
+    transition-delay: 0s;
 }
 
-
-.hovering {
-    border: 2px solid transparent;
-    display: inline-block;
-    -webkit-transition : border 500ms ease-out;
-    -moz-transition : border 500ms ease-out;
-    -o-transition : border 500ms ease-out;
-    transition : border 500ms ease-out;
-}
-
-.hovering:hover {
-    border: 2px solid gray;
-}
-
-.label-border:hover {
-    border: 1px solid white;
+.label-resize:focus {
+    border: 2px solid grey;
 }
 
 
@@ -90,26 +77,17 @@ body {
 }
 
 
-.editor-label { 
-    border: 0; 
-    background-color: transparent; 
-    color: orange; 
-    font-family : 'GothaPro';
-    font-size: 30px;
-    line-height: 10px;
-    margin: 0;
-    padding: 0;
-}
 
-
-.react-drag {
-    position: relative;
+.react-draggable {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     -o-user-select: none;
     user-select: none;
     cursor: move;
+    display: inline-block;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 
