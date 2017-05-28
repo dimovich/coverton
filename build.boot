@@ -18,10 +18,7 @@
                  [hiccup "1.0.5"]
 
                  [prismatic/dommy "1.1.0"]
-                 [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 ;;[cljsjs/react "15.5.4-0"]
-                 ;;[cljsjs/react-dom "15.5.4-0"]
-                 ])
+                 [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]])
 
 
 (require
@@ -40,25 +37,27 @@
 
 
 (deftask build []
-  (comp (cljs :compiler-options
-              {:out-file "main.js"
-               #_(:npm-deps {:react-dom "15.5.4"
-                             :react "15.5.4"
-                             :react-draggable "2.2.3"
-                             :react-resizable-box "2.0.4"})
-               :foreign-libs [{:file "public/js/bundle.js"
-                               :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
-        (target :dir #{"target"})))
+  (comp
+   (cljs :compiler-options
+         {:out-file "main.js"
+          #_(:npm-deps {:react-dom "15.5.4"
+                        :react "15.5.4"
+                        :react-draggable "2.2.3"
+                        :react-resizable-box "2.0.4"})
+          :foreign-libs [{:file "public/js/bundle.js"
+                          :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
+   (target :dir #{"target"})))
 
 (deftask run []
-  (comp (serve :resource-root "target"
-               :handler 'coverton.core/app
-               :reload true
-               :httpkit true)
-        (watch)
-        (reload)
-        (cljs-repl)
-        (build)))
+  (comp
+   (serve :resource-root "target"
+          :handler 'coverton.core/app
+          :reload true
+          :httpkit true)
+   (watch)
+   (reload)
+   (cljs-repl)
+   (build)))
 
 (deftask production []
   (task-options! cljs {:optimizations :advanced})
