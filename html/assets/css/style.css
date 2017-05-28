@@ -44,9 +44,12 @@ body {
 
 
 .label-container {
+    font-size: 60px;
     position: absolute;
     width: 0px;
     height: 0px;
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -56,19 +59,13 @@ body {
     transition-delay: 1.3s;
     margin: 0;
     padding: 10px;
-    font-size: 60px;
 }
 
 
-.react-draggable:hover .label-resize {
+.react-draggable:hover .label-resize, .label-resize:active {
     border: 2px solid grey;
     transition-delay: 0s;
 }
-
-.label-resize:focus {
-    border: 2px solid grey;
-}
-
 
 .item {
     display: inline-block;
@@ -77,6 +74,20 @@ body {
 }
 
 
+.label-input {
+    font-size: 1em;
+    font-family: 'GothaPro';
+    color: orange;
+    outline: none;
+    border: 0px solid brown;
+    background-color: transparent;
+    user-select: none;
+}
+
+
+.label-input:focus {
+    user-select: default;
+}
 
 .react-draggable {
     -webkit-user-select: none;
@@ -86,7 +97,7 @@ body {
     user-select: none;
     cursor: move;
     display: inline-block;
-    padding: 10px;
+    padding: 15px;
     box-sizing: border-box;
 }
 
@@ -115,3 +126,12 @@ body {
     margin: 0;
 }
 
+
+#span-measure {
+    position:absolute;
+    top:0px;
+    left:0px;
+    visibility:hidden;
+    white-space:nowrap;
+    overflow:hidden
+}

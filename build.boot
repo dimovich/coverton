@@ -1,8 +1,8 @@
 (set-env!
  :source-paths    #{"src/cljs" "src/clj"}
  :resource-paths  #{"html" "public"}
- :dependencies '[[org.clojure/clojure "1.9.0-alpha16" :scope "provided"]
-                 [org.clojure/clojurescript "1.9.542"]
+ :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
+                 [org.clojure/clojurescript "1.9.562"]
 
                  [adzerk/boot-cljs          "2.0.0"  :scope "test"]
                  [adzerk/boot-cljs-repl     "0.3.3"      :scope "test"]
@@ -18,8 +18,7 @@
                  [hiccup "1.0.5"]
 
                  [prismatic/dommy "1.1.0"]
-                 [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 [metosin/komponentit "0.3.0"]])
+                 [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]])
 
 
 (require

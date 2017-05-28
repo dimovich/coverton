@@ -10,6 +10,7 @@
    [:body
     [:div.wrap
      [:div.app]]
+    [:span#span-measure]
     (include-js "main.js")
     [:script "coverton.core.init();"]]))
 
