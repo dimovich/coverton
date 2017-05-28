@@ -18,7 +18,10 @@
                  [hiccup "1.0.5"]
 
                  [prismatic/dommy "1.1.0"]
-                 [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]])
+                 [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
+                 ;;[cljsjs/react "15.5.4-0"]
+                 ;;[cljsjs/react-dom "15.5.4-0"]
+                 ])
 
 
 (require
@@ -39,8 +42,12 @@
 (deftask build []
   (comp (cljs :compiler-options
               {:out-file "main.js"
-               :foreign-libs [{:file "public/js/bundle.js"
-                               :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
+               :npm-deps {:react-draggable "2.2.3"
+                          :react-resizable-box "2.0.4"
+                          :react-dom "15.5.4"
+                          :react "15.5.4"}
+               #_(:foreign-libs [{:file "public/js/bundle.js"
+                                  :provides ["cljsjs.react" "cljsjs.react.dom"]}])})
         (target :dir #{"target"})))
 
 (deftask run []

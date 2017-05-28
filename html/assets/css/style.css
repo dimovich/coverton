@@ -85,6 +85,7 @@ body {
     background-color: transparent;
     user-select: none;
     width: 1em;
+    margin: 0;
 }
 
 .label-input:focus {
