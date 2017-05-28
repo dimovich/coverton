@@ -1,13 +1,15 @@
 {
   "scripts": {
     "watch": "webpack -d --watch",
-    "build": "webpack -p"
+      "build": "webpack -p",
+      "externs": "generate-extern -f ./node_modules/react-resizable-box/lib/index.js -n Resizable -o resizable-extern.js"
   },
   "dependencies": {
       "react": "15.5.4",
       "react-dom": "15.5.4",
       "webpack": "2.5.1",
       "react-draggable": "2.2.3",
-      "react-resizable-box": "2.0.4"
+      "react-resizable-box": "2.0.4",
+      "externs-generator": "0.2.2"
   }
 }

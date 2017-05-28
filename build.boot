@@ -42,12 +42,12 @@
 (deftask build []
   (comp (cljs :compiler-options
               {:out-file "main.js"
-               :npm-deps {:react-draggable "2.2.3"
-                          :react-resizable-box "2.0.4"
-                          :react-dom "15.5.4"
-                          :react "15.5.4"}
-               #_(:foreign-libs [{:file "public/js/bundle.js"
-                                  :provides ["cljsjs.react" "cljsjs.react.dom"]}])})
+               #_(:npm-deps {:react-dom "15.5.4"
+                             :react "15.5.4"
+                             :react-draggable "2.2.3"
+                             :react-resizable-box "2.0.4"})
+               :foreign-libs [{:file "public/js/bundle.js"
+                               :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
         (target :dir #{"target"})))
 
 (deftask run []

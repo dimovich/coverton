@@ -32,9 +32,8 @@
      {:display-name "autosize-input"
       :component-did-mount
       (fn [this]
-        (let [dom (r/dom-node this)]
-          (ref dom)
-          (set-width dom @state)))
+        (ref (r/dom-node this))
+        (set-width (r/dom-node this) @state))
       :component-did-update
       (fn [this]
         (let [dom (r/dom-node this)]
@@ -51,61 +50,55 @@
 
 
 
-(defn resizable [{:keys [ref]}]
+(defn resizable []
   (r/with-let [this (r/current-component)
-               ref-child (atom nil)
+               ref (atom nil)
                state (atom nil)]
 
-    (r/create-class
-     {:display-name "resizable"
-      :component-did-mount
-      (fn [this])
-      :reagent-render
-      (fn []
-        (into
-         [react-resize {:class-name "label-resize"
-                        :width "1em" :height "1em"
-                        :lock-aspect-ratio true
-                        :on-resize-start (fn [_ _ el _]
-                                           (reset! state (d/px el :font-size))
-                                           (d/set-attr! @ref-child :disabled)
-                                           (d/add-class! el :cancel-drag))
-                        :on-resize-stop (fn [_ _ el _]
-                                          (d/remove-attr! @ref-child :disabled)
-                                          (d/remove-class! el :cancel-drag))
-                        :on-resize (fn [_ _ el d]
-                                     ;; element is inline, so child will set size
-                                     (d/remove-style! el :height)
-                                     (d/remove-style! el :width)
+    (into
+     [react-resize {:class-name "label-resize"
+                    :width "1em" :height "1em"
+                    :lock-aspect-ratio true
+                    :on-resize-start (fn [_ _ el _]
+                                       (reset! state (d/px el :font-size))
+                                       (some-> @ref (d/set-attr! :disabled))
+                                       (d/add-class! el :cancel-drag))
+                    
+                    :on-resize-stop (fn [_ _ el _]
+                                      (some-> @ref (d/remove-attr! :disabled))
+                                      (d/remove-class! el :cancel-drag))
+                    
+                    :on-resize (fn [_ _ el d]
+                                 ;; element is inline, so child will set size
+                                 (d/remove-style! el :height)
+                                 (d/remove-style! el :width)
 
-                                     ;; change font size
-                                     (d/set-px! el :font-size
-                                                (+ @state
-                                                   (get-in (vec (js->clj d)) [1 1])))
+                                 ;; change font size
+                                 (d/set-px! el :font-size
+                                            (+ @state
+                                               (get-in (vec (js->clj d)) [1 1])))
 
-                                     ;; update child width
-                                     (set-width @ref-child (.-value @ref-child)))}]
+                                 ;; update child width
+                                 (some-> @ref
+                                         (set-width (.-value @ref))))}]
 
-         (-> (r/children this)
-             ;; pass-through the ref to the child
-             (update-in [0 1] assoc :ref #(do (ref %)
-                                              (reset! ref-child %))))))})))
+     (-> (r/children this)
+         ;; pass-through the ref to the child
+         (update-in [0 1] assoc :ref #(reset! ref %))))))
 
 
 
 (defn draggable []
   (r/with-let [this (r/current-component)
-               child-ref (atom nil)]
-    (r/create-class
-     {:display-name "draggable"
-      :reagent-render
-      (fn []
-        [react-drag (merge (r/props this)
-                           {:on-start #(d/set-attr! @child-ref :disabled)
-                            :on-stop #(d/remove-attr! @child-ref :disabled)})
-         (into [:div.handle-drag]
-               (-> (r/children this)
-                   (update-in [0 1] assoc :ref #(reset! child-ref %))))])})))
+               ref (atom nil)]
+    
+    [react-drag (merge (r/props this)
+                       {:on-start #(some-> @ref (d/set-attr! :disabled))
+                        :on-stop #(some-> @ref (d/remove-attr! :disabled))})
+     
+     (into [:div.handle-drag]
+           (-> (r/children this)
+               (update-in [0 1] assoc :ref #(reset! ref %))))]))
 
 
 
