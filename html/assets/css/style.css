@@ -56,16 +56,18 @@ body {
 .label-resize {
     border: 2px solid transparent;
     transition : border .2s ease-in;
-    transition-delay: 1.3s;
+    /*transition-delay: 1.3s;*/
+    transition-delay: .5s;
     margin: 0;
     padding: 10px;
 }
 
 
-.react-draggable:hover .label-resize, .label-resize:active {
+.border .label-resize, .react-draggable:hover .label-resize {
     border: 2px solid grey;
-    transition-delay: 0s;
+    transition-delay: .2s;
 }
+
 
 .item {
     display: inline-block;
@@ -82,8 +84,8 @@ body {
     border: 0px solid brown;
     background-color: transparent;
     user-select: none;
+    width: 1em;
 }
-
 
 .label-input:focus {
     user-select: default;

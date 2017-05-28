@@ -17,7 +17,8 @@
 
     (d/set-style! span :font-size size)
     (d/set-style! span :font-family font)
-    (d/set-html!  span text)
+    (d/set-html!  span "")
+    (d/append! span (d/create-text-node text))
 
     (d/set-px! el :width (+ 2 (.. span -scrollWidth)))
     (d/set-px! el :width (.. el -scrollWidth))))
@@ -25,7 +26,7 @@
 
 
 (defn autosize-input [{:keys [uuid ref]}]
-  (r/with-let [state (r/atom nil)]
+  (r/with-let [state (r/atom "")]
 
     (r/create-class
      {:display-name "autosize-input"
@@ -50,9 +51,6 @@
 
 
 
-;;
-;; rewrite input using on-change, width
-;;
 (defn resizable [{:keys [ref]}]
   (r/with-let [this (r/current-component)
                ref-child (atom nil)
@@ -65,7 +63,7 @@
       :reagent-render
       (fn []
         (into
-         [react-resize {:class-name :label-resize
+         [react-resize {:class-name "label-resize"
                         :width "1em" :height "1em"
                         :lock-aspect-ratio true
                         :on-resize-start (fn [_ _ el _]
@@ -79,28 +77,37 @@
                                      ;; element is inline, so child will set size
                                      (d/remove-style! el :height)
                                      (d/remove-style! el :width)
-                                     
+
+                                     ;; change font size
                                      (d/set-px! el :font-size
                                                 (+ @state
                                                    (get-in (vec (js->clj d)) [1 1])))
 
-                                     ;; update child
+                                     ;; update child width
                                      (set-width @ref-child (.-value @ref-child)))}]
 
          (-> (r/children this)
+             ;; pass-through the ref to the child
              (update-in [0 1] assoc :ref #(do (ref %)
                                               (reset! ref-child %))))))})))
+
 
 
 (defn draggable []
   (r/with-let [this (r/current-component)
                child-ref (atom nil)]
-    [react-drag (merge (r/props this)
-                       {:on-start #(d/set-attr! @child-ref :disabled)
-                        :on-stop #(d/remove-attr! @child-ref :disabled)})
-     (into [:div.handle-drag]
-           (-> (r/children this)
-               (update-in [0 1] assoc :ref #(reset! child-ref %))))]))
+    (r/create-class
+     {:display-name "draggable"
+      :reagent-render
+      (fn []
+        [react-drag (merge (r/props this)
+                           {:on-start #(d/set-attr! @child-ref :disabled)
+                            :on-stop #(d/remove-attr! @child-ref :disabled)})
+         (into [:div.handle-drag]
+               (-> (r/children this)
+                   (update-in [0 1] assoc :ref #(reset! child-ref %))))])})))
+
+
 
 
 (defn editor []
@@ -118,8 +125,8 @@
                           px (.. rect -left)
                           py (.. rect -top)]
                       (swap! labels conj
-                             {:x (- (- (.. e -clientX) px) 10)
-                              :y (- (- (.. e -clientY) py) 10)
+                             {:x (- (- (.. e -clientX) px) 5)
+                              :y (- (- (.. e -clientY) py) 5)
                               :uuid (random-uuid)})))}]]
      (->> @labels
           (map (fn [l]
