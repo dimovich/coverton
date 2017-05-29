@@ -13,10 +13,13 @@
                  [weasel                    "0.7.0"      :scope "test"]
                  [tolitius/boot-check       "0.1.4"]
 
+                 [devcards "0.2.3"]
+
                  [compojure "1.6.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
                  [hiccup "1.0.5"]
 
+                 [garden "1.3.2"]
                  [prismatic/dommy "1.1.0"]
                  [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]])
 
@@ -40,12 +43,10 @@
   (comp
    (cljs :compiler-options
          {:out-file "main.js"
-          #_(:npm-deps {:react-dom "15.5.4"
-                        :react "15.5.4"
-                        :react-draggable "2.2.3"
-                        :react-resizable-box "2.0.4"})
-          :foreign-libs [{:file "public/js/bundle.js"
-                          :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
+          :devcards true
+          :foreign-libs
+          [{:file "public/js/bundle.js"
+            :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
    (target :dir #{"target"})))
 
 (deftask run []
@@ -66,15 +67,24 @@
 (deftask development []
   (task-options! cljs {:optimizations :none
                        :source-map true}
-                 reload {:on-jsload 'coverton.core/init}
                  cljs-repl {:nrepl-opts {:port 3311}})
+  identity)
+
+(deftask on-jsload []
+  (task-options! reload {:on-jsload 'coverton.core/main})
   identity)
 
 (deftask dev
   []
   (comp (development)
+        (on-jsload)
         (run)))
 
+
+(deftask devcards
+  []
+  (comp (development)
+        (run)))
 
 (deftask prod
   []

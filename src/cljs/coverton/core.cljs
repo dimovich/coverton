@@ -6,8 +6,7 @@
 
 (enable-console-print!)
 
-
-(defn ^:export init []
+(defn ^:export main []
   (when js/document
     (do
       (r/render [ed/editor] (sel1 :.app)))))

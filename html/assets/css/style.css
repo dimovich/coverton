@@ -34,12 +34,11 @@ body {
 }
 
 .editor {
-    width: 100vw;
-    height: 100vh;
     margin: auto;
     border: 0px solid green;
     text-align: center;
     position: relative;
+    background-color: #0c0c0c;
 }
 
 
@@ -137,11 +136,12 @@ body {
 }
 
 
-.editor-image {
-    width: 500px;
-    height: 500px;
-    border: 1px solid black;
-    margin: auto;
+.editor-img {
+    width: 480px;
+    height: 480px;
+    border: 0px solid black;
+    margin: 0;
+    padding: 0;
 }
 
 .vcenter {
@@ -169,4 +169,32 @@ body {
     visibility:hidden;
     white-space:nowrap;
     overflow:hidden
+}
+
+
+
+.picker-container {
+    width: 100%;
+    height: 100%;
+    border: 0px solid blue;
+    position: relative;
+}
+
+.picker-block {
+    position: relative;
+    display: inline-block;
+    border: 0px solid red;
+    width: 30%;
+}
+
+.picker-img {
+    width: 100%;
+    height: 100%;
+}
+
+.picker-label {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    border: 0px solid black;
 }

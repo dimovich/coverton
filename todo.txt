@@ -1,0 +1,4 @@
+- datomic
+- deploy
+- font picker
+  (disable editor, show font thumbs)

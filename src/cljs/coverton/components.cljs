@@ -1,6 +1,7 @@
 (ns coverton.components
   (:require [reagent.core :as r]
-            [dommy.core :as d :refer-macros [sel1]]))
+            [dommy.core :as d :refer-macros [sel1]])
+  (:require-macros [devcards.core :refer [defcard-rg]]))
 
 
 
@@ -118,3 +119,67 @@
    [:div.label-toolbox-item {:style {:background-color "orange"}
                              :on-click (fn [e]
                                          (d/set-style! @dom :color "orange"))}]])
+
+
+
+
+(defn font-picker [state]
+  (let [size (atom nil)]
+    (r/create-class
+     {:display-name "font-picker"
+      :component-did-mount
+      (fn [this]
+        (reset! size [(d/px (r/dom-node this) :width)
+                      (d/px (r/dom-node this) :height)]))
+      :reagent-render
+      (fn []
+        (let [{:keys [img labels]} @state
+              {:keys [src]} img]
+          [:div.picker-container
+           (into
+            [:div.picker-block
+       
+             [:img.picker-img {:src src}]]
+      
+            (->> labels
+                 (map (fn [{:keys [pos text font]}]
+                        (let [[w h] @size
+                              {:keys [font-family font-size color]} font
+                              font-size (* font-size h)
+                              [x y] pos
+                              x (* x w)
+                              y (* y h)]
+                    
+                          [:div.picker-label {:style {:font-family font-family
+                                                      :font-size font-size
+                                                      :color color
+                                                      :top y
+                                                      :left x}}
+                           text])))))]))})))
+
+
+
+
+
+
+#_{:img {:src "assets/img/coverton.jpg" :w 480 :h 480}
+   :labels [{:pos ["50%" "50%"]
+             :text "Hello"
+             :font {:font-family "GothaPro"
+                    :font-size 30
+                    :color :orange}}
+            {:pos ["10%" "-5.56%"]
+             :text "fsdfdff", :font {:font-family "GothaPro"
+                                     :font-size "30px"
+                                     :color "rgb(255, 165, 0)"}}]}
+
+
+(defcard-rg label
+  (fn [data-atom _]
+    [draggable {:dom data-atom
+                :cancel ".cancel-drag"}
+     [toolbox {:dom data-atom}]
+     [resizable {:dom data-atom}
+      [autosize-input {:ref #(reset! data-atom %)
+                       :uuid 143434}]]])
+  (atom nil))
