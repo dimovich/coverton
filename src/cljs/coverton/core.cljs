@@ -14,19 +14,9 @@
 
 
 
-
-
-
 ;; TODO
 ;;
 ;; fade-in fade-out of border
-;; del on key press (history?)
 ;;
-
-
-#_(:on-key-up (fn [e] (when (= 46 (.. e -keyCode))
-                        (do
-                          (reset! state nil)))))
-
 
 ;;[ContainerDimensions {} (fn [height] (r/as-element [my-component {:height height}]))]

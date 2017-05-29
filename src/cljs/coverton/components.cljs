@@ -21,7 +21,7 @@
     (d/set-style! span :font-size size)
     (d/set-style! span :font-family font)
     (d/set-html!  span "")
-    (d/append! span (d/create-text-node text))
+    (d/append!    span (d/create-text-node text))
 
     ;; get normal width (has issues with whitespace),
     ;; so possibly extend to scroll width
@@ -29,17 +29,15 @@
     (d/set-px! el :width (.. el -scrollWidth))))
 
 
-;;
-;; ref will resize item width
-;;
-(defn autosize-input [{:keys [uuid ref color]}]
+
+(defn autosize-input [{:keys [uuid ref]}]
   (r/with-let [this (r/current-component)
                state (r/atom "")]
     (r/create-class
      {:display-name "autosize-input"
       :component-did-mount
       (fn [this]
-        (ref (r/dom-node this))
+        (ref (r/dom-node this)) ;;love
         (set-width (r/dom-node this) @state))
       :component-did-update
       (fn [this]
@@ -49,12 +47,11 @@
       (fn []
         [:input {:value @state
                  :on-change #(reset! state (.. % -target -value))
-                 :on-key-up (fn [e] (condp = (.. e -keyCode)
-                                      ;; 46 (reset! state "") ;; delete
-                                      27 (.. e -target blur)
-                                      false))
+                 :on-key-down (fn [e] (condp = (.. e -keyCode)
+                                        46 (do (reset! state "")) ;; delete
+                                        27 (.. e -target blur)
+                                        false))
                  :class "label-input cancel-drag"
-                 :style {:color color}
                  :id uuid
                  :auto-focus true}])})))
 
@@ -63,7 +60,6 @@
 
 (defn resizable [{:keys [dom]}]
   (r/with-let [this (r/current-component)
-               ;;ref (atom nil)
                state (atom nil)]
 
     (into
@@ -74,7 +70,7 @@
                                        ;; save current font size and add delta later
                                        (reset! state (d/px el :font-size))
                                        
-                                       ;; prevent selecting text
+                                       ;; prevent selecting text (issue with stopping)
                                        ;;(some-> @ref (d/set-attr! :disabled))
                                        
                                        ;; prevent dragging
@@ -89,36 +85,28 @@
                                  (d/remove-style! el :height)
                                  (d/remove-style! el :width)
 
-                                 ;; change font size
+                                 ;; change font size based on delta
                                  (d/set-px! el :font-size
                                             (+ @state
                                                (get-in (vec (js->clj d)) [1 1])))
 
                                  ;; update child width
-                                 (some-> @dom
-                                         (set-width (.-value @dom))))}]
+                                 (some-> @dom (set-width (.-value @dom))))}]
 
-     (-> (r/children this)
-         ;; pass-through the ref to the child
-         ;;(update-in [0 1] assoc :ref #(reset! ref %))
-         ))))
+     (r/children this))))
 
 
 
 
-(defn draggable []
-  (r/with-let [this (r/current-component)
-               ;;ref (atom nil)
-               ]
+(defn draggable [{:keys [dom]}]
+  (r/with-let [this (r/current-component)]
     
     [react-drag (merge (r/props this)
-                       #_{:on-start #(some-> @ref (d/set-attr! :disabled))
-                          :on-stop #(some-> @ref (d/remove-attr! :disabled))})
+                       #_{:on-start #(some-> @dom (d/set-attr! :disabled))
+                          :on-stop #(some-> @dom (d/remove-attr! :disabled))})
      
      (into [:div.handle-drag]
-           (r/children this)
-           #_(-> (r/children this)
-                 (update-in [0 1] assoc :ref #(reset! ref %))))]))
+           (r/children this))]))
 
 
 
