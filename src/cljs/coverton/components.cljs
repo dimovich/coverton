@@ -1,7 +1,6 @@
 (ns coverton.components
   (:require [reagent.core :as r]
-            [dommy.core :as d :refer-macros [sel1]])
-  (:require-macros [devcards.core :refer [defcard-rg]]))
+            [dommy.core :as d :refer-macros [sel1]]))
 
 
 
@@ -158,28 +157,3 @@
                            text])))))]))})))
 
 
-
-
-
-
-#_{:img {:src "assets/img/coverton.jpg" :w 480 :h 480}
-   :labels [{:pos ["50%" "50%"]
-             :text "Hello"
-             :font {:font-family "GothaPro"
-                    :font-size 30
-                    :color :orange}}
-            {:pos ["10%" "-5.56%"]
-             :text "fsdfdff", :font {:font-family "GothaPro"
-                                     :font-size "30px"
-                                     :color "rgb(255, 165, 0)"}}]}
-
-
-(defcard-rg label
-  (fn [data-atom _]
-    [draggable {:dom data-atom
-                :cancel ".cancel-drag"}
-     [toolbox {:dom data-atom}]
-     [resizable {:dom data-atom}
-      [autosize-input {:ref #(reset! data-atom %)
-                       :uuid 143434}]]])
-  (atom nil))

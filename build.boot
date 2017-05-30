@@ -13,7 +13,7 @@
                  [weasel                    "0.7.0"      :scope "test"]
                  [tolitius/boot-check       "0.1.4"]
 
-                 [devcards "0.2.3"]
+                 [devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [compojure "1.6.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
@@ -70,9 +70,11 @@
                  cljs-repl {:nrepl-opts {:port 3311}})
   identity)
 
+
 (deftask on-jsload []
   (task-options! reload {:on-jsload 'coverton.core/main})
   identity)
+
 
 (deftask dev
   []
@@ -83,6 +85,7 @@
 
 (deftask devcards
   []
+  (set-env! :source-paths #(conj % "src/devcards"))
   (comp (development)
         (run)))
 

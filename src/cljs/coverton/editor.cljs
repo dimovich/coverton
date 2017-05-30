@@ -1,12 +1,9 @@
 (ns coverton.editor
   (:require [reagent.core :as r]
             [dommy.core :as d :refer-macros [sel1]]
-            [coverton.components :as cc])
-  (:require-macros [devcards.core :refer [defcard-rg]]))
+            [coverton.components :as cc]))
 
 (enable-console-print!)
-
-(defonce dc-labels (r/atom nil))
 
 ;; export
 (defn export-labels [labels]
@@ -28,8 +25,7 @@
                         :color (d/style @dom :color)}})))
        doall
        (assoc-in {:img {:src "assets/img/coverton.jpg"}}
-                  [:labels])
-       (reset! dc-labels)))
+                  [:labels])))
 
 
 (defn editor []
@@ -79,14 +75,3 @@
 
 
 
-
-
-(defcard-rg editor
-  [editor])
-
-
-
-
-
-(defcard-rg font-picker-devcards
-  [cc/font-picker dc-labels])
