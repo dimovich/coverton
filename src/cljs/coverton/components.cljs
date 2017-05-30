@@ -1,11 +1,12 @@
 (ns coverton.components
   (:require [reagent.core :as r]
-            [dommy.core :as d :refer-macros [sel1]]))
+            [dommy.core :as d :refer-macros [sel1]]
+            [goog.object]))
 
 (enable-console-print!)
 
-(def react-drag   (r/adapt-react-class (aget js/window "deps" "draggable")))
-(def react-resize (r/adapt-react-class (aget js/window "deps" "resizable")))
+(def react-drag   (r/adapt-react-class (goog.object/get js/window.deps "draggable")))
+(def react-resize (r/adapt-react-class (goog.object/get js/window.deps "resizable")))
 
 
 ;;
@@ -110,11 +111,10 @@
 
 
 
-(defn toolbox [{:keys [dom]}]
+(defn toolbox [{:keys [dom data-fn]}]
   [:div.label-toolbox.cancel-drag
    [:div.label-toolbox-item {:style {:background-color "green"}
-                             :on-click (fn [e]
-                                         (d/set-style! @dom :color "green"))}]
+                             :on-click #(data-fn)}]
    [:div.label-toolbox-item {:style {:background-color "orange"}
                              :on-click (fn [e]
                                          (d/set-style! @dom :color "orange"))}]])
@@ -123,38 +123,43 @@
 
 
 (defn font-picker [state]
-  (let [size (atom nil)]
+  (let [size (atom nil)
+        update-size (fn [this]
+                      (let [height (d/px (sel1 :.picker-img) :height)
+                            width (d/px (sel1 :.picker-img) :width)]
+                        (reset! size [width height])))]
     (r/create-class
      {:display-name "font-picker"
-      :component-did-update
+      :component-did-mount
       (fn [this]
-        (reset! size [(d/px (r/dom-node this) :width)
-                      (d/px (r/dom-node this) :height)]))
+        (let [[w h] (update-size this)]
+          (d/set-px! (sel1 :.picker-block) :height h)))
+      :component-did-update update-size
       :reagent-render
       (fn []
-        (when @state
-          (let [{:keys [img labels]} @state
-                {:keys [src]} img]
-            [:div.picker-container
-             (into
-              [:div.picker-block
-       
-               [:img.picker-img {:src src}]]
-      
-              (->> labels
-                   (map (fn [{:keys [pos text font]}]
-                          (let [[w h] @size
-                                {:keys [font-family font-size color]} font
-                                font-size (* font-size h)
-                                [x y] pos
-                                x (* x w)
-                                y (* y h)]
-                    
-                            [:div.picker-label {:style {:font-family font-family
-                                                        :font-size font-size
-                                                        :color color
-                                                        :top y
-                                                        :left x}}
-                             text])))))])))})))
+        (let [{:keys [img labels]} @state
+              {:keys [src]} img]
+          [:div.picker-container
+           (into
+            [:div.picker-block (when-let [[_ h] @size]
+                                 {:style {:height h}})
+             
+             [:img.picker-img {:src src}]]
+            
+            (->> labels
+                 (map (fn [{:keys [pos text font]}]
+                        (let [[w h] @size
+                              {:keys [font-family font-size color]} font
+                              font-size (* font-size h)
+                              [x y] pos
+                              x (* x w)
+                              y (* y h)]
+                          
+                          [:div.picker-label {:style {:font-family font-family
+                                                      :font-size font-size
+                                                      :color color
+                                                      :top y
+                                                      :left x}}
+                           text])))))]))})))
 
 

@@ -1,3 +1,5 @@
+@import url('fonts.css');
+
 @font-face {
     font-family: 'GothaPro';
     src:url('../fonts/GothaProReg.otf');
@@ -175,21 +177,20 @@ body {
 
 .picker-container {
     width: 100%;
-    height: 100%;
     border: 0px solid blue;
     position: relative;
 }
 
 .picker-block {
     position: relative;
-    display: inline-block;
     border: 0px solid red;
-    width: 30%;
+    width: 33%;
+    overflow: hidden;
 }
 
 .picker-img {
-    width: 100%;
-    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .picker-label {
@@ -197,4 +198,5 @@ body {
     margin: 0;
     padding: 0;
     border: 0px solid black;
+    white-space: nowrap;
 }

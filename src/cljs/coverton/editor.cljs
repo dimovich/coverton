@@ -8,7 +8,7 @@
 ;; export
 (defn export-labels [labels]
   (->> labels
-       (map (fn [{:keys [uuid dom]}]
+       (map (fn [[uuid {:keys [dom]}]]
               (let [img (.. (sel1 :.editor-img) getBoundingClientRect)
                     lbl (.. @dom getBoundingClientRect)
                     x   (- (.. lbl -left) (.. img -left))
@@ -37,13 +37,13 @@
                   (let [text (.. e -target -value)
                         id   (uuid (.. e -target -id))]
                     (when (empty? text)
-                      (swap! labels (fn [coll]
-                                      (remove #(= id (:uuid %)) coll))))))}
-      
+                      (swap! labels dissoc id))))}
+
       [:div {:style {:position :absolute
                      :right 0 :top 0 :width 50 :height 50
                      :background-color "green"}
              :on-click #(reset! label-data (export-labels @labels))}]
+
       
       [:img.editor-img
        {:src "assets/img/coverton.jpg"
@@ -53,21 +53,21 @@
           (let [rect (.. e -target -parentElement  getBoundingClientRect)
                 px (.. rect -left)
                 py (.. rect -top)]
-            (swap! labels conj
-                   {:x (- (- (.. e -clientX) px) 5)
-                    :y (- (- (.. e -clientY) py) 5)
-                    :uuid (random-uuid)
-                    :dom (atom nil)})))}]]
+            (swap! labels assoc
+                   (random-uuid) {:x (- (- (.. e -clientX) px) 5)
+                                  :y (- (- (.. e -clientY) py) 5)
+                                  :dom (atom nil)})))}]]
      
      ;; display labels
      (->> @labels
-          (map (fn [{:keys [uuid dom x y]}]
+          (map (fn [[uuid {:keys [dom x y]}]]
                  [:div.label-container {:style {:left x :top y}
                                         :key uuid}
                   [cc/draggable {:cancel ".cancel-drag"
                                  :key :draggable}
 
-                   [cc/toolbox {:dom dom, :key :toolbox}]
+                   [cc/toolbox {:dom dom, :key :toolbox
+                                :data-fn #(reset! label-data (export-labels @labels))}]
                   
                    [cc/resizable {:dom dom, :key :resizable}
                     [cc/autosize-input {:key :input, :uuid uuid
