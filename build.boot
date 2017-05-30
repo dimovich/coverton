@@ -13,13 +13,12 @@
                  [weasel                    "0.7.0"      :scope "test"]
                  [tolitius/boot-check       "0.1.4"]
 
-                 [devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
-
                  [compojure "1.6.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
                  [hiccup "1.0.5"]
 
-                 [garden "1.3.2"]
+                 [devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
+                 
                  [prismatic/dommy "1.1.0"]
                  [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]])
 

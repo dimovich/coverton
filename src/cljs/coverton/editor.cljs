@@ -28,7 +28,7 @@
                   [:labels])))
 
 
-(defn editor []
+(defn editor [label-data]
   (r/with-let [labels (r/atom nil)]
     (into
      [:div.editor
@@ -43,7 +43,7 @@
       [:div {:style {:position :absolute
                      :right 0 :top 0 :width 50 :height 50
                      :background-color "green"}
-             :on-click #(println (export-labels @labels))}]
+             :on-click #(reset! label-data (export-labels @labels))}]
       
       [:img.editor-img
        {:src "assets/img/coverton.jpg"

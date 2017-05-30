@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [dommy.core :as d :refer-macros [sel1]]))
 
-
+(enable-console-print!)
 
 (def react-drag   (r/adapt-react-class (aget js/window "deps" "draggable")))
 (def react-resize (r/adapt-react-class (aget js/window "deps" "resizable")))
@@ -126,34 +126,35 @@
   (let [size (atom nil)]
     (r/create-class
      {:display-name "font-picker"
-      :component-did-mount
+      :component-did-update
       (fn [this]
         (reset! size [(d/px (r/dom-node this) :width)
                       (d/px (r/dom-node this) :height)]))
       :reagent-render
       (fn []
-        (let [{:keys [img labels]} @state
-              {:keys [src]} img]
-          [:div.picker-container
-           (into
-            [:div.picker-block
+        (when @state
+          (let [{:keys [img labels]} @state
+                {:keys [src]} img]
+            [:div.picker-container
+             (into
+              [:div.picker-block
        
-             [:img.picker-img {:src src}]]
+               [:img.picker-img {:src src}]]
       
-            (->> labels
-                 (map (fn [{:keys [pos text font]}]
-                        (let [[w h] @size
-                              {:keys [font-family font-size color]} font
-                              font-size (* font-size h)
-                              [x y] pos
-                              x (* x w)
-                              y (* y h)]
+              (->> labels
+                   (map (fn [{:keys [pos text font]}]
+                          (let [[w h] @size
+                                {:keys [font-family font-size color]} font
+                                font-size (* font-size h)
+                                [x y] pos
+                                x (* x w)
+                                y (* y h)]
                     
-                          [:div.picker-label {:style {:font-family font-family
-                                                      :font-size font-size
-                                                      :color color
-                                                      :top y
-                                                      :left x}}
-                           text])))))]))})))
+                            [:div.picker-label {:style {:font-family font-family
+                                                        :font-size font-size
+                                                        :color color
+                                                        :top y
+                                                        :left x}}
+                             text])))))])))})))
 
 
