@@ -4,7 +4,7 @@
             [coverton.editor :as ed]))
 
 
-(enable-console-print!)
+
 
 (defn ^:export main []
   (when js/document
