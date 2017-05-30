@@ -133,7 +133,7 @@
       :component-did-mount
       (fn [this]
         (let [[w h] (update-size this)]
-          (d/set-px! (sel1 :.picker-block) :height h)))
+          (d/set-px! (sel1 :.picker-block) :height h))) ;;fixme
       :component-did-update update-size
       :reagent-render
       (fn []
