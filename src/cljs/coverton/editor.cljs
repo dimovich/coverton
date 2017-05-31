@@ -5,6 +5,8 @@
 
 (enable-console-print!)
 
+(defonce dc-font-family (r/atom "GothaPro"))
+
 ;; export
 (defn export-labels [labels]
   (->> labels
@@ -14,7 +16,7 @@
                     x   (- (.. lbl -left) (.. img -left))
                     y   (- (.. lbl -top) (.. img -top))
                     w   (.. img -width)
-                    h   (.. img -height)   
+                    h   (.. img -height)
                     x   (/ x w)
                     y   (/ y h)
                     fs  (/ (d/px @dom :font-size) h)]
@@ -71,7 +73,8 @@
                   
                    [cc/resizable {:dom dom, :key :resizable}
                     [cc/autosize-input {:key :input, :uuid uuid
-                                        :ref #(reset! dom %)}]]]]))))))
+                                        :ref #(reset! dom %)
+                                        :font-family @dc-font-family}]]]]))))))
 
 
 

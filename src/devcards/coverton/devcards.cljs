@@ -17,7 +17,8 @@
 
 
 (defcard-rg font-picker
-  [cc/font-picker dc-labels])
+  [cc/font-picker dc-labels ed/dc-font-family]
+  ed/dc-font-family)
 
 
 #_(defcard-rg label

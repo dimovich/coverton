@@ -1,7 +1,8 @@
 (ns coverton.components
   (:require [reagent.core :as r]
-            [dommy.core :as d :refer-macros [sel1]]
-            [goog.object]))
+            [dommy.core :as d :refer-macros [sel1 sel]]
+            [goog.object]
+            [coverton.fonts]))
 
 (enable-console-print!)
 
@@ -31,7 +32,7 @@
 
 
 
-(defn autosize-input [{:keys [uuid ref]}]
+(defn autosize-input [{:keys [uuid ref font-family]}]
   (r/with-let [this (r/current-component)
                state (r/atom "")]
     (r/create-class
@@ -52,6 +53,7 @@
                                         46 (do (reset! state "")) ;; delete
                                         27 (.. e -target blur)
                                         false))
+                 :style {:font-family font-family}
                  :class "label-input cancel-drag"
                  :id uuid
                  :auto-focus true}])})))
@@ -122,7 +124,7 @@
 
 
 
-(defn font-picker [state]
+(defn font-picker [state font-ref]
   (let [size (atom nil)
         update-size (fn [this]
                       (let [height (d/px (sel1 :.picker-img) :height)
@@ -133,33 +135,41 @@
       :component-did-mount
       (fn [this]
         (let [[w h] (update-size this)]
-          (d/set-px! (sel1 :.picker-block) :height h))) ;;fixme
+          ;; resize blocks
+          ;; fixme
+          (doseq [el (sel :.picker-block)]
+            (d/set-px! el :height h)
+            (d/set-px! el :width w))))
       :component-did-update update-size
       :reagent-render
       (fn []
         (let [{:keys [img labels]} @state
               {:keys [src]} img]
+          
           [:div.picker-container
-           (into
-            [:div.picker-block (when-let [[_ h] @size]
-                                 {:style {:height h}})
+           
+           (for [font-family coverton.fonts/font-names]
+             (into
+              [:div.picker-block (:key font-family)
              
-             [:img.picker-img {:src src}]]
+               [:img.picker-img {:src src}]]
             
-            (->> labels
-                 (map (fn [{:keys [pos text font]}]
-                        (let [[w h] @size
-                              {:keys [font-family font-size color]} font
-                              font-size (* font-size h)
-                              [x y] pos
-                              x (* x w)
-                              y (* y h)]
+              (->> labels
+                   (map (fn [{:keys [pos text font]}]
+                          (let [[w h] @size
+                                {:keys [font-size color]} font
+                                font-size (* font-size h)
+                                [x y] pos
+                                x (* x w)
+                                y (* y h)]
                           
-                          [:div.picker-label {:style {:font-family font-family
-                                                      :font-size font-size
-                                                      :color color
-                                                      :top y
-                                                      :left x}}
-                           text])))))]))})))
+                            [:div.picker-label {:key (str x y)
+                                                :on-click #(reset! font-ref font-family)
+                                                :style {:font-family font-family
+                                                        :font-size font-size
+                                                        :color color
+                                                        :top y
+                                                        :left x}}
+                             text]))))))]))})))
 
 

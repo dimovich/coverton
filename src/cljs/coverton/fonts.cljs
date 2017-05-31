@@ -13,7 +13,9 @@
                   "Gravitas One"
                   "Vampiro One"))
 
-(->> font-names
-     (map #(clojure.string/replace % #" " "+"))
-     (clojure.string/join "|"))
+
+(defn for-css []
+  (->> font-names
+       (map #(clojure.string/replace % #" " "+"))
+       (clojure.string/join "|")))
 
