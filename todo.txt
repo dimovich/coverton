@@ -2,3 +2,4 @@
 - deploy
 - font picker
   (disable editor, show font thumbs)
+- svg items

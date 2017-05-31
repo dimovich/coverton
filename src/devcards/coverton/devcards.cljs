@@ -7,18 +7,17 @@
   (:require-macros [devcards.core :refer [defcard-rg]]))
 
 
-(defonce dc-labels (r/atom {:img {:src "assets/img/coverton.jpg"}
-                        :labels []}))
+(defonce dc-labels (r/atom {:parent nil
+                            :data {:img {:src "assets/img/coverton.jpg"}
+                                   :labels []}}))
 
 (defcard-rg editor
-  [ed/editor dc-labels]
-  dc-labels
-  {:inspect-data true})
+  [ed/editor dc-labels])
 
 
 (defcard-rg font-picker
   [cc/font-picker dc-labels]
-  ed/dc-font-family
+  dc-labels
   {:inspect-data true})
 
 

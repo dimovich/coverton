@@ -184,7 +184,8 @@ body {
 
 .picker-block {
     position: relative;
-    border: 0px solid red;
+    border: 0;
+    padding: 0;
     width: 30%;
     overflow: hidden;
     margin: 10px;
@@ -206,7 +207,5 @@ body {
 }
 
 .picker-label:hover {
-    border: 0px solid gray;
     opacity: 0.7;
 }
-    

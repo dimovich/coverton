@@ -5,8 +5,6 @@
 
 (enable-console-print!)
 
-(defonce dc-font-family (r/atom "GothaPro"))
-
 ;; export
 (defn export-labels [labels]
   (->> labels
@@ -33,7 +31,11 @@
 
 
 (defn editor [label-data]
-  (r/with-let [labels (r/atom nil)]
+  (r/with-let [labels (r/atom nil)
+               this   (r/current-component)
+               picker (fn [e]
+                        (reset! label-data {:data (export-labels @labels)
+                                            :parent this}))]
     (into
      [:div.editor
       { ;; delete empty labels
@@ -45,8 +47,8 @@
 
       [:div {:style {:position :absolute
                      :right 0 :top 0 :width 50 :height 50
-                     :background-color "green"}
-             :on-click #(reset! label-data (export-labels @labels))}]
+                     :background-color "orange"}
+             :on-click picker}]
 
       
       [:img.editor-img
@@ -72,13 +74,12 @@
                                  :key :draggable}
 
                    [cc/toolbox {:dom dom :key :toolbox
-                                :data-fn #(reset! label-data (export-labels @labels))}]
+                                :data-fn picker}]
 
                    [cc/resizable {:dom dom, :key :resizable}
 
                     [cc/autosize-input {:uuid uuid :key :input
-                                        :ref #(reset! dom %)
-                                        :font-family @dc-font-family}]]]]))))))
+                                        :ref #(reset! dom %)}]]]]))))))
 
 
 
