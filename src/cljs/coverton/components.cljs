@@ -125,7 +125,7 @@
 
 
 (defn picker-block [{:keys [labels img-src font-family update-fn]}]
-  (let [size (atom nil)
+  (let [size (r/atom nil)
         update-size (fn [this]
                       (let [w (.. (sel1 :.picker-img)
                                   getBoundingClientRect
@@ -166,9 +166,9 @@
 ;;
 (defn font-picker [label-data]
   (let [{:keys [data parent]} @label-data
-        {:keys [img labels]} data
-        {:keys [src]} img
-        update-fn #(r/force-update parent)]
+               {:keys [img labels]} data
+               {:keys [src]} img
+               update-fn #(r/force-update parent)]
 
     (into
      [:div.picker-container]
