@@ -18,7 +18,8 @@
 
 (defcard-rg font-picker
   [cc/font-picker dc-labels ed/dc-font-family]
-  ed/dc-font-family)
+  ed/dc-font-family
+  {:inspect-data true})
 
 
 #_(defcard-rg label

@@ -124,7 +124,7 @@
 
 
 
-(defn font-picker [state font-ref]
+(defn font-picker [label-data]
   (let [size (atom nil)
         update-size (fn [this]
                       (let [height (d/px (sel1 :.picker-img) :height)
@@ -135,27 +135,25 @@
       :component-did-mount
       (fn [this]
         (let [[w h] (update-size this)]
-          ;; resize blocks
-          ;; fixme
           (doseq [el (sel :.picker-block)]
             (d/set-px! el :height h)
             (d/set-px! el :width w))))
       :component-did-update update-size
       :reagent-render
       (fn []
-        (let [{:keys [img labels]} @state
+        (let [{:keys [img labels]} @label-data
               {:keys [src]} img]
           
           [:div.picker-container
            
            (for [font-family coverton.fonts/font-names]
              (into
-              [:div.picker-block (:key font-family)
+              [:div.picker-block {:key font-family}
              
                [:img.picker-img {:src src}]]
             
               (->> labels
-                   (map (fn [{:keys [pos text font]}]
+                   (map (fn [{:keys [pos text font dom]}]
                           (let [[w h] @size
                                 {:keys [font-size color]} font
                                 font-size (* font-size h)
@@ -163,13 +161,14 @@
                                 x (* x w)
                                 y (* y h)]
                           
-                            [:div.picker-label {:key (str x y)
-                                                :on-click #(reset! font-ref font-family)
-                                                :style {:font-family font-family
-                                                        :font-size font-size
-                                                        :color color
-                                                        :top y
-                                                        :left x}}
+                            [:span.picker-label
+                             {:key (str x y)
+                              ;; change font of the label
+                              :on-click #(d/set-style! dom :font-family font-family)
+                              :style {:font-family font-family
+                                      :font-size font-size
+                                      :color color
+                                      :top y
+                                      :left x}}
                              text]))))))]))})))
-
 

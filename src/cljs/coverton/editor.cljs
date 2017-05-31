@@ -21,7 +21,9 @@
                     y   (/ y h)
                     fs  (/ (d/px @dom :font-size) h)]
                 
-                {:pos [x y] :text (.. @dom -value)
+                {:pos [x y]
+                 :text (.. @dom -value)
+                 :dom @dom
                  :font {:font-family (d/style @dom :font-family)
                         :font-size fs
                         :color (d/style @dom :color)}})))
@@ -63,16 +65,18 @@
      ;; display labels
      (->> @labels
           (map (fn [[uuid {:keys [dom x y]}]]
-                 [:div.label-container {:style {:left x :top y}
-                                        :key uuid}
+                 ^{:key uuid}
+                 [:div.label-container {:style {:left x :top y}}
                   [cc/draggable {:cancel ".cancel-drag"
                                  :key :draggable}
 
-                   [cc/toolbox {:dom dom, :key :toolbox
+                   ^{:key :toolbox}
+                   [cc/toolbox {:dom dom
                                 :data-fn #(reset! label-data (export-labels @labels))}]
                   
                    [cc/resizable {:dom dom, :key :resizable}
-                    [cc/autosize-input {:key :input, :uuid uuid
+                    ^{:key :input}
+                    [cc/autosize-input {:uuid uuid
                                         :ref #(reset! dom %)
                                         :font-family @dc-font-family}]]]]))))))
 
