@@ -65,18 +65,18 @@
      ;; display labels
      (->> @labels
           (map (fn [[uuid {:keys [dom x y]}]]
-                 ^{:key uuid}
-                 [:div.label-container {:style {:left x :top y}}
+
+                 [:div.label-container {:key uuid
+                                        :style {:left x :top y}}
                   [cc/draggable {:cancel ".cancel-drag"
                                  :key :draggable}
 
-                   ^{:key :toolbox}
-                   [cc/toolbox {:dom dom
+                   [cc/toolbox {:dom dom :key :toolbox
                                 :data-fn #(reset! label-data (export-labels @labels))}]
-                  
+
                    [cc/resizable {:dom dom, :key :resizable}
-                    ^{:key :input}
-                    [cc/autosize-input {:uuid uuid
+
+                    [cc/autosize-input {:uuid uuid :key :input
                                         :ref #(reset! dom %)
                                         :font-family @dc-font-family}]]]]))))))
 

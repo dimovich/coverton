@@ -2,7 +2,8 @@
   (:require [reagent.core :as r]
             [dommy.core :as d :refer-macros [sel1 sel]]
             [goog.object]
-            [coverton.fonts]))
+            [coverton.fonts]
+            [soda-ash.core]))
 
 (enable-console-print!)
 

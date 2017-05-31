@@ -18,8 +18,9 @@
                  [hiccup "1.0.5"]
 
                  [devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 
+
                  [prismatic/dommy "1.1.0"]
+                 [soda-ash "0.2.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]])
 
 
