@@ -2,14 +2,11 @@
   (:require [reagent.core :as r]
             [devcards.core :as dc]
             [coverton.components :as cc]
-            [coverton.editor :as ed]
-            [dommy.core :as d :refer-macros [sel1]])
+            [coverton.editor :as ed])
   (:require-macros [devcards.core :refer [defcard-rg]]))
 
 
-(defonce dc-labels (r/atom {:parent nil
-                            :data {:img {:src "assets/img/coverton.jpg"}
-                                   :labels []}}))
+(def dc-labels (r/atom nil))
 
 (defcard-rg editor
   [ed/editor dc-labels])
@@ -35,3 +32,7 @@
 
 (defn ^:export init []
   (dc/start-devcard-ui!))
+
+
+
+;; 

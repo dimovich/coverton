@@ -5,37 +5,27 @@
 
 (enable-console-print!)
 
-;; export
-(defn export-labels [labels]
-  (->> labels
-       (map (fn [[uuid {:keys [dom]}]]
-              (let [img (.. (sel1 :.editor-img) getBoundingClientRect)
-                    lbl (.. @dom getBoundingClientRect)
-                    x   (- (.. lbl -left) (.. img -left))
-                    y   (- (.. lbl -top) (.. img -top))
-                    w   (.. img -width)
-                    h   (.. img -height)
-                    x   (/ x w)
-                    y   (/ y h)
-                    fs  (/ (d/px @dom :font-size) h)]
-                
-                {:pos [x y]
-                 :text (.. @dom -value)
-                 :dom @dom
-                 :font {:font-family (d/style @dom :font-family)
-                        :font-size fs
-                        :color (d/style @dom :color)}})))
-       doall
-       (assoc-in {:img {:src "assets/img/coverton.jpg"}}
-                  [:labels])))
+
+
+(defn add-label [labels]
+  (fn [e]
+    (let [rect (.. e -target -parentElement  getBoundingClientRect)
+          px (.. rect -left)
+          py (.. rect -top)]
+      (swap! labels assoc
+             (random-uuid) {:x (- (- (.. e -clientX) px) 5)
+                            :y (- (- (.. e -clientY) py) 5)
+                            :dom (atom nil)
+                            :static false}))))
 
 
 (defn editor [label-data]
   (r/with-let [labels (r/atom nil)
                this   (r/current-component)
                picker (fn [e]
-                        (reset! label-data {:data (export-labels @labels)
-                                            :parent this}))]
+                        (reset! label-data {:labels labels
+                                            :parent this}))
+               _      (picker)]
     (into
      [:div.editor
       { ;; delete empty labels
@@ -53,16 +43,7 @@
       
       [:img.editor-img
        {:src "assets/img/coverton.jpg"
-        :on-click
-        ;; create new label
-        (fn [e]
-          (let [rect (.. e -target -parentElement  getBoundingClientRect)
-                px (.. rect -left)
-                py (.. rect -top)]
-            (swap! labels assoc
-                   (random-uuid) {:x (- (- (.. e -clientX) px) 5)
-                                  :y (- (- (.. e -clientY) py) 5)
-                                  :dom (atom nil)})))}]]
+        :on-click (add-label labels)}]]
      
      ;; display labels
      (->> @labels
@@ -70,16 +51,14 @@
 
                  [:div.label-container {:key uuid
                                         :style {:left x :top y}}
-                  [cc/draggable {:cancel ".cancel-drag"
-                                 :key :draggable}
+                  [cc/draggable {:cancel ".cancel-drag"}
 
-                   [cc/toolbox {:dom dom :key :toolbox
+                   [cc/toolbox {:dom dom
                                 :data-fn picker}]
 
-                   [cc/resizable {:dom dom, :key :resizable}
+                   [cc/resizable {:dom dom}
 
-                    [cc/autosize-input {:uuid uuid :key :input
-                                        :ref #(reset! dom %)}]]]]))))))
+                    [cc/autosize-input {:uuid uuid :ref #(reset! dom %)}]]]]))))))
 
 
 

@@ -48,6 +48,7 @@
           (set-width dom @state)))
       :reagent-render
       (fn [{:keys [uuid ref]}]
+        ^{:key (gensym)}
         [:input {:value @state
                  :on-change #(reset! state (.. % -target -value))
                  :on-key-down (fn [e] (condp = (.. e -keyCode)
@@ -66,6 +67,7 @@
                state (atom nil)]
 
     (into
+     ^{:key (gensym)}
      [react-resize {:class-name "label-resize"
                     :width "1em" :height "1em"
                     :lock-aspect-ratio true
@@ -103,13 +105,14 @@
 
 (defn draggable [{:keys [dom]}]
   (r/with-let [this (r/current-component)]
-    
+    ^{:key (gensym)}
     [react-drag (merge (r/props this)
                        #_{:on-start #(some-> @dom (d/set-attr! :disabled))
                           :on-stop #(some-> @dom (d/remove-attr! :disabled))})
      
      (into [:div.handle-drag]
            (r/children this))]))
+
 
 
 
@@ -124,59 +127,90 @@
 
 
 
-(defn picker-block [{:keys [labels img-src font-family update-fn]}]
-  (let [size (r/atom nil)
+(defn picker-block [{:keys [labels font-family update-fn]}]
+  (let [size (atom nil)
         update-size (fn [this]
                       (let [w (.. (sel1 :.picker-img)
                                   getBoundingClientRect
                                   -width)]
-                        (reset! size [w w])))]
+                        (reset! size [w w])
+                        (d/set-px! (r/dom-node this) :height w)))]
     (r/create-class
      {:display-name "picker-block"
       :component-did-mount update-size
+      :component-will-update update-size
       :reagent-render
-      (fn [{:keys [labels img-src font-family update-fn]}]
-        (into
-         [:div.picker-block
-          [:img.picker-img {:src img-src}]]
-         (->> labels
-              (map (fn [{:keys [pos text font dom]}]
-                     (let [[w h] @size
-                           {:keys [font-size color]} font
-                           font-size (* font-size h)
-                           [x y] pos
-                           x (* x w)
-                           y (* y h)]
-                          
-                       [:span.picker-label
-                        {:key (str x y)
-                         ;; change font of the label
-                         :on-click #(do (d/set-style! dom :font-family font-family)
-                                        (update-fn))
-                         :style {:font-family font-family
-                                 :font-size font-size
-                                 :color color
-                                 :top y
-                                 :left x}}
-                        text]))))))})))
+      (fn [{:keys [labels font-family update-fn]}]
+        (let [{:keys [img labels]} labels
+              img-src (:src img)]
+          (into
+           ^{:key (gensym)}
+           [:div.picker-block
+            [:img.picker-img {:src img-src}]]
+           (->> labels
+                (map (fn [{:keys [pos text font dom uuid]}]
+                       (let [[w h] @size
+                             {:keys [font-size color]} font
+                             font-size (* font-size h)
+                             [x y] pos
+                             x (* x w)
+                             y (* y h)]
+
+                         ^{:key (str x y)}
+                         [:span.picker-label
+                          { ;; change font of the label
+                           :on-click #(do (d/set-style! dom :font-family font-family)
+                                          (update-fn uuid))
+                           :style {:font-family font-family
+                                   :font-size font-size
+                                   :color color
+                                   :top y
+                                   :left x}}
+                          text])))))))})))
+
+
+
+;; export
+(defn export-labels [labels]
+  (->> labels
+       (map (fn [[uuid {:keys [dom static]}]]
+              (let [img (.. (sel1 :.editor-img) getBoundingClientRect)
+                    lbl (.. @dom getBoundingClientRect)
+                    x   (- (.. lbl -left) (.. img -left))
+                    y   (- (.. lbl -top) (.. img -top))
+                    w   (.. img -width)
+                    h   (.. img -height)
+                    x   (/ x w)
+                    y   (/ y h)
+                    fs  (/ (d/px @dom :font-size) h)]
+                
+                {:pos [x y]
+                 :text (.. @dom -value)
+                 :dom @dom
+                 :uuid uuid
+                 :static static
+                 :font {:font-family (d/style @dom :font-family)
+                        :font-size fs
+                        :color (d/style @dom :color)}})))
+       doall
+       (assoc-in {:img {:src "assets/img/coverton.jpg"}}
+                  [:labels])))
 
 
 ;; TODO
 ;; - changed flag
 ;;
 (defn font-picker [label-data]
-  (let [{:keys [data parent]} @label-data
-               {:keys [img labels]} data
-               {:keys [src]} img
-               update-fn #(r/force-update parent)]
-
+  (let [{:keys [labels parent]} @label-data
+        labels (export-labels @labels)
+        update-fn #(r/force-update parent)]
     (into
+     ^{:key (gensym)}
      [:div.picker-container]
      (for [font-family coverton.fonts/font-names]
-       (do
-         [picker-block {:key font-family
-                        :img-src src
-                        :labels labels
-                        :font-family font-family
-                        :update-fn update-fn}])))))
+       [picker-block {:labels labels
+                      :font-family font-family
+                      :update-fn update-fn}]))))
+
+
 
