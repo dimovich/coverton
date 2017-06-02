@@ -1,21 +1,23 @@
 (ns coverton.core
-  (:require [reagent.core :as r]
+  (:require [re-frame.core :as rf]
+            [reagent.core :as r]
             [dommy.core :as d :refer-macros [sel1]]
-            [coverton.editor :as ed]))
+            [coverton.editor.views :as ed]
+            [coverton.editor.events]
+            [coverton.editor.subs]
+            [coverton.editor.db]))
 
+(enable-console-print!)
+
+(defn reload []
+  (rf/dispatch-sync [:initialize])
+  (r/render [ed/editor] (sel1 :#app)))
 
 
 
 (defn ^:export main []
-  (when js/document
-    (do
-      (r/render [ed/editor] (sel1 :.app)))))
+  (reload))
 
 
-
-;; TODO
-;;
-;; fade-in fade-out of border
-;;
 
 ;;[ContainerDimensions {} (fn [height] (r/as-element [my-component {:height height}]))]

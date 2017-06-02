@@ -20,8 +20,9 @@
                  [devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]
-                 [soda-ash "0.2.0" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]])
+                 ;;[soda-ash "0.2.0" :exclusions [cljsjs/react cljsjs/react-dom]]
+                 [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
+                 [re-frame "0.9.4"]])
 
 
 (require
@@ -60,18 +61,21 @@
    (cljs-repl)
    (build)))
 
-(deftask production []
+(deftask production
+  []
   (task-options! cljs {:optimizations :advanced})
   identity)
 
-(deftask development []
+(deftask development
+  []
   (task-options! cljs {:optimizations :none
                        :source-map true}
                  cljs-repl {:nrepl-opts {:port 3311}})
   identity)
 
 
-(deftask on-jsload []
+(deftask reload-main
+  []
   (task-options! reload {:on-jsload 'coverton.core/main})
   identity)
 
@@ -79,7 +83,7 @@
 (deftask dev
   []
   (comp (development)
-        (on-jsload)
+        (reload-main)
         (run)))
 
 
@@ -95,7 +99,8 @@
         (build)))
 
 
-(deftask check-sources []
+(deftask check-sources
+  []
   (comp
     (check/with-yagni)
     (check/with-eastwood)

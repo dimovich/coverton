@@ -14,6 +14,10 @@
                   "Vampiro One"))
 
 
+(def default-font {:font-size 50
+                   :font-family "GothaPro"
+                   :color :orange})
+
 (defn for-css []
   (->> font-names
        (map #(clojure.string/replace % #" " "+"))

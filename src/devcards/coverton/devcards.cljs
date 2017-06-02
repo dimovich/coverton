@@ -1,21 +1,24 @@
 (ns coverton.devcards
   (:require [reagent.core :as r]
+            [re-frame.core :as rf :refer [subscribe]]
             [devcards.core :as dc]
             [coverton.components :as cc]
-            [coverton.editor :as ed])
+            [coverton.editor.views :as ed]
+            [coverton.editor.subs])
   (:require-macros [devcards.core :refer [defcard-rg]]))
 
 
-(def dc-labels (r/atom nil))
+(def items-with-dom (subscribe [:items-with-dom]))
+
 
 (defcard-rg editor
-  [ed/editor dc-labels])
-
+  [ed/editor])
 
 (defcard-rg font-picker
-  [cc/font-picker dc-labels]
-  dc-labels
+  [cc/font-picker items-with-dom]
+  items-with-dom
   {:inspect-data true})
+
 
 
 #_(defcard-rg label
@@ -31,8 +34,6 @@
 
 
 (defn ^:export init []
+  (rf/dispatch-sync [:initialize])
   (dc/start-devcard-ui!))
 
-
-
-;; 
