@@ -4,12 +4,9 @@
             [coverton.fonts :refer [default-font]]))
 
 
-(defn allocate-next-id
-  [items]
-  ((fnil inc 0) (last (keys items))))
-
 
 (def items-interceptors [(path :items) trim-v])
+(def dim-interceptors   [(path :dim) trim-v])
 
 
 (reg-event-db
@@ -17,6 +14,26 @@
  (fn [_ _]
    default-value))
 
+
+(reg-event-db
+ :toggle-dim
+ dim-interceptors
+ (fn [dim _]
+   (not dim)))
+
+
+(reg-event-db
+ :update-font-size
+ items-interceptors
+ (fn [items [id size]]
+   (assoc-in items [id :font :font-size] size)))
+
+
+(reg-event-db
+ :update-dom
+ items-interceptors
+ (fn [items [id dom]]
+   (assoc-in items [id :dom] dom)))
 
 
 (reg-event-db

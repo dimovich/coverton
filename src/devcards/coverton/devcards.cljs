@@ -8,18 +8,21 @@
   (:require-macros [devcards.core :refer [defcard-rg]]))
 
 
+(def items (subscribe [:items]))
 (def items-with-dom (subscribe [:items-with-dom]))
 
 
 (defcard-rg editor
-  [ed/editor])
-
-
-(defcard-rg font-picker
-  (fn [data-atom _]
-   [cc/font-picker (cc/export-labels @data-atom)])
-  items-with-dom
+  [ed/editor]
+  items
   {:inspect-data true})
+
+
+#_(defcard-rg font-picker
+    (fn [data-atom _]
+      [cc/font-picker (cc/export-labels @data-atom)])
+    items-with-dom
+    {:inspect-data true})
 
 
 

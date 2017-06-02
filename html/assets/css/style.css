@@ -63,6 +63,7 @@ body {
     transition-delay: 0;
     margin: 0;
     padding: 10px;
+    position: relative;
 }
 
 .label-toolbox {
@@ -90,6 +91,7 @@ body {
     padding: 0;
     margin: 0px;
     cursor: pointer;
+    position: relative;
 }
 
 .react-draggable:hover .label-toolbox {
@@ -138,16 +140,18 @@ body {
     display: inline-block;
     padding: 15px;
     box-sizing: border-box;
+    position: relative;
 }
 
 
 .editor-img {
-    width: 480px;
-    height: 480px;
+    width: 40%;
+    height: 40%;
     border: 0px solid black;
     margin: 0;
     margin-top: 20px;
     padding: 0;
+    position: relative;
 }
 
 .vcenter {
@@ -216,6 +220,7 @@ body {
 
 #dimmer {
     position:fixed;
+    display: block;
     width:100vw;
     top: 0;
     left: 0;

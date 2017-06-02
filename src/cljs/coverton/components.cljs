@@ -48,7 +48,7 @@
       :component-did-mount 
       (fn [this]
         (update-size this)
-        (dispatch [:update-item id [:dom] (r/dom-node this)]))
+        (dispatch [:update-dom id (r/dom-node this)]))
       
       :component-did-update update-size
       
@@ -84,7 +84,7 @@
                                        (reset! state (:font-size @font))
                                        (d/add-class! el :cancel-drag))
                     
-                    :on-resize-stop (fn [_ _ el d]
+                    :on-resize-stop (fn [_ _ el _]
                                       (d/remove-class! el :cancel-drag))
                     
                     :on-resize (fn [_ _ el d]
@@ -92,7 +92,7 @@
                                  (d/remove-style! el :height)
                                  (d/remove-style! el :width)
 
-                                 (dispatch [:update-item id [:font :font-size]
+                                 (dispatch [:update-font-size id
                                             (+ @state (get-in (vec (js->clj d)) [1 1]))]))}]
 
      (r/children (r/current-component)))))
@@ -100,9 +100,9 @@
 
 
 
-(defn draggable []
+(defn draggable [{:keys [id]}]
   (r/with-let [this (r/current-component)]
-    [react-drag (r/props this)
+    [react-drag (merge (r/props this))
      (into [:div.handle-drag]
            (r/children this))]))
 
@@ -153,9 +153,9 @@
 ;; export
 (defn export-labels [labels]
   (->> labels
-       (map (fn [[id {:keys [font static dom text]}]]
-              (let [img (.. (sel1 :.editor-img) getBoundingClientRect)
-                    lbl (.. dom getBoundingClientRect)
+       (map (fn [[id {:keys [pos font static dom text]}]]
+              (let [lbl (.. dom getBoundingClientRect)
+                    img (.. (sel1 :.editor-img) getBoundingClientRect)
                     x   (- (.. lbl -left) (.. img -left))
                     y   (- (.. lbl -top) (.. img -top))
                     w   (.. img -width)
@@ -210,7 +210,8 @@
   (r/with-let [visible (r/atom false)
                items (subscribe [:items-with-dom])]
     [:div.label-toolbox-item {:style {:background-color "green"}
-                              :on-click #(swap! visible not)}
+                              :on-click #(do (dispatch [:toggle-dim])
+                                             (swap! visible not))}
      (when @visible
        (dispatch [:update-item id [:static] false])
        [dimmer

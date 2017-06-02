@@ -22,12 +22,13 @@
      
      ;; display labels
      (->> @items
-          (map (fn [[id {:keys [x y]}]]
+          (map (fn [[id {:keys [x y dimmed]}]]
 
                  [:div.label-container {:key id :style {:left x :top y}}
                   [cc/draggable {:cancel ".cancel-drag"
-                                 :key :draggable}
+                                 :key    :draggable
+                                 :id     id}
                    [cc/toolbox {:id id}]
-                   [cc/resizable {:id id}
-                    [cc/autosize-input {:id id}]]]]))))))
+                   [cc/resizable {:id id :key :resizable}
+                    [cc/autosize-input {:id id :key :input}]]]]))))))
 

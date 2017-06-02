@@ -29,6 +29,10 @@
    (get-in items [id :font])))
 
 
+(reg-sub
+ :dim
+ (fn [db _]
+   (:dim db)))
 
 
 
