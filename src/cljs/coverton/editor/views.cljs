@@ -26,7 +26,8 @@
           (map (fn [[id {:keys [x y]}]]
 
                  [:div.label-container {:key id :style {:left x :top y}}
-                  [cc/draggable {:cancel ".cancel-drag"}
+                  [cc/draggable {:cancel ".cancel-drag"
+                                 :key :draggable}
                    [cc/toolbox {:id id}]
                    [cc/resizable {:id id}
                     [cc/autosize-input {:id id}]]]]))))))

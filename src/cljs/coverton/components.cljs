@@ -12,7 +12,6 @@
 (def react-resize (r/adapt-react-class (aget js/window "deps" "resizable")))
 
 
-
 ;;
 ;; calculate text width in px for font type and size
 ;; and change element width
@@ -117,17 +116,16 @@
 
 
 
-
-
 (defn picker-block
   [{:keys [labels font-family]}]
+  
   (let [size (r/atom nil)]
     (r/create-class
      {:display-name "picker-block"
+
       :component-did-mount
-      (fn [this]
-        (let [w (d/px (r/dom-node this) :width)]
-          (reset! size [w w])))
+      #(let [w (d/px (sel1 :.picker-img) :width)]
+         (reset! size [w w]))
       
       :reagent-render
       (fn [{:keys [labels font-family]}]
@@ -138,7 +136,7 @@
             [:img.picker-img {:src img-src}]]
        
            (->> labels
-                (map (fn [{:keys [pos text font id]}]
+                (map (fn [{:keys [pos text font id static]}]
                        (let [[w h] @size
                              {:keys [font-size color]} font
                              font-size (* font-size h)
@@ -150,7 +148,7 @@
                          [:span.picker-label
                           {:on-click #(do (dispatch [:update-item id [:font :font-family] font-family])
                                           (dispatch [:update-item id [:static] true]))
-                           :style {:font-family font-family
+                           :style {:font-family (if static (:font-family font) font-family)
                                    :font-size font-size
                                    :color color
                                    :top y
@@ -184,52 +182,50 @@
 
 
 
-;; TODO
-;; - changed flag
-;;
 (defn font-picker [labels]
   (into
    [:div.picker-container]
-   (let [labels (export-labels @labels)]
-       (for [font-family coverton.fonts/font-names]
-         [picker-block {:key font-family
-                        :labels labels
-                        :font-family font-family}]))))
+   (for [font-family coverton.fonts/font-names]
+     [picker-block {:key font-family
+                    :labels labels
+                    :font-family font-family}])))
 
 
 
 
-(defn dimmer [{:keys [visible]}]
+(defn dimmer []
   (r/with-let [this (r/current-component)]
     (r/create-class
      {:display-name "dimmer"
-      :component-did-update
+      :component-did-mount
       (fn [this]
         (when-let [dom (r/dom-node this)]
+          ;; move top page (0,0)
           (let [top (- (.. dom getBoundingClientRect -top))
                 left (- (.. dom getBoundingClientRect -left))]
             (d/set-px! dom :top top)
             (d/set-px! dom :left left))))
       :reagent-render
-      (fn [{:keys [visible]}]
-        (when visible
-          (into
-           [:div#dimmer]
-           (r/children this))))})))
+      (fn []
+        (into
+         [:div#dimmer]
+         (r/children this)))})))
 
 
 
-(defn toolbox-font-picker []
+(defn toolbox-font-picker [{:keys [id]}]
   (r/with-let [visible (r/atom false)
                items (subscribe [:items-with-dom])]
     [:div.label-toolbox-item {:style {:background-color "green"}
                               :on-click #(swap! visible not)}
-     [dimmer {:visible @visible}
-      [font-picker items]]]))
+     (when @visible
+       (dispatch [:update-item id [:static] false])
+       [dimmer
+        [font-picker (export-labels @items)]])]))
 
 
 
-(defn toolbox []
+(defn toolbox [props]
   [:div.label-toolbox.cancel-drag
-   [toolbox-font-picker]])
+   [toolbox-font-picker props]])
 
