@@ -9,7 +9,7 @@
     (include-css "assets/css/style.css")]
    [:body
     [:div.wrap
-     [:div.app]]
+     [:div#app]]
     [:span#span-measure]
     (include-js "main.js")
     [:script "coverton.core.main();"]]))

@@ -44,7 +44,7 @@
   (comp
    (cljs :compiler-options
          {:out-file "main.js"
-          :devcards true
+          ;;:devcards true
           :foreign-libs
           [{:file "public/js/bundle.js"
             :provides ["cljsjs.react" "cljsjs.react.dom"]}]})

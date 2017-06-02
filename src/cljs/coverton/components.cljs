@@ -34,7 +34,8 @@
     (d/set-px! el :width (.. el -scrollWidth))))
 
 
-
+;; todo: decouple re-frame logic from element
+;;       pass an update-fn and a ref-fn
 (defn autosize-input [{:keys [id]}]
   (let [this  (r/current-component)
         state (r/atom "")
@@ -44,11 +45,14 @@
     
     (r/create-class
      {:display-name "autosize-input"
+      
       :component-did-mount 
       (fn [this]
         (update-size this)
         (dispatch [:update-item id [:dom] (r/dom-node this)]))
+      
       :component-did-update update-size
+      
       :reagent-render
       (fn []
         (let [{:keys [font-family font-size]} @font]
@@ -60,9 +64,11 @@
                                           27 (.. e -target blur)
                                           false))
                    :class "label-input cancel-drag"
-                   :style {:font-family font-family :font-size font-size}
+                   :style {:font-family font-family :font-size font-size
+                           :position :relative}
                    :id id
-                   :auto-focus true}]))})))
+                   :auto-focus true
+                   }]))})))
 
 
 
@@ -111,17 +117,11 @@
 
 
 
-(defn toolbox [{:keys [id]}]
-  [:div.label-toolbox.cancel-drag
-   [:div.label-toolbox-item {:style {:background-color "green"}}]
-   [:div.label-toolbox-item {:style {:background-color "orange"}}]])
-
-
 
 
 (defn picker-block
   [{:keys [labels font-family]}]
-  (let [size (atom nil)]
+  (let [size (r/atom nil)]
     (r/create-class
      {:display-name "picker-block"
       :component-did-mount
@@ -146,16 +146,17 @@
                              x (* x w)
                              y (* y h)]
 
-                         ^{:key (gensym)}
+                         ^{:key id}
                          [:span.picker-label
-                          {:on-click #(do (dispatch [:update-item id [:font :font-family] font-family]))
+                          {:on-click #(do (dispatch [:update-item id [:font :font-family] font-family])
+                                          (dispatch [:update-item id [:static] true]))
                            :style {:font-family font-family
                                    :font-size font-size
                                    :color color
                                    :top y
                                    :left x}}
+                          
                           text])))))))})))
-
 
 
 ;; export
@@ -194,4 +195,41 @@
          [picker-block {:key font-family
                         :labels labels
                         :font-family font-family}]))))
+
+
+
+
+(defn dimmer [{:keys [visible]}]
+  (r/with-let [this (r/current-component)]
+    (r/create-class
+     {:display-name "dimmer"
+      :component-did-update
+      (fn [this]
+        (when-let [dom (r/dom-node this)]
+          (let [top (- (.. dom getBoundingClientRect -top))
+                left (- (.. dom getBoundingClientRect -left))]
+            (d/set-px! dom :top top)
+            (d/set-px! dom :left left))))
+      :reagent-render
+      (fn [{:keys [visible]}]
+        (when visible
+          (into
+           [:div#dimmer]
+           (r/children this))))})))
+
+
+
+(defn toolbox-font-picker []
+  (r/with-let [visible (r/atom false)
+               items (subscribe [:items-with-dom])]
+    [:div.label-toolbox-item {:style {:background-color "green"}
+                              :on-click #(swap! visible not)}
+     [dimmer {:visible @visible}
+      [font-picker items]]]))
+
+
+
+(defn toolbox []
+  [:div.label-toolbox.cancel-drag
+   [toolbox-font-picker]])
 

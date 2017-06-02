@@ -9,6 +9,7 @@
 
 (enable-console-print!)
 
+
 (defn reload []
   (rf/dispatch-sync [:initialize])
   (r/render [ed/editor] (sel1 :#app)))
