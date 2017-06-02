@@ -2,10 +2,7 @@
   (:require [re-frame.core :as rf]
             [reagent.core :as r]
             [dommy.core :as d :refer-macros [sel1]]
-            [coverton.editor.views :as ed]
-            [coverton.editor.events]
-            [coverton.editor.subs]
-            [coverton.editor.db]))
+            [coverton.editor :as ed]))
 
 (enable-console-print!)
 

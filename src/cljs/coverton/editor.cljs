@@ -1,11 +1,10 @@
-(ns coverton.editor.views
+(ns coverton.editor
   (:require [reagent.core :as r]
             [re-frame.core :as rf :refer [subscribe]]
+            [coverton.components :as cc]
             [coverton.editor.events :as events]
             [coverton.editor.subs]
-            [coverton.editor.db]
-            [coverton.components :as cc]))
-
+            [coverton.editor.db]))
 
 
 (defn editor []

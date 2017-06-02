@@ -3,7 +3,7 @@
             [re-frame.core :as rf :refer [subscribe]]
             [devcards.core :as dc]
             [coverton.components :as cc]
-            [coverton.editor.views :as ed]
+            [coverton.editor :as ed]
             [coverton.editor.subs])
   (:require-macros [devcards.core :refer [defcard-rg]]))
 
@@ -14,8 +14,10 @@
 (defcard-rg editor
   [ed/editor])
 
+
 (defcard-rg font-picker
-  [cc/font-picker items-with-dom]
+  (fn [data-atom _]
+   [cc/font-picker (cc/export-labels @data-atom)])
   items-with-dom
   {:inspect-data true})
 

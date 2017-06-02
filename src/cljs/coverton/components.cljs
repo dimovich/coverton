@@ -73,43 +73,36 @@
 
 
 (defn resizable [{:keys [id]}]
-  (let [state (atom nil)
-        item (subscribe [:item id])
-        font (subscribe [:font id])]
-
-    (r/create-class
-     {:display-namae "resizable"
-      :reagent-render
-      (fn [{:keys [id]}]
-        (into
-         ^{:key (gensym)}
-         [react-resize {:class-name "label-resize"
-                        :width "1em" :height "1em"
-                        :lock-aspect-ratio true
-                        :on-resize-start (fn [_ _ el _]
-                                           (reset! state (:font-size @font))
-                                           (d/add-class! el :cancel-drag))
+  (r/with-let [state (atom nil)
+               font (subscribe [:font id])]
+    (into
+     ^{:key (gensym)}
+     [react-resize {:class-name "label-resize"
+                    :width "1em" :height "1em"
+                    :lock-aspect-ratio true
+                    :on-resize-start (fn [_ _ el _]
+                                       (reset! state (:font-size @font))
+                                       (d/add-class! el :cancel-drag))
                     
-                        :on-resize-stop (fn [_ _ el d]
-                                          (d/remove-class! el :cancel-drag))
+                    :on-resize-stop (fn [_ _ el d]
+                                      (d/remove-class! el :cancel-drag))
                     
-                        :on-resize (fn [_ _ el d]
-                                     ;; element is inline, so child will set size
-                                     (d/remove-style! el :height)
-                                     (d/remove-style! el :width)
+                    :on-resize (fn [_ _ el d]
+                                 ;; element is inline, so child will set size
+                                 (d/remove-style! el :height)
+                                 (d/remove-style! el :width)
 
-                                     (dispatch [:update-item id [:font :font-size]
-                                                (+ @state (get-in (vec (js->clj d)) [1 1]))]))}]
+                                 (dispatch [:update-item id [:font :font-size]
+                                            (+ @state (get-in (vec (js->clj d)) [1 1]))]))}]
 
-         (r/children (r/current-component))))})))
+     (r/children (r/current-component)))))
 
 
 
 
 (defn draggable []
   (r/with-let [this (r/current-component)]
-    ^{:key (gensym)}
-    [react-drag (merge (r/props this))     
+    [react-drag (r/props this)
      (into [:div.handle-drag]
            (r/children this))]))
 

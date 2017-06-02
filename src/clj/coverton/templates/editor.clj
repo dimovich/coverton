@@ -6,8 +6,7 @@
    {:lang "en"}
    [:head
     [:title "Coverton Editor"]
-    (include-css "assets/css/style.css")
-    (include-css "https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css")]
+    (include-css "assets/css/style.css")]
    [:body
     [:div.wrap
      [:div#app]]
