@@ -20,7 +20,6 @@
                  [devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]
-                 ;;[soda-ash "0.2.0"]
                  [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.9.4"]])
 
@@ -74,24 +73,21 @@
   identity)
 
 
-(deftask reload-main
-  []
-  (task-options! reload {:on-jsload 'coverton.core/main})
-  identity)
-
 
 (deftask dev
   []
+  (task-options! reload {:on-jsload 'coverton.core/reload})
   (comp (development)
-        (reload-main)
         (run)))
 
 
 (deftask devcards
   []
   (set-env! :source-paths #(conj % "src/devcards"))
+  (task-options! reload {:on-jsload 'coverton.devcards/reload})
   (comp (development)
         (run)))
+
 
 (deftask prod
   []

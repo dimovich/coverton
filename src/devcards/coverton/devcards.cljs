@@ -37,8 +37,9 @@
     (atom nil))
 
 
+(defn reload []
+  (rf/dispatch-sync [:initialize]))
 
 (defn ^:export init []
-  (rf/dispatch-sync [:initialize])
   (dc/start-devcard-ui!))
 

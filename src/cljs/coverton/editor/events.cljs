@@ -1,7 +1,8 @@
 (ns coverton.editor.events
   (:require [re-frame.core :as rf :refer [reg-event-db path trim-v dispatch]]
             [coverton.editor.db :refer [default-value]]
-            [coverton.fonts :refer [default-font]]))
+            [coverton.fonts :refer [default-font]]
+            [dommy.core :as d]))
 
 
 
@@ -16,6 +17,12 @@
 
 
 (reg-event-db
+ :update
+ (fn [db [_ ks v]]
+   (assoc-in db ks v)))
+
+
+(reg-event-db
  :toggle-dim
  dim-interceptors
  (fn [dim _]
@@ -27,13 +34,6 @@
  items-interceptors
  (fn [items [id size]]
    (assoc-in items [id :font :font-size] size)))
-
-
-(reg-event-db
- :update-dom
- items-interceptors
- (fn [items [id dom]]
-   (assoc-in items [id :dom] dom)))
 
 
 (reg-event-db
@@ -54,16 +54,20 @@
  :update-item
  items-interceptors
  (fn [items [id ks v]]
-   (assoc-in items (into [id] ks) v)))
-
+   (if (and (get items id)
+            (not= (get-in items (into [id] ks))
+                  v))
+     (assoc-in items (into [id] ks) v)
+     items)))
 
 
 (defn handle-add-item [e]
-  (let [rect (.. e -target -parentNode getBoundingClientRect)
+  (let [x (.. e -clientX)
+        y (.. e -clientY)
+        rect (.. e -target -parentNode getBoundingClientRect)
         px (.. rect -left)
         py (.. rect -top)]
-    (dispatch [:add-item {:x (- (- (.. e -clientX) px) 5)
-                          :y (- (- (.. e -clientY) py) 5)
+    (dispatch [:add-item {:pos [(- x px) (- y py)]
                           :font default-font}])))
 
 

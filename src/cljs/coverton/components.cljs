@@ -33,84 +33,111 @@
     (d/set-px! el :width (.. el -scrollWidth))))
 
 
+
+
 ;; todo: decouple re-frame logic from element
 ;;       pass an update-fn and a ref-fn
-(defn autosize-input [{:keys [id]}]
-  (let [this  (r/current-component)
-        state (r/atom "")
-        item  (subscribe [:item id])
-        font  (subscribe [:font id])
-        update-size #(set-width (r/dom-node %) @state)]
+(defn autosize-input [{:keys [id update-fn text ;;update-ref
+                              ]}]
+  (let [state       (r/atom (or text ""))
+        update-size #(set-width (r/dom-node %) @state)
+        font-family (subscribe [:font-family id])]
     
     (r/create-class
      {:display-name "autosize-input"
       
-      :component-did-mount 
-      (fn [this]
-        (update-size this)
-        (dispatch [:update-dom id (r/dom-node this)]))
-      
+      :component-did-mount (fn [this]
+                             (update-size this))
       :component-did-update update-size
       
       :reagent-render
       (fn []
-        (let [{:keys [font-family font-size]} @font]
-          [:input {:value @state
-                   :on-change #(reset! state (.. % -target -value))
-                   :on-blur #(dispatch [:update-item id [:text] @state])
-                   :on-key-down (fn [e] (condp = (.. e -keyCode)
-                                          46 (do (reset! state "")) ;; delete
-                                          27 (.. e -target blur)
-                                          false))
-                   :class "label-input cancel-drag"
-                   :style {:font-family font-family :font-size font-size
-                           :position :relative}
-                   :id id
-                   :auto-focus true
-                   }]))})))
+        [:input {:value @state
+                 :on-change (fn [e]
+                              (reset! state (.. e -target -value)))
+                 :on-blur #(update-fn @state)
+                 :on-key-down (fn [e] (condp = (.. e -keyCode)
+                                        46 (do (reset! state "")) ;; delete
+                                        27 (.. e -target blur)
+                                        false))
+                 :class "label-input cancel-drag"
+                 ;;:style {:font-size :inherit :font-family :inherit}
+                 :style {:font-size   "1em"
+                         :font-family @font-family}
+                 :id id
+                 :auto-focus true}])})))
 
 
 
 
-(defn resizable [{:keys [id]}]
-  (r/with-let [state (atom nil)
-               font (subscribe [:font id])]
-    (into
-     ^{:key (gensym)}
-     [react-resize {:class-name "label-resize"
-                    :width "1em" :height "1em"
-                    :lock-aspect-ratio true
-                    :on-resize-start (fn [_ _ el _]
-                                       (reset! state (:font-size @font))
-                                       (d/add-class! el :cancel-drag))
+(defn resizable [{:keys [id text]}]
+  (let [this  (r/current-component)
+        start (atom nil)
+        size  (atom nil)
+        child (atom nil)
+        font  (subscribe [:font id])]
+    (r/create-class
+     {:component-did-mount
+      (fn [this]
+        (reset! child (.. (r/dom-node this) -firstChild)))
+      :reagent-render
+      (fn [{:keys [text]}]
+        (into
+         ^{:key (gensym)}
+         [react-resize {:class-name "label-resize"
+                        :width "1em" :height "1em"
+                        :style {:font-size (:font-size @font)}
+                        :lock-aspect-ratio true
+                        :on-resize-start (fn [_ _ el _]
+                                           (reset! start (d/px el :font-size))
+                                           (d/add-class! el :cancel-drag))
                     
-                    :on-resize-stop (fn [_ _ el _]
-                                      (d/remove-class! el :cancel-drag))
+                        :on-resize-stop (fn [_ _ el d]
+                                          ;;(dispatch [:update-item id [:font :font-size] @size])
+                                          (dispatch [:update-font-size id @size])
+                                          (d/remove-class! el :cancel-drag))
                     
-                    :on-resize (fn [_ _ el d]
-                                 ;; element is inline, so child will set size
-                                 (d/remove-style! el :height)
-                                 (d/remove-style! el :width)
+                        :on-resize (fn [_ _ el d]
+                                     ;; element is inline, so child will set size
+                                     (d/remove-style! el :height)
+                                     (d/remove-style! el :width)
 
-                                 (dispatch [:update-font-size id
-                                            (+ @state (get-in (vec (js->clj d)) [1 1]))]))}]
+                                     (reset! size (+ @start
+                                                     (get-in (vec (js->clj d)) [1 1])))
 
-     (r/children (r/current-component)))))
+                                     (d/set-px! el :font-size @size))}]
+
+         (r/children this)))})))
 
 
 
+(defn relative-pos [el]
+  (let [er (.. el getBoundingClientRect)
+        pr (.. el -parentNode getBoundingClientRect)
+        x  (- (.. er -left) (.. pr -left))
+        y  (- (.. er -top)  (.. pr -top))]
+    [x y]))
 
-(defn draggable [{:keys [id]}]
-  (r/with-let [this (r/current-component)]
-    [react-drag (merge (r/props this))
-     (into [:div.handle-drag]
+
+
+(defn draggable [{:keys [id pos]}]
+  (r/with-let [this  (r/current-component)
+               [x y] pos]
+    [react-drag
+     (merge (r/props this)
+            {:on-stop (fn [e d]
+                        (let [el (aget d "node")]
+                          (dispatch [:update-item id
+                                     [:pos] (relative-pos el)])))})
+     
+     (into [:div.react-draggable-child
+            {:style {:left x :top y}}]
            (r/children this))]))
 
 
 
 
-(defn picker-block
-  [{:keys [labels font-family]}]
+(defn picker-block [{:keys [labels font-family]}]
   
   (let [size (r/atom nil)]
     (r/create-class
@@ -152,70 +179,59 @@
 
 ;; export
 (defn export-labels [labels]
-  (->> labels
-       (map (fn [[id {:keys [pos font static dom text]}]]
-              (let [lbl (.. dom getBoundingClientRect)
-                    img (.. (sel1 :.editor-img) getBoundingClientRect)
-                    x   (- (.. lbl -left) (.. img -left))
-                    y   (- (.. lbl -top) (.. img -top))
-                    w   (.. img -width)
-                    h   (.. img -height)
-                    x   (/ x w)
-                    y   (/ y h)
-                    font  (update-in font [:font-size] / h)]
+  (let [img (.. (sel1 :.editor-img) getBoundingClientRect)]
+    (assoc-in {:img {:src "assets/img/coverton.jpg"}} [:labels]
+              (for [lbl (sel :.label-input)]
+                (let [rect (.. lbl getBoundingClientRect)
+                      x   (- (.. rect -left) (.. img -left))
+                      y   (- (.. rect -top) (.. img -top))
+                      w   (.. img -width)
+                      h   (.. img -height)
+                      x   (/ x w)
+                      y   (/ y h)
+                      font-family (d/style lbl :font-family)
+                      font-size   (/ (d/px lbl :font-size) h)
+                      color       (d/style lbl :color)
+                      text        (.. lbl -value)
+                      id          (.. lbl -id)
+                      ;;_ (dispatch [:update-item id [:text] text])
+                      static      (:static (get labels id))]
 
-                {:pos [x y]
-                 :text text
-                 :id id
-                 :static static
-                 :font font})))
-       
-       (assoc-in {:img {:src "assets/img/coverton.jpg"}}
-                 [:labels])))
-
-
-
-(defn font-picker [labels]
-  (into
-   [:div.picker-container]
-   (for [font-family coverton.fonts/font-names]
-     [picker-block {:key font-family
-                    :labels labels
-                    :font-family font-family}])))
-
-
+                  {:pos [x y]
+                   :text text
+                   :id id
+                   :static static
+                   :font {:font-family font-family
+                          :font-size   font-size
+                          :color       color}})))))
 
 
 (defn dimmer []
   (r/with-let [this (r/current-component)]
-    (r/create-class
-     {:display-name "dimmer"
-      :component-did-mount
-      (fn [this]
-        (when-let [dom (r/dom-node this)]
-          ;; move top page (0,0)
-          (let [top (- (.. dom getBoundingClientRect -top))
-                left (- (.. dom getBoundingClientRect -left))]
-            (d/set-px! dom :top top)
-            (d/set-px! dom :left left))))
-      :reagent-render
-      (fn []
-        (into
-         [:div#dimmer]
-         (r/children this)))})))
+    (into
+     [:div#dimmer {:on-click #(dispatch [:update [:dim] false])}]
+     (r/children this))))
+
+
+
+(defn font-picker [labels]
+  [dimmer
+   (into
+    [:div.picker-container]
+    (for [font-family coverton.fonts/font-names]
+      [picker-block {:key font-family
+                     :labels labels
+                     :font-family font-family}]))])
+
 
 
 
 (defn toolbox-font-picker [{:keys [id]}]
-  (r/with-let [visible (r/atom false)
-               items (subscribe [:items-with-dom])]
-    [:div.label-toolbox-item {:style {:background-color "green"}
-                              :on-click #(do (dispatch [:toggle-dim])
-                                             (swap! visible not))}
-     (when @visible
-       (dispatch [:update-item id [:static] false])
-       [dimmer
-        [font-picker (export-labels @items)]])]))
+  [:div.label-toolbox-item
+   {:style {:background-color "green"}
+    :on-click #(do (dispatch [:update-item id [:static] false])
+                   (dispatch [:update [:dim] :show-font-picker]))}])
+
 
 
 

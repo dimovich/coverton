@@ -1,34 +1,48 @@
 (ns coverton.editor
   (:require [reagent.core :as r]
-            [re-frame.core :as rf :refer [subscribe]]
+            [re-frame.core :as rf :refer [subscribe dispatch]]
             [coverton.components :as cc]
             [coverton.editor.events :as events]
             [coverton.editor.subs]
-            [coverton.editor.db]))
+            [coverton.editor.db]
+            [dommy.core :as d]))
+
+
+
+(defn item [[id {:keys [pos text font]}]]
+  (r/with-let [[x y]  pos]
+    [cc/draggable {:cancel ".cancel-drag"
+                   :key    :draggable
+                   :id     id
+                   :pos    pos}
+     [cc/toolbox {:id id}]
+     [cc/resizable {:id id}
+      [cc/autosize-input {:id   id
+                          :key  :input
+                          :text text
+                          :update-fn  #(dispatch [:update-item id [:text] %])}]]]))
+
+
 
 
 (defn editor []
-  (r/with-let [items (subscribe [:items])]
+  (r/with-let [items (subscribe [:items])
+               dim   (subscribe [:dim])]
     (into
      [:div.editor {:on-blur events/handle-remove-item}
-      [:div {:style {:position :absolute
-                     :right 0 :top 0 :width 50 :height 50
-                     :background-color "orange"}}]
 
-      
       [:img.editor-img
        {:src "assets/img/coverton.jpg"
         :on-click events/handle-add-item}]]
-     
-     ;; display labels
-     (->> @items
-          (map (fn [[id {:keys [x y dimmed]}]]
 
-                 [:div.label-container {:key id :style {:left x :top y}}
-                  [cc/draggable {:cancel ".cancel-drag"
-                                 :key    :draggable
-                                 :id     id}
-                   [cc/toolbox {:id id}]
-                   [cc/resizable {:id id :key :resizable}
-                    [cc/autosize-input {:id id :key :input}]]]]))))))
+     (condp = @dim
+       :show-font-picker
+       (let [labels (cc/export-labels @items)]
+         [[cc/font-picker labels]])
+       
+       ;; display labels
+       (for [lbl @items]
+         [item lbl])))))
+
+
 

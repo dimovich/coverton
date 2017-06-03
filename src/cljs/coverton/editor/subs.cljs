@@ -35,6 +35,18 @@
    (:dim db)))
 
 
+(reg-sub
+ :show-font-picker?
+ (fn [db _]
+   (:show-font-picker? db)))
+
+
+(reg-sub
+ :font-family
+ :<- [:items]
+ (fn [items [_ id]]
+   (get-in items [id :font :font-family])))
+
 
 #_(reg-sub
    :a-b-sub
