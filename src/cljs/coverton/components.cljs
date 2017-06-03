@@ -37,17 +37,18 @@
 
 ;; todo: decouple re-frame logic from element
 ;;       pass an update-fn and a ref-fn
-(defn autosize-input [{:keys [id update-fn text ;;update-ref
-                              ]}]
-  (let [state       (r/atom (or text ""))
-        update-size #(set-width (r/dom-node %) @state)
-        font-family (subscribe [:font-family id])]
+(defn autosize-input [{:keys [id update-fn text ref]}]
+  (r/with-let [state       (r/atom (or text ""))
+               update-size #(set-width (r/dom-node %) @state)
+               font-family (subscribe [:font-family id])
+               _ (println "created autosize")]
     
     (r/create-class
      {:display-name "autosize-input"
       
       :component-did-mount (fn [this]
-                             (update-size this))
+                             (update-size this)
+                             (ref #(update-size this)))
       :component-did-update update-size
       
       :reagent-render
@@ -61,7 +62,6 @@
                                         27 (.. e -target blur)
                                         false))
                  :class "label-input cancel-drag"
-                 ;;:style {:font-size :inherit :font-family :inherit}
                  :style {:font-size   "1em"
                          :font-family @font-family}
                  :id id
@@ -71,43 +71,41 @@
 
 
 (defn resizable [{:keys [id text]}]
-  (let [this  (r/current-component)
-        start (atom nil)
-        size  (atom nil)
-        child (atom nil)
-        font  (subscribe [:font id])]
-    (r/create-class
-     {:component-did-mount
-      (fn [this]
-        (reset! child (.. (r/dom-node this) -firstChild)))
-      :reagent-render
-      (fn [{:keys [text]}]
-        (into
-         ^{:key (gensym)}
-         [react-resize {:class-name "label-resize"
-                        :width "1em" :height "1em"
-                        :style {:font-size (:font-size @font)}
-                        :lock-aspect-ratio true
-                        :on-resize-start (fn [_ _ el _]
-                                           (reset! start (d/px el :font-size))
-                                           (d/add-class! el :cancel-drag))
+  (r/with-let [this  (r/current-component)
+               start (atom nil)
+               size  (atom nil)
+               ref   (atom nil)
+               font  (subscribe [:font id])
+               _ (println "created resizable")]
+    (into
+     ^{:key (gensym)}
+     [react-resize {:class-name "label-resize"
+                    :width "1em" :height "1em"
+                    :style {:font-size (:font-size @font)}
+                    :lock-aspect-ratio true
+                    :on-resize-start (fn [_ _ el _]
+                                       (reset! start (d/px el :font-size))
+                                       (d/add-class! el :cancel-drag))
                     
-                        :on-resize-stop (fn [_ _ el d]
-                                          ;;(dispatch [:update-item id [:font :font-size] @size])
-                                          (dispatch [:update-font-size id @size])
-                                          (d/remove-class! el :cancel-drag))
+                    :on-resize-stop (fn [_ _ el d]
+                                      (dispatch [:update-font-size id @size])
+                                      (d/remove-class! el :cancel-drag))
                     
-                        :on-resize (fn [_ _ el d]
-                                     ;; element is inline, so child will set size
-                                     (d/remove-style! el :height)
-                                     (d/remove-style! el :width)
+                    :on-resize (fn [_ _ el d]
+                                 ;; element is inline, so child will set size
+                                 (d/remove-style! el :height)
+                                 (d/remove-style! el :width)
 
-                                     (reset! size (+ @start
-                                                     (get-in (vec (js->clj d)) [1 1])))
+                                 (reset! size (+ @start
+                                                 (get-in (vec (js->clj d)) [1 1])))
 
-                                     (d/set-px! el :font-size @size))}]
+                                 (d/set-px! el :font-size @size)
 
-         (r/children this)))})))
+                                 ;; run child update fn
+                                 (@ref))}]
+
+     (-> (r/children this)
+         (update-in [0 1] assoc :ref #(reset! ref %))))))
 
 
 
@@ -194,7 +192,6 @@
                       color       (d/style lbl :color)
                       text        (.. lbl -value)
                       id          (.. lbl -id)
-                      ;;_ (dispatch [:update-item id [:text] text])
                       static      (:static (get labels id))]
 
                   {:pos [x y]
@@ -206,11 +203,25 @@
                           :color       color}})))))
 
 
+
+
 (defn dimmer []
   (r/with-let [this (r/current-component)]
-    (into
-     [:div#dimmer {:on-click #(dispatch [:update [:dim] false])}]
-     (r/children this))))
+    (r/create-class
+     {:display-name "dimmer"
+      :component-did-mount
+      (fn [this]
+        (when-let [dom (r/dom-node this)]
+          ;; move to top page (0,0)
+          (let [top  (- (.. dom getBoundingClientRect -top))
+                left (- (.. dom getBoundingClientRect -left))]
+            (d/set-px! dom :top top)
+            (d/set-px! dom :left left))))
+      :reagent-render
+      (fn []
+        (into
+         [:div#dimmer {:on-click #(dispatch [:update [:dim] false])}]
+         (r/children this)))})))
 
 
 
@@ -219,7 +230,7 @@
    (into
     [:div.picker-container]
     (for [font-family coverton.fonts/font-names]
-      [picker-block {:key font-family
+      [picker-block {:key    font-family
                      :labels labels
                      :font-family font-family}]))])
 

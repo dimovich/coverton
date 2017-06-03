@@ -4,23 +4,23 @@
  :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
                  [org.clojure/clojurescript "1.9.562"]
 
-                 [adzerk/boot-cljs          "2.0.0"  :scope "test"]
-                 [adzerk/boot-cljs-repl     "0.3.3"      :scope "test"]
+                 [adzerk/boot-cljs          "2.0.0"      :scope "test"]
+                 [adzerk/boot-cljs-repl     "0.3.2"      :scope "test"]
                  [adzerk/boot-reload        "0.5.1"      :scope "test"]
                  [pandeiro/boot-http        "0.8.3"      :scope "test"]
                  [com.cemerick/piggieback   "0.2.1"      :scope "test"]
-                 [org.clojure/tools.nrepl   "0.2.12"     :scope "test"]
+                 [org.clojure/tools.nrepl   "0.2.13"     :scope "test"]
                  [weasel                    "0.7.0"      :scope "test"]
-                 [tolitius/boot-check       "0.1.4"]
+                 [tolitius/boot-check       "0.1.4"      :scope "test"]
 
                  [compojure "1.6.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
-                 [hiccup "1.0.5"]
+                 [hiccup "2.0.0-alpha1"]
 
                  [devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]
-                 [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
+                 [reagent "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.9.4"]])
 
 

@@ -12,6 +12,7 @@ html {}
 body {
     background-color: #0c0c0c;
     margin: 0;
+    overflow-x: hidden;
 }
 
 /*455 x 90*/
@@ -22,27 +23,36 @@ body {
     font-family : 'GothaPro';
     font-size : 20px;
     font-weight: normal;
-    font-style: normal;
+    font-style: normal;    
 }
 
 .wrap {
-    margin: auto;
+    margin: 0 auto;
     padding: 0;
 }
 
-.app {
-    width: 100%;
-    
+#app {
+    margin: 0 auto;
 }
 
 .editor {
-    margin: auto;
+    margin: 0 auto;
     border: 0px solid green;
-    text-align: center;
     position: relative;
     background-color: #0c0c0c;
-    height: 100%;
     width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+
+.editor-img {
+    height: 80vh;
+    border: 0px solid black;
+    padding: 0;
+    position: absolute;
+    top: 10vh;
+    transform: translatex(-50%);
 }
 
 
@@ -149,15 +159,6 @@ body {
     display: inline-block;
 }
 
-.editor-img {
-    width: 40%;
-    height: 40%;
-    border: 0px solid black;
-    margin: 0;
-    margin-top: 20px;
-    padding: 0;
-    position: relative;
-}
 
 .vcenter {
     padding-top: calc((100vh - 150px) / 2);
@@ -183,7 +184,7 @@ body {
     left:0px;
     visibility:hidden;
     white-space:nowrap;
-    overflow:hidden
+    overflow:hidden;
 }
 
 
@@ -224,7 +225,7 @@ body {
 
 
 #dimmer {
-    position:fixed;
+    position: absolute;
     display: block;
     width:100vw;
     top: 0;
