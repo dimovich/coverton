@@ -1,14 +1,11 @@
 ! resize after input change doesn't work. component is redrawn.
 
++ Esc for font-picker
++ dynamic line-height
 
-- font-picker in main loop
 - read re-frame docs
 - read reagent docs
 - read blog posts
-
-- fittext for input, and resize changes size of item (update-fn) (start-fn) in resize
-
-- are there any common paterns for keyword naming in re-frame, (::message vs :message)?
 
 
 - backend

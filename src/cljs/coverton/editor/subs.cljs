@@ -3,62 +3,57 @@
 
 
 (reg-sub
- :items
+ :ed-items
  (fn [db _]
    (:items db)))
 
 
 (reg-sub
- :item
- :<- [:items]
- (fn [items [_ id]]
-   (get items id)))
-
-
-(reg-sub
- :items-with-dom
- :<- [:items]
- (fn [items _]
-   (filter (fn [[k v]] (:dom v)) items)))
-
-(reg-sub
- :item-ids
- :<- [:items]
+ :ed-item-ids
+ :<- [:ed-items]
  (fn [items _]
    (keys items)))
 
 
 (reg-sub
- :item
- :<- [:items]
+ :ed-item
+ :<- [:ed-items]
  (fn [items [_ id]]
    (get items id)))
 
 
 (reg-sub
- :font
- :<- [:items]
- (fn [items [_ id]]
-   (get-in items [id :font])))
-
-
-(reg-sub
- :dim
+ :ed-dim
  (fn [db _]
    (:dim db)))
 
 
 (reg-sub
- :show-font-picker?
- (fn [db _]
-   (:show-font-picker? db)))
+ :ed-item-font-family
+ :<- [:ed-items]
+ (fn [items [_ id]]
+   (get-in items [id :font :font-family])))
 
 
 (reg-sub
- :font-family
- :<- [:items]
+ :ed-item-font-size
+ :<- [:ed-items]
  (fn [items [_ id]]
-   (get-in items [id :font :font-family])))
+   (get-in items [id :font :font-size])))
+
+
+(reg-sub
+ :ed-item-text
+ :<- [:ed-items]
+ (fn [items [_ id]]
+   (get-in items [id :text])))
+
+
+(reg-sub
+ :ed-item-pos
+ :<- [:ed-items]
+ (fn [items [_ id]]
+   (get-in items [id :pos])))
 
 
 #_(reg-sub

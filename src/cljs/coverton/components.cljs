@@ -37,25 +37,24 @@
 
 ;; todo: decouple re-frame logic from element
 ;;       pass an update-fn and a ref-fn
-(defn autosize-input [{:keys [id update-fn text ref]}]
-  (r/with-let [state       (r/atom (or text ""))
-               update-size #(set-width (r/dom-node %) @state)
-               font-family (subscribe [:font-family id])
-               _ (println "created autosize")]
+(defn autosize-input [{:keys [id update-fn text font-family ref]}]
+  (let [state   (r/atom (or text ""))
+        update  #(set-width (r/dom-node %) @state)]
     
     (r/create-class
      {:display-name "autosize-input"
       
-      :component-did-mount (fn [this]
-                             (update-size this)
-                             (ref #(update-size this)))
-      :component-did-update update-size
+      :component-did-mount
+      (fn [this]
+        (ref #(update this))
+        (update this))
+
+      :component-did-update  update
       
       :reagent-render
-      (fn []
+      (fn [{:keys [font-family]}]
         [:input {:value @state
-                 :on-change (fn [e]
-                              (reset! state (.. e -target -value)))
+                 :on-change #(reset! state (.. % -target -value))
                  :on-blur #(update-fn @state)
                  :on-key-down (fn [e] (condp = (.. e -keyCode)
                                         46 (do (reset! state "")) ;; delete
@@ -63,32 +62,29 @@
                                         false))
                  :class "label-input cancel-drag"
                  :style {:font-size   "1em"
-                         :font-family @font-family}
+                         :font-family font-family}
                  :id id
                  :auto-focus true}])})))
 
 
 
 
-(defn resizable [{:keys [id text]}]
+(defn resizable [{:keys [font-size update-fn]}]
   (r/with-let [this  (r/current-component)
                start (atom nil)
                size  (atom nil)
-               ref   (atom nil)
-               font  (subscribe [:font id])
-               _ (println "created resizable")]
+               ref   (atom nil)]
     (into
-     ^{:key (gensym)}
      [react-resize {:class-name "label-resize"
                     :width "1em" :height "1em"
-                    :style {:font-size (:font-size @font)}
+                    :style {:font-size font-size}
                     :lock-aspect-ratio true
                     :on-resize-start (fn [_ _ el _]
                                        (reset! start (d/px el :font-size))
                                        (d/add-class! el :cancel-drag))
                     
                     :on-resize-stop (fn [_ _ el d]
-                                      (dispatch [:update-font-size id @size])
+                                      (update-fn @size)
                                       (d/remove-class! el :cancel-drag))
                     
                     :on-resize (fn [_ _ el d]
@@ -103,7 +99,6 @@
 
                                  ;; run child update fn
                                  (@ref))}]
-
      (-> (r/children this)
          (update-in [0 1] assoc :ref #(reset! ref %))))))
 
@@ -118,20 +113,18 @@
 
 
 
-(defn draggable [{:keys [id pos]}]
-  (r/with-let [this  (r/current-component)
-               [x y] pos]
-    [react-drag
-     (merge (r/props this)
-            {:on-stop (fn [e d]
-                        (let [el (aget d "node")]
-                          (dispatch [:update-item id
-                                     [:pos] (relative-pos el)])))})
-     
-     (into [:div.react-draggable-child
-            {:style {:left x :top y}}]
-           (r/children this))]))
 
+(defn draggable [{:keys [pos update-fn]}]
+  (r/with-let [this (r/current-component)
+        [x y] pos]
+    [react-drag {:cancel ".cancel-drag"
+                 :on-stop (fn [e d]
+                            (let [el (aget d "node")]
+                              (update-fn (relative-pos el))))}
+     
+     (into
+      [:div.react-draggable-child {:style {:left x :top y}}]
+      (r/children this))]))
 
 
 
@@ -226,13 +219,14 @@
 
 
 (defn font-picker [labels]
-  [dimmer
-   (into
-    [:div.picker-container]
-    (for [font-family coverton.fonts/font-names]
-      [picker-block {:key    font-family
-                     :labels labels
-                     :font-family font-family}]))])
+  (r/with-let [lbls (export-labels labels)]
+   [dimmer
+    (into
+     [:div.picker-container]
+     (for [font-family coverton.fonts/font-names]
+       [picker-block {:key    font-family
+                      :labels lbls
+                      :font-family font-family}]))]))
 
 
 

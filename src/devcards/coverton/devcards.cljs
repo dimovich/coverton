@@ -9,7 +9,6 @@
 
 
 (def items (subscribe [:items]))
-(def items-with-dom (subscribe [:items-with-dom]))
 
 
 (defcard-rg editor
@@ -20,8 +19,8 @@
 
 #_(defcard-rg font-picker
     (fn [data-atom _]
-      [cc/font-picker (cc/export-labels @data-atom)])
-    items-with-dom
+      [cc/font-picker @data-atom])
+    items
     {:inspect-data true})
 
 

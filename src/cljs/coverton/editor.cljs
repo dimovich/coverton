@@ -9,49 +9,52 @@
 
 
 (defn item [id]
-  (r/with-let [lbl (subscribe [:item id])]
-    (let [{:keys [pos text]} @lbl]
-      [cc/draggable {:cancel ".cancel-drag"
-                     :id     id
-                     :pos    pos}
-       
-       [cc/toolbox {:id  id}]
-       
-       [cc/resizable {:id  id}
-        
-        [cc/autosize-input {:id   id
-                            :key  :input
-                            :text text
-                            :update-fn #(dispatch [:update-item id [:text] %])}]]])))
+  (r/with-let [text  (subscribe [:ed-item-text        id])
+               pos   (subscribe [:ed-item-pos         id])
+               font  (subscribe [:ed-item-font-family id])
+               size  (subscribe [:ed-item-font-size   id])
+               [x y] @pos]
+    
+    [cc/draggable {:update-fn #(dispatch [:update-item id [:pos] %])
+                   :pos       @pos}
+     
+     [cc/toolbox {:id  id}]
+     
+     [cc/resizable {:font-size  @size
+                    :update-fn  #(dispatch [:update-item id [:font :font-size] %])}
+      
+      [cc/autosize-input {:id          id
+                          :key         :input
+                          :text        @text
+                          :font-family @font
+                          :update-fn   #(dispatch [:update-item id [:text] %])}]]]))
 
 
-(defn items []
-  (r/with-let [ids (subscribe [:item-ids])]
-    (into [:div]
-          (for [id @ids]
-            ^{:key id}
-            [item id]))))
+
+(defn items [ids]
+  (into [:div]
+        (for [id ids]
+          ^{:key id}
+          [item id])))
 
 
 
 
 (defn editor []
-  (r/with-let [dim      (subscribe [:dim])
-               changed? (subscribe [:count])
-               its      (subscribe [:items])]
+  (r/with-let [dim  (subscribe [:ed-dim])
+               its  (subscribe [:ed-items])
+               ids  (subscribe [:ed-item-ids])]
 
     [:div.editor {:on-blur events/handle-remove-item}
 
-     [:img.editor-img
-      {:src "assets/img/coverton.jpg"
-       :on-click events/handle-add-item}]
+     [:img.editor-img {:src "assets/img/coverton.jpg"
+                       :on-click events/handle-add-item}]
 
      (condp = @dim
        :show-font-picker
-       (let [labels (cc/export-labels @its)]
-         [cc/font-picker labels])
+       [cc/font-picker @its]
 
-       [items])]))
+       [items @ids])]))
 
 
 
