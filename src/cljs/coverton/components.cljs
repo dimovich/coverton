@@ -49,7 +49,7 @@
         (ref #(update this))
         (update this))
 
-      :component-did-update  update
+      :component-did-update update
       
       :reagent-render
       (fn [{:keys [font-family]}]
