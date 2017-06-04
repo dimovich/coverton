@@ -21,6 +21,19 @@
  (fn [items _]
    (filter (fn [[k v]] (:dom v)) items)))
 
+(reg-sub
+ :item-ids
+ :<- [:items]
+ (fn [items _]
+   (keys items)))
+
+
+(reg-sub
+ :item
+ :<- [:items]
+ (fn [items [_ id]]
+   (get items id)))
+
 
 (reg-sub
  :font

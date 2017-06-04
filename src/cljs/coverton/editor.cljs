@@ -8,41 +8,50 @@
             [dommy.core :as d]))
 
 
+(defn item [id]
+  (r/with-let [lbl (subscribe [:item id])]
+    (let [{:keys [pos text]} @lbl]
+      [cc/draggable {:cancel ".cancel-drag"
+                     :id     id
+                     :pos    pos}
+       
+       [cc/toolbox {:id  id}]
+       
+       [cc/resizable {:id  id}
+        
+        [cc/autosize-input {:id   id
+                            :key  :input
+                            :text text
+                            :update-fn #(dispatch [:update-item id [:text] %])}]]])))
 
-(defn item [[id {:keys [pos text font]}]]
-  (r/with-let [[x y]  pos]
-    [cc/draggable {:cancel ".cancel-drag"
-                   :key    :draggable
-                   :id     id
-                   :pos    pos}
-     [cc/toolbox {:id id}]
-     [cc/resizable {:id id}
-      [cc/autosize-input {:id   id
-                          :key  :input
-                          :text text
-                          :update-fn  #(dispatch [:update-item id [:text] %])}]]]))
+
+(defn items []
+  (r/with-let [ids (subscribe [:item-ids])]
+    (into [:div]
+          (for [id @ids]
+            ^{:key id}
+            [item id]))))
 
 
 
 
 (defn editor []
-  (r/with-let [items (subscribe [:items])
-               dim   (subscribe [:dim])]
-    (into
-     [:div.editor {:on-blur events/handle-remove-item}
+  (r/with-let [dim      (subscribe [:dim])
+               changed? (subscribe [:count])
+               its      (subscribe [:items])]
 
-      [:img.editor-img
-       {:src "assets/img/coverton.jpg"
-        :on-click events/handle-add-item}]]
+    [:div.editor {:on-blur events/handle-remove-item}
+
+     [:img.editor-img
+      {:src "assets/img/coverton.jpg"
+       :on-click events/handle-add-item}]
 
      (condp = @dim
        :show-font-picker
-       (let [labels (cc/export-labels @items)]
-         [[cc/font-picker labels]])
-       
-       ;; display labels
-       (for [lbl @items]
-         [item lbl])))))
+       (let [labels (cc/export-labels @its)]
+         [cc/font-picker labels])
+
+       [items])]))
 
 
 

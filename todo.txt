@@ -1,3 +1,6 @@
+! resize after input change doesn't work. component is redrawn.
+
+
 - font-picker in main loop
 - read re-frame docs
 - read reagent docs
