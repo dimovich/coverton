@@ -35,8 +35,6 @@
 
 
 
-;; todo: decouple re-frame logic from element
-;;       pass an update-fn and a ref-fn
 (defn autosize-input [{:keys [id update-fn text font-family ref]}]
   (let [state   (r/atom (or text ""))
         update  #(set-width (r/dom-node %) @state)]
@@ -116,7 +114,7 @@
 
 (defn draggable [{:keys [pos update-fn]}]
   (r/with-let [this (r/current-component)
-        [x y] pos]
+               [x y] pos]
     [react-drag {:cancel ".cancel-drag"
                  :on-stop (fn [e d]
                             (let [el (aget d "node")]
@@ -215,6 +213,7 @@
         (into
          [:div#dimmer {:on-click #(dispatch [:update [:dim] false])}]
          (r/children this)))})))
+
 
 
 
