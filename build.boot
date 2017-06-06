@@ -1,6 +1,6 @@
 (set-env!
- :source-paths    #{"src/cljs" "src/clj"}
- :resource-paths  #{"html" "public"}
+ :source-paths    #{"src/cljs" "src/clj" "public/js"}
+ :resource-paths  #{"html" }
  :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
                  [org.clojure/clojurescript "1.9.562"]
 
@@ -14,8 +14,10 @@
                  [tolitius/boot-check       "0.1.4"      :scope "test"]
 
                  [compojure "1.6.0"]
+                 [hiccup    "2.0.0-alpha1"]
+                 [http-kit  "2.2.0"]
+                 [ring/ring-core "1.6.1"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
-                 [hiccup "2.0.0-alpha1"]
 
                  [devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
@@ -39,15 +41,30 @@
        conj 'cider.nrepl/cider-middleware)
 
 
+(deftask build-jar
+  []
+  (comp (aot :namespace #{'coverton.core})
+        (uber)
+        (jar :main 'coverton.core :file "app.jar")
+        (sift :include #{#"app.jar" #"main.js" #"assets.*" })))
+
+
 (deftask build []
   (comp
+   ;;(build-jar)
+
    (cljs :compiler-options
          {:out-file "main.js"
-          :devcards true
+         ;; :devcards true
+         ;; :parallel-build true
           :foreign-libs
           [{:file "public/js/bundle.js"
             :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
+
+   (build-jar)
+   
    (target :dir #{"target"})))
+
 
 (deftask run []
   (comp

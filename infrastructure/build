@@ -1,0 +1,4 @@
+#!/bin/bash
+cd ..
+boot prod
+chmod 755 target/app.jar
