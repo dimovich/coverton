@@ -26,4 +26,4 @@
 
 
 (defn -main [& args]
-  (server/run-server app {:port 3000}))
+  (server/run-server app {:port 80}))
