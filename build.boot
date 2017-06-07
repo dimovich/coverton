@@ -22,7 +22,7 @@
                  [devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]
-                 [reagent "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
+                 [reagent  "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.9.4"]])
 
 
@@ -53,15 +53,14 @@
   (comp
    (cljs :compiler-options
          {:out-file "main.js"
-         :devcards true
+         ;;:devcards true
          :parallel-build true
           :foreign-libs
           [{:file "public/js/bundle.js"
             :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
 
-   ;;(build-jar)
-   
-   (target :dir #{"target"})))
+   (build-jar)
+   (target)))
 
 
 (deftask run []
@@ -77,14 +76,16 @@
 
 (deftask production
   []
-  (task-options! cljs {:optimizations :advanced})
+  (task-options! cljs   {:optimizations :advanced}
+                 target {:dir #{"release"}})
   identity)
 
 (deftask development
   []
   (task-options! cljs {:optimizations :none
                        :source-map true}
-                 cljs-repl {:nrepl-opts {:port 3311}})
+                 cljs-repl {:nrepl-opts {:port 3311}}
+                 target {:dir #{"target"}})
   identity)
 
 
