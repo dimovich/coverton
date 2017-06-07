@@ -1,4 +1,10 @@
---- Fetch/Set
+;; scp -rp sourcedirectory user@dest:/path
+
+
+
+
+
+;;--- Fetch/Set
 
 (reg-event-db
  :process-notes-list

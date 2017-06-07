@@ -51,17 +51,15 @@
 
 (deftask build []
   (comp
-   ;;(build-jar)
-
    (cljs :compiler-options
          {:out-file "main.js"
-         ;; :devcards true
-         ;; :parallel-build true
+         :devcards true
+         :parallel-build true
           :foreign-libs
           [{:file "public/js/bundle.js"
             :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
 
-   (build-jar)
+   ;;(build-jar)
    
    (target :dir #{"target"})))
 
