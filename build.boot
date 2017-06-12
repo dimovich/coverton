@@ -2,7 +2,7 @@
  :source-paths    #{"src/cljs" "src/clj"}
  :resource-paths  #{"resources" }
  :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
-                 [org.clojure/clojurescript "1.9.562"]
+                 [org.clojure/clojurescript "1.9.562" :scope "provided"]
 
                  [adzerk/boot-cljs          "2.0.0"      :scope "test"]
                  [adzerk/boot-cljs-repl     "0.3.2"      :scope "test"]
@@ -19,7 +19,7 @@
                  [ring/ring-core "1.6.1"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
 
-                 [devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
+                 ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]
                  [reagent  "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
@@ -49,26 +49,6 @@
         (sift :include #{#"app.jar"})))
 
 
-(deftask build-cljs
-  []
-  (comp (cljs
-         :compiler-options { ;;:out-file "public/main.js"
-                            ;;:devcards true
-                            :parallel-build true
-                            :foreign-libs
-                            [{:file "src/js/bundle.js"
-                              :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
-       ;; (sift :include #{#"main.js" #"public.*"})
-        ))
-
-
-(deftask build []
-  (comp
-   (build-cljs)
-   (build-jar)
-   (target)))
-
-
 (deftask run []
   (comp
    (serve :resource-root "target/public"
@@ -78,12 +58,13 @@
    (watch)
    (reload)
    (cljs-repl)
-   (build)))
+   (cljs)
+   (target)))
 
 
 (deftask production
   []
-  (task-options! cljs   {:optimizations :advanced}
+  (task-options! cljs {:optimizations :advanced}
                  target {:dir #{"release"}})
   identity)
 
@@ -91,8 +72,8 @@
 (deftask development
   []
   (task-options! cljs {:optimizations :none
-                       :source-map true}
-                 cljs-repl {:nrepl-opts {:port 3311}}
+                       :source-map    true}
+   cljs-repl {:nrepl-opts {:port 3311}}
                  target {:dir #{"target"}})
   identity)
 
@@ -116,7 +97,9 @@
 (deftask prod
   []
   (comp (production)
-        (build)))
+        (cljs)
+        (build-jar)
+        (target)))
 
 
 (deftask check-sources
