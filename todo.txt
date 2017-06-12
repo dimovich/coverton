@@ -1,4 +1,10 @@
-! resize after input change doesn't work. component is redrawn.
+ansible
+datomic
+ - install
+ - read docs
+ 
+
+
 
 + Esc for font-picker
 + dynamic line-height

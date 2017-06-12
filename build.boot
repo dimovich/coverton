@@ -1,6 +1,6 @@
 (set-env!
- :source-paths    #{"src/cljs" "src/clj" "public/js"}
- :resource-paths  #{"html" }
+ :source-paths    #{"src/cljs" "src/clj"}
+ :resource-paths  #{"resources" }
  :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
                  [org.clojure/clojurescript "1.9.562"]
 
@@ -43,29 +43,35 @@
 
 (deftask build-jar
   []
-  (comp (aot :namespace #{'coverton.core})
+  (comp (aot  :namespace #{'coverton.core})
         (uber)
-        (jar :main 'coverton.core :file "app.jar")
-        (sift :include #{#"app.jar" #"main.js" #"assets.*" })))
+        (jar  :main 'coverton.core :file "app.jar")
+        (sift :include #{#"app.jar"})))
+
+
+(deftask build-cljs
+  []
+  (comp (cljs
+         :compiler-options { ;;:out-file "public/main.js"
+                            ;;:devcards true
+                            :parallel-build true
+                            :foreign-libs
+                            [{:file "src/js/bundle.js"
+                              :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
+       ;; (sift :include #{#"main.js" #"public.*"})
+        ))
 
 
 (deftask build []
   (comp
-   (cljs :compiler-options
-         {:out-file "main.js"
-         ;;:devcards true
-         :parallel-build true
-          :foreign-libs
-          [{:file "public/js/bundle.js"
-            :provides ["cljsjs.react" "cljsjs.react.dom"]}]})
-
+   (build-cljs)
    (build-jar)
    (target)))
 
 
 (deftask run []
   (comp
-   (serve :resource-root "target"
+   (serve :resource-root "target/public"
           :handler 'coverton.core/app
           :reload true
           :httpkit true)

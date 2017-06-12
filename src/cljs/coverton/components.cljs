@@ -1,9 +1,9 @@
 (ns coverton.components
-  (:require [reagent.core :as r]
+  (:require [reagent.core  :as r]
             [re-frame.core :as rf :refer [dispatch subscribe]]
-            [dommy.core :as d :refer-macros [sel1 sel]]
+            [dommy.core    :as d  :refer-macros [sel1 sel]]
             [coverton.fonts :refer [default-font]]
-            [coverton.editor.subs]))
+            [coverton.ed.events :as evt]))
 
 
 (enable-console-print!)
@@ -114,7 +114,7 @@
 
 (defn draggable [{:keys [pos update-fn]}]
   (r/with-let [this (r/current-component)
-               [x y] pos]
+               [x y] pos];;prevents redrawing on db update
     [react-drag {:cancel ".cancel-drag"
                  :on-stop (fn [e d]
                             (let [el (aget d "node")]
@@ -155,8 +155,8 @@
 
                          ^{:key id}
                          [:span.picker-label
-                          {:on-click #(do (dispatch [:update-item id [:font :font-family] font-family])
-                                          (dispatch [:update-item id [:static] true]))
+                          {:on-click #(do (dispatch [::evt/update-item id [:font :font-family] font-family])
+                                          (dispatch [::evt/update-item id [:static] true]))
                            :style {:font-family (if static (:font-family font) font-family)
                                    :font-size font-size
                                    :color color
@@ -211,7 +211,7 @@
       :reagent-render
       (fn []
         (into
-         [:div#dimmer {:on-click #(dispatch [:update [:dim] false])}]
+         [:div#dimmer {:on-click #(dispatch [::evt/update [:dim] false])}]
          (r/children this)))})))
 
 
@@ -233,8 +233,8 @@
 (defn toolbox-font-picker [{:keys [id]}]
   [:div.label-toolbox-item
    {:style {:background-color "green"}
-    :on-click #(do (dispatch [:update-item id [:static] false])
-                   (dispatch [:update [:dim] :show-font-picker]))}])
+    :on-click #(do (dispatch [::evt/update-item id [:static] false])
+                   (dispatch [::evt/update [:dim] :show-font-picker]))}])
 
 
 

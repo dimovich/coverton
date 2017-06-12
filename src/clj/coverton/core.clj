@@ -3,6 +3,9 @@
             [compojure.route    :refer [not-found files resources]]
             [compojure.handler  :refer [site]]
             [ring.util.response :refer [file-response]]
+            [ring.middleware.resource :refer [wrap-resource]]
+            [ring.middleware.content-type :refer [wrap-content-type]]
+            [ring.middleware.not-modified :refer [wrap-not-modified]]
             [coverton.templates.editor   :refer [editor]]
             [coverton.templates.devcards :refer [devcards]]
             [coverton.templates.index    :refer [index]]            
@@ -22,6 +25,9 @@
 
 (def app
   (-> handler
+      (wrap-resource "public")
+      (wrap-content-type)
+      (wrap-not-modified)
       (site)))
 
 
