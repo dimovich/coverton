@@ -1,4 +1,4 @@
-;; scp -rp sourcedirectory user@dest:/path
+;; scp -rp release/* root@coverton.co:/var/www/coverton-co/
 
 
 
