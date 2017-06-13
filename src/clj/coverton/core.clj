@@ -8,19 +8,19 @@
             [ring.middleware.not-modified :refer [wrap-not-modified]]
             [coverton.templates.editor   :refer [editor]]
             [coverton.templates.devcards :refer [devcards]]
-            [coverton.templates.index    :refer [index]]            
+            [coverton.templates.index    :refer [index static-promo]]
             [org.httpkit.server :as server])
   (:gen-class))
 
 
 
 (defroutes handler
-  (GET "/" [] (index))
+  (GET "/"         [] (static-promo))
   (GET "/devcards" [] (devcards))
-  (GET "/editor" [] (editor))
-  (files "/" {:root "."})     ;; to serve static resources
+  (GET "/index"    [] (index))
+  (files     "/" {:root "."}) ;; to serve static resources
   (resources "/" {:root "."}) ;; to serve anything else
-  (not-found "Page Not Found"))    ;; page not found
+  (not-found "Page Not Found")) ;; page not found
 
 
 (def app

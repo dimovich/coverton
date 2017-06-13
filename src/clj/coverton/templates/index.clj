@@ -5,6 +5,20 @@
   (html5
    {:lang "en"}
    [:head
+    [:title "Coverton Editor"]
+    (include-css "assets/css/style.css")]
+   [:body
+    [:div.wrap
+     [:div#app]]
+    [:span#span-measure]
+    (include-js "main.js")
+    [:script "coverton.core.main();"]]))
+
+
+(defn static-promo []
+  (html5
+   {:lang "en"}
+   [:head
     [:title "Coverton"]
     [:meta {:charset "utf-8"}]
     (include-css "assets/css/style.css")
