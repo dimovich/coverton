@@ -3,8 +3,7 @@
             [re-frame.core :as rf :refer [subscribe dispatch dispatch-sync]]
             [coverton.components  :as cc]
             [coverton.ed.events   :as evt]
-            [coverton.ed.subs     :as sub]
-            [dommy.core :as d]))
+            [coverton.ed.subs     :as sub]))
 
 
 (defn item [id]

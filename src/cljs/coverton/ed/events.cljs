@@ -14,6 +14,7 @@
 
 (reg-event-db
  ::initialize
+ ed-interceptors
  (fn [_ _]
    default-value))
 
