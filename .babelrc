@@ -1,8 +1,6 @@
 {
    "presets" : [
-   	     ["es2015", {"modules": false}],
-	     "react",
-	     "stage-1"],
+   	     ["es2015"]],
    "plugins": [
     ["lodash", { "id": ["lodash", "semantic-ui-react"] }]
   ]
