@@ -24,7 +24,11 @@
                  [prismatic/dommy "1.1.0"]
                  ;;[soda-ash "0.3.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [reagent  "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 [re-frame "0.9.4"]])
+                 [re-frame "0.9.4"]
+;;                 [cljsjs/react "15.5.4-1"]
+;;                 [cljsjs/react-dom "15.5.4-1"]
+;;                 [cljsjs/semantic-ui-react "0.68.4-0"]
+                 ])
 
 
 (require
