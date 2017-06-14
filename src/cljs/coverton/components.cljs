@@ -3,13 +3,18 @@
             [re-frame.core :as rf :refer [dispatch subscribe]]
             [dommy.core    :as d  :refer-macros [sel1 sel]]
             [coverton.fonts :refer [default-font]]
-            [coverton.ed.events :as evt]))
+            [coverton.ed.events :as evt]
+            [react.draggable :as drag]
+            [react.resizable :as resz]))
 
 
 (enable-console-print!)
 
-(def react-drag   (r/adapt-react-class (aget js/window "deps" "draggable")))
-(def react-resize (r/adapt-react-class (aget js/window "deps" "resizable")))
+(def react-drag   (r/adapt-react-class js/Draggable;;(aget js/window "deps" "draggable")
+                   ))
+(def react-resize (r/adapt-react-class js/Resizable;;(aget js/window "deps" "resizable")
+                   ))
+
 
 
 ;;

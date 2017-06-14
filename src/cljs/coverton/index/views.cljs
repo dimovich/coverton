@@ -6,7 +6,8 @@
             [coverton.ed.views     :as ed]))
 
 
-(def sem-button (r/adapt-react-class (aget js/window "deps" "semui-button")))
+(def sem-button :div;;(r/adapt-react-class (aget js/window "deps" "semui-button"))
+  )
 
 
 
