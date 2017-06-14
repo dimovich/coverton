@@ -22,6 +22,7 @@
                  ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]
+                 ;;[soda-ash "0.3.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [reagent  "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.9.4"]])
 
@@ -46,7 +47,7 @@
   (comp (aot  :namespace #{'coverton.core})
         (uber)
         (jar  :main 'coverton.core :file "app.jar")
-        (sift :include #{#"app.jar"})))
+        (sift :include #{#"app.jar" #"main.js"})))
 
 
 (deftask run []
@@ -71,9 +72,9 @@
 
 (deftask development
   []
-  (task-options! cljs {:optimizations :none
-                       :source-map    true}
-   cljs-repl {:nrepl-opts {:port 3311}}
+  (task-options! cljs      {:optimizations :none
+                            :source-map    true}
+                 cljs-repl {:nrepl-opts {:port 3311}}
                  target {:dir #{"target"}})
   identity)
 

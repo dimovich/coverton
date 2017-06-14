@@ -1,18 +1,26 @@
 (ns coverton.templates.index
   (:require [hiccup.page :refer [html5 include-css include-js]]))
 
+
+
 (defn index []
   (html5
    {:lang "en"}
    [:head
     [:title "Coverton Editor"]
-    (include-css "assets/css/style.css")]
+    (include-css "assets/css/style.css")
+    (include-css "https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.css")]
+   [:link {:rel "shortcut icon"
+           :href "assets/img/f.ico"
+           :type "image/x-icon"}]
    [:body
     [:div.wrap
      [:div#app]]
     [:span#span-measure]
     (include-js "main.js")
     [:script "coverton.core.main();"]]))
+
+
 
 
 (defn static-promo []

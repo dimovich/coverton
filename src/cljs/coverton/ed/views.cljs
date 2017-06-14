@@ -38,7 +38,7 @@
 
 
 (defn editor []
-  (r/with-let [_    (dispatch-sync [::evt/initialize])
+  (r/with-let [;;_    (dispatch-sync [::evt/initialize])
                dim  (subscribe [::sub/dim])
                its  (subscribe [::sub/items])
                ids  (subscribe [::sub/item-ids])]

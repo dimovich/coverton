@@ -197,7 +197,11 @@
 
 
 (defn dimmer []
-  (r/with-let [this (r/current-component)]
+  (r/with-let [this  (r/current-component)
+               body  (sel1 :body)
+               close #(dispatch [::evt/update [:dim] false])
+               esc   #(when (= (.. % -keyCode) 27) (close))
+               _     (d/listen! body :keyup esc)]
     (r/create-class
      {:display-name "dimmer"
       :component-did-mount
@@ -211,21 +215,24 @@
       :reagent-render
       (fn []
         (into
-         [:div#dimmer {:on-click #(dispatch [::evt/update [:dim] false])}]
-         (r/children this)))})))
+         [:div#dimmer {:on-click close}]
+         (r/children this)))})
+    (finally
+      (d/unlisten! body :keyup esc))))
 
 
 
 
 (defn font-picker [labels]
   (r/with-let [lbls (export-labels labels)]
-   [dimmer
-    (into
-     [:div.picker-container]
-     (for [font-family coverton.fonts/font-names]
-       [picker-block {:key    font-family
-                      :labels lbls
-                      :font-family font-family}]))]))
+    [dimmer
+     (into
+      [:div.picker-container]
+      (for [font-family coverton.fonts/font-names]
+        [picker-block {:key    font-family
+                       :labels lbls
+                       :font-family font-family
+                       }]))]))
 
 
 

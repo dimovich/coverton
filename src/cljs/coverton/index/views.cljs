@@ -6,16 +6,25 @@
             [coverton.ed.views     :as ed]))
 
 
+(def sem-button (r/adapt-react-class (aget js/window "deps" "semui-button")))
+
+
 
 (defn index []
-  (r/with-let [_            (dispatch-sync [::evt/initialize])
+  (r/with-let [;;_            (dispatch-sync [::evt/initialize])
                active-panel (subscribe [::sub/active-panel])]
     [:div.index
-     [:button {:on-click #(dispatch [::evt/set-active-panel :index])}
+     [sem-button {:on-click #(dispatch [::evt/set-active-panel :index])}
       "Index"]
-     [:button {:on-click #(dispatch [::evt/set-active-panel :ed])}
+     [sem-button {:on-click #(dispatch [::evt/set-active-panel :ed])}
       "Editor"]
      
      (condp = @active-panel
        :ed [ed/editor]
-       [:p.text [:br] "INDEX"])]))
+       
+       [:div {:class "content vcenter"}
+        [:img.logo {:src "assets/svg/logo.svg"}]
+        [:p.text
+         "a publishing platform for cover makers"
+         [:br]
+         "is coming soon."]])]))
