@@ -1,12 +1,11 @@
 {:require [coverton.core]
- :compiler-options {:externs ["src/js/draggable.ext.js"]
-                    :foreign-libs
-                    [{:file "node_modules/react-draggable/dist/react-draggable.js"
-                      :file-min "node_modules/react-draggable/dist/react-draggable.min.js"
-                      :provides ["react.draggable"]}
-                     {:file "../react-resizable-box/src/index.js"
-                      :provides ["react.resizable"]
-                      ;;:externs ["src/js/resizable.ext.js"]
-                      :module-type :es6}
-                     #_{:file "src/js/bundle.js"
-                        :provides ["cljsjs.react" "cljsjs.react-dom"]}]}}
+ :compiler-options {:foreign-libs
+                    [#_{:file "node_modules/react-draggable/dist/react-draggable.js"
+                        :file-min "node_modules/react-draggable/dist/react-draggable.min.js"
+                        :provides ["react.draggable"]}
+                     #_{:file "../react-resizable-box/src/index.js"
+                        :provides ["react.resizable"]
+                        ;;:externs ["src/js/resizable.ext.js"]
+                        :module-type :es6}
+                     {:file "src/js/bundle.js"
+                      :provides ["cljsjs.react" "cljsjs.react-dom"]}]}}

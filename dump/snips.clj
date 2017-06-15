@@ -2,9 +2,18 @@
 
 
 
+;; dumb component
+(r/with-let [[x y] some-dynamic-var]
+  (;;use x y
+   ))
+
+;; smart components
+(r/with-let [s (subscribe [:key])]
+  @s)
 
 
-;;--- Fetch/Set
+
+;;--- Fetch/Set (take server from namen)
 
 (reg-event-db
  :process-notes-list
@@ -22,4 +31,5 @@
    db))
 
 
----
+;;---
+

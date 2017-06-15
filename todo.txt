@@ -5,6 +5,13 @@
 - experiment with double space (similar to pick-block)
 
 
++ image crop / zoom
+
++ dynamic line-height
+
++ color picker
+
+! fix export label coordinates
 
 
 ansible
@@ -15,8 +22,7 @@ datomic
 
 
 
-+ Esc for font-picker
-+ dynamic line-height
+
 
 - read re-frame docs
 - read reagent docs

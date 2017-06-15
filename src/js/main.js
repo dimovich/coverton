@@ -7,7 +7,7 @@ window.deps = {
     'react-dom' : require('react-dom'),
     'draggable': Draggable,
     'resizable': Resizable,
-    'semui-button': Button
+    'sem-button': Button
 };
 
 window.React = window.deps['react'];

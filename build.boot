@@ -22,8 +22,7 @@
                  ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]
-                 [reagent  "0.6.2";; :exclusions [cljsjs/react cljsjs/react-dom]
-                  ]
+                 [reagent  "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.9.4"]])
 
 

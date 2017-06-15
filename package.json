@@ -9,6 +9,7 @@
       "babel-preset-react": "^6.23.0",
       "babel-preset-stage-1": "^6.22.0",
       "babel-plugin-lodash": "^3.2.11",
+      "babel-core": "6.25.0",
       "react": "15.6.0",
       "react-dom": "15.6.0",
       "webpack": "2.5.1",
