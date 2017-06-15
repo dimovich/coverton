@@ -5,6 +5,8 @@
 - experiment with double space (similar to pick-block)
 
 
++ auth  https://github.com/lambdaisland/booklog
+
 + image crop / zoom
 
 + dynamic line-height
