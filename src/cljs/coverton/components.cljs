@@ -10,9 +10,9 @@
 
 (enable-console-print!)
 
-(def react-drag   (r/adapt-react-class js/Draggable;;(aget js/window "deps" "draggable")
+(def react-drag   (r/adapt-react-class drag/Draggable;;(aget js/window "deps" "draggable")
                    ))
-(def react-resize (r/adapt-react-class js/Resizable;;(aget js/window "deps" "resizable")
+(def react-resize (r/adapt-react-class resz/Resizable;;(aget js/window "deps" "resizable")
                    ))
 
 
