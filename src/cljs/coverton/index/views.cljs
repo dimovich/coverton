@@ -6,7 +6,10 @@
             [coverton.ed.views     :as ed]))
 
 
-(def sem-button (r/adapt-react-class (aget js/window "deps" "sem-button")))
+;;(def sem-button (r/adapt-react-class (aget js/window "deps" "sem-button")))
+
+(def Button (r/adapt-react-class (aget js/window "deps" "semui" "Button")))
+
 
 
 
@@ -14,9 +17,9 @@
   (r/with-let [;;_            (dispatch-sync [::evt/initialize])
                active-panel (subscribe [::sub/active-panel])]
     [:div.index
-     [sem-button {:on-click #(dispatch [::evt/set-active-panel :index])}
+     [Button {:on-click #(dispatch [::evt/set-active-panel :index])}
       "Index"]
-     [sem-button {:on-click #(dispatch [::evt/set-active-panel :ed])}
+     [Button {:on-click #(dispatch [::evt/set-active-panel :ed])}
       "Editor"]
      
      (condp = @active-panel
