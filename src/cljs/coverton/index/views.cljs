@@ -6,10 +6,7 @@
             [coverton.ed.views     :as ed]))
 
 
-;;(def sem-button (r/adapt-react-class (aget js/window "deps" "sem-button")))
-
 (def Button (r/adapt-react-class (aget js/window "deps" "semui" "Button")))
-
 
 
 
