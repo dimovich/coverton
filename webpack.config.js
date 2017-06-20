@@ -11,11 +11,17 @@ const config = {
     filename: 'bundle.js'
   },
 
-    module: {
-        loaders: [{loader: 'babel-loader',
-		   test: APP_DIR}]
-    },
-
+/*    module: {
+	rules: [
+	    {
+		test: /\.js$/,
+		exclude: /(node_modules|bower_components)/,
+		use: {
+		    loader: 'babel-loader'
+		}
+	    }
+	]
+    }*/
 };
 
 module.exports = config;
