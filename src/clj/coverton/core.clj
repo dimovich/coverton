@@ -9,7 +9,9 @@
             [coverton.templates.editor   :refer [editor]]
             [coverton.templates.devcards :refer [devcards]]
             [coverton.templates.index    :refer [index static-promo]]
-            [org.httpkit.server :as server])
+            [org.httpkit.server :as server]
+            [coverton.templates.wordizer :as w]
+            [cheshire.core :as json])
   (:gen-class))
 
 
@@ -17,9 +19,12 @@
 (defroutes handler
   (GET "/"         [] (static-promo))
   (GET "/devcards" [] (devcards))
+  (GET "/wordizer" [] (w/wordizer))
+  (GET "/generate" xs (json/generate-string
+                       (w/generate (-> xs :params :words vals))))
   (GET "/index"    [] (index))
-  (files     "/" {:root "."}) ;; to serve static resources
-  (resources "/" {:root "."}) ;; to serve anything else
+  (files     "/" {:root "."})   ;; to serve static resources
+  (resources "/" {:root "."})   ;; to serve anything else
   (not-found "Page Not Found")) ;; page not found
 
 

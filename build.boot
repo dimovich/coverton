@@ -19,6 +19,13 @@
                  [ring/ring-core "1.6.1"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
 
+                 [cheshire "5.6.3"]
+                 [cljs-ajax "0.5.8"]
+                 [slingshot "0.12.2"]
+                 [clj-http "2.2.0"]
+                 [enlive "1.1.6"]
+                 [org.clojure/math.combinatorics "0.1.3"]
+
                  ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]

@@ -1,0 +1,291 @@
+(ns coverton.templates.wordizer
+  (:require [hiccup.page :refer [html5 include-css include-js]]
+            [compojure.core :refer [defroutes GET POST]]
+            [compojure.route :refer [not-found files resources]]
+            [compojure.handler :refer [site]]
+            [clj-http.client :as client]
+            [net.cgrand.enlive-html :as enlive]
+            [clojure.math.combinatorics :as math]
+            [cheshire.core :as json]
+            [slingshot.slingshot :refer [try+ throw+]]))
+
+
+;;fixme: include as lib
+
+
+
+(defn wordizer []
+  (html5
+   {:lang "en"}
+   [:head
+    [:title "Word.what?"]
+    (include-css "assets/css/wordizer.css")
+    (include-css "assets/css/bootstrap.min.css")]
+   [:body
+    [:div.wrap
+     [:div#app]]
+    [:span#span-measure]
+    (include-js "wordizer.js")]))
+
+
+
+
+
+(def config {:retry-time 2000
+             :google-size 50})
+
+
+
+(def google-url "https://www.google.com/search")
+(def ts-url "http://www.thesaurus.com/browse/")
+(def ds-url "https://api.deusu.org/v1/query")
+
+
+
+;; for urls
+(defn try-n-times [f n]
+  (if (zero? n)
+    ;;(f)
+    {:body ""}
+    (try+
+     (f)
+     (catch [:status 403] {:keys [request-time headers body]}
+       ;;(println "403" request-time headers)
+       {:body ""})
+     (catch [:status 404] {:keys [request-time headers body]}
+       ;;(println "NOT Found 404" request-time headers body)
+       {:body ""})
+     (catch Object _
+       (do
+        ;; (println (:throwable &throw-context) "unexpected error")
+         (println "unexpected error")
+         (Thread/sleep (:retry-time config))
+         (try-n-times f (dec n)))))))
+
+(defmacro try3 [& body]
+  `(try-n-times (fn [] ~@body) 10))
+
+
+
+
+(def client-headers {"User-Agent" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:48.0) Gecko/20100101 Firefox/48.0"})
+
+(def english-articles #{"his" "ago" "of" "up" "off" "theirs" "yours" "mine" "by" "away" "about" "they" "near to" "without" "for" "my" "short" "circa" "a" "on" "notwithstanding" "from" "with" "through" "aside" "your" "to" "hence" "apart" "as" "at" "her" "in" "adjacent to" "on account of" "us" "them" "me" "you" "do" "the" "are" "our" "their" "it" "I" "and" "over" "be" "there" "here" "is" "s" "that" "he" "has" "have" "an" "t" "was" "all" "its" "two" "three" "into" "than" "more" "if" "also" "or" "when" "then" "each" "across" "out" "where" "can" "one" "this" "not" "these" "non" "most" "will" "why" "may" "how"})
+
+
+
+
+
+(defn http-get [url opts]
+  (let [opts (assoc opts :throw-entire-message? true :headers client-headers)]
+    (try3 (client/get url opts))
+    ;;(reset! http-timer (now))
+    ))
+
+#_(if (>= 1 (Math/abs (- (now) @http-timer))))
+      
+
+
+(defn parse-html
+  [html]
+  (when-not (empty? html)
+    (-> html
+        java.io.StringReader.
+        enlive/html-resource)))
+
+
+(defn get-html
+  ([url]
+   (get-html url {}))
+  ([url opts]
+   (-> (http-get url opts)
+       :body)))
+
+
+(defn extract-text [dom selectors]
+  (for [st (enlive/select dom [selectors])]
+    (enlive/text st)))
+
+
+(defn term-search [term s]
+  (let [p (re-pattern (str "(\\w+)?\\s*" term "\\s*(\\w+)?"))]
+    (->> s
+         clojure.string/lower-case
+         ;;deconstruct and clean
+         (re-seq #"\b[^\d\W]{3,}\b")
+         (remove english-articles)
+         ;;reconstruct and analyze
+         (interpose " ")
+         (apply str)
+         (re-seq p)
+         (mapcat rest)
+         (remove nil?)
+         (remove #{"s"})
+         frequencies)))
+
+
+
+
+;;
+;; Thesaurus
+;;
+(defn ts-search [term]
+  (let [st [[:span (enlive/attr= :class "text")]
+            [:a (enlive/attr= :class "syn_of_syns")]]
+        dom (-> (str ts-url term)
+                get-html
+                parse-html)]
+    (mapcat #(extract-text dom %) st)))
+
+
+
+(defn cn-normalize [term]
+  (let [url "http://conceptnet5.media.mit.edu/data/5.4/uri"
+        res (-> (http-get url {:headers client-headers
+                               :query-params {"language" "en"
+                                              "text" term}})
+                :body
+                json/parse-string)]
+    ;;(println "===!!!!!!!!!!! " res " !!!!!!!!111======")
+    (if res
+      (->> (res "uri")
+           (re-seq #"\w+$")
+           first)
+      "")))
+
+
+(defn get-cn-surface [term {:strs [start end surfaceStart]}]
+  (let [[start end] (map #(first (re-seq #"\w+$" %)) [start end])]
+    (if (= term start)
+      end
+      (or surfaceStart end))))
+
+
+(defn cn-lookup [term]
+  (let [url "http://conceptnet5.media.mit.edu/data/5.4/c/en/"
+        res (-> (str url term)
+                (http-get {:headers client-headers
+                           :query-params {"limit" 15}})
+                :body
+                json/parse-string)]
+    (map #(get-cn-surface term %) (res "edges"))))
+
+
+
+(defn cn-search [term & [rel]]
+  (let [relations {:has-property "/r/HasProperty"
+                   :capable-of "/r/CapableOf"
+                   :used-for "/r/UsedFor"
+                   :related-to "/r/RelatedTo"}
+        rel (relations (or rel :related-to))
+        url "http://conceptnet5.media.mit.edu/data/5.4/search"
+        res (-> (http-get url {:headers client-headers
+                               :query-params {"limit" 15
+                                              "rel" rel
+                                              "end" (str "/c/en/" term)}})
+                :body
+                json/parse-string)
+        res (or res ())]
+    (map #(get-cn-surface term %) (res "edges"))))
+
+
+
+(defn cn-assoc [term]
+  (let [url "http://conceptnet5.media.mit.edu/data/5.4/assoc/list/en/"
+        res (-> (str url term)
+                (http-get {:headers client-headers
+                           :query-params {"limit" 15}})
+                :body
+                json/parse-string)]
+    (map (fn [[c w]]
+           (-> (re-seq #"\w+$" c)
+               first))
+         (res "similar"))))
+
+
+
+;;
+;; DeuSu
+;;
+(defn ds-search [term]
+  (let [r (->> (http-get ds-url {:query-params {"p" 10
+                                                "pc" 10
+                                                "q" "hello"}
+                                 :insecure? true})
+               :body
+               (re-seq #"snippet=(.*)")
+               (map second)
+               (apply str))
+        r1 (term-search term r)
+        r2 (term-search (cn-normalize term) r)]
+    [r1 r2]))
+
+
+
+
+(defn get-combinations [words]
+  (->> words
+       count
+       inc
+       (range 1)
+       (mapcat #(math/combinations words %))
+       (map #(->> % (interpose " ") (apply str)))))
+
+
+
+
+
+(defn google-search [term]
+  ;;find words next to our term
+  (let [p (re-pattern (str "(\\w+)?\\s*" term "\\s*(\\w+)?"))]
+    (->>
+     (-> (get-html google-url {:query-params {"num" "100"
+                                              "safe" "off"
+                                              "source" "hp"
+                                              "q" term}})
+         (parse-html)
+         (extract-text [[:span (enlive/attr= :class "st")]]))
+     (apply str)
+     (term-search term))))
+
+
+
+
+(defn generate [search-terms]
+  (println "generating: " search-terms)
+  (let [ ;; ConceptNet
+        cn (let [search-terms (map #(cn-normalize %) search-terms)
+                 ;; single terms
+                 tsks {search-terms
+                       [cn-lookup cn-search cn-assoc]}
+                 ;; combination of terms
+                 tsks (if (< 1 (count search-terms))
+                        (assoc tsks
+                               (list (apply str (interpose \, search-terms)))
+                               [cn-assoc])
+                        tsks)]
+             (->> (map #(for [t (first %) f (second %)]
+                          (f t))
+                       tsks)
+                  flatten
+                  (remove nil?)
+                  (map #(clojure.string/replace % "_" " "))
+                  distinct))
+        ;; Thesaurus
+        ts (mapcat #(ts-search %) search-terms)
+
+        ;; Google
+        google (->> search-terms
+                    get-combinations
+                    (map #(google-search %))
+                    (reduce #(merge-with + %1 %2))
+                    (sort-by val)
+                    reverse
+                    (take (:google-size config))
+                    (map first)
+                    ;;distinct
+                    )]
+    {:google google
+     :conceptnet cn
+     :thesaurus ts}))
+
