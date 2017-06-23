@@ -10,7 +10,7 @@
             [coverton.templates.devcards :refer [devcards]]
             [coverton.templates.index    :refer [index static-promo]]
             [org.httpkit.server :as server]
-            [coverton.templates.wordizer :as w]
+            [namen.core :as w]
             [cheshire.core :as json])
   (:gen-class))
 
@@ -19,7 +19,7 @@
 (defroutes handler
   (GET "/"         [] (static-promo))
   (GET "/devcards" [] (devcards))
-  (GET "/wordizer" [] (w/wordizer))
+  (GET "/wordizer" [] (w/frontend))
   (GET "/generate" xs (json/generate-string
                        (w/generate (-> xs :params :words vals))))
   (GET "/index"    [] (index))
