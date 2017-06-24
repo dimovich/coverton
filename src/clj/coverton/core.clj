@@ -36,4 +36,5 @@
 
 
 (defn -main [& args]
-  (server/run-server app {:port 80}))
+  (server/run-server app {:port 80})
+  (println "started server"))

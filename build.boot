@@ -1,5 +1,5 @@
 (set-env!
- :source-paths    #{"src/cljs" "src/clj" "src/js"}
+ :source-paths    #{"src/cljs" "src/clj"}
  :resource-paths  #{"resources" }
  :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
                  [org.clojure/clojurescript "1.9.562" :scope "provided"]
@@ -38,7 +38,6 @@
 
 
 
-
 (swap! boot.repl/*default-dependencies*
        concat '[[cider/cider-nrepl "0.15.0-SNAPSHOT"]])
 
@@ -46,34 +45,20 @@
        conj 'cider.nrepl/cider-middleware)
 
 
-(task-options! jar {:main 'coverton.core :file "coverton.jar"}
-               sift {:include #{#"coverton.jar" #"coverton.js"}})
 
-
-(deftask build-jar
-  []
-  (comp (aot  :namespace #{'coverton.core})
-        (uber)
-        (jar)
-        (sift)))
-
-
-(deftask run []
-  (comp
-   (serve :resource-root "target/public"
-          :handler 'coverton.core/app
-          :reload true
-          :httpkit true)
-   (watch)
-   (reload)
-   (cljs-repl)
-   (cljs)
-   (target)))
+(task-options! jar   {:main 'coverton.core :file "coverton.jar"}
+               sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets" #"namen\.js"}}
+               aot   {:namespace #{'coverton.core}}
+               cljs  {:ids #{"public/coverton"}}
+               serve {:resource-root "target/public"
+                      :handler 'coverton.core/app
+                      :reload true
+                      :httpkit true})
 
 
 (deftask production
   []
-  (task-options! cljs {:optimizations :advanced}
+  (task-options! cljs   {:optimizations :advanced}
                  target {:dir #{"release"}})
   identity)
 
@@ -83,9 +68,27 @@
   (task-options! cljs      {:optimizations :none
                             :source-map    true}
                  cljs-repl {:nrepl-opts {:port 3311}}
-                 target {:dir #{"target"}})
+                 target    {:dir #{"target"}})
   identity)
 
+
+
+(deftask build-jar
+  []
+  (comp (aot)
+        (uber)
+        (jar)
+        (sift)))
+
+
+(deftask run []
+  (comp
+   (serve)
+   (watch)
+   (reload)
+   (cljs-repl)
+   (cljs)
+   (target)))
 
 
 (deftask dev
@@ -98,7 +101,8 @@
 (deftask devcards
   []
   (set-env! :source-paths #(conj % "src/devcards"))
-  (task-options! reload {:on-jsload 'coverton.devcards/reload})
+  (task-options! reload {:on-jsload 'coverton.devcards/reload}
+                 cljs   {:ids #{"public/devcards"}})
   (comp (development)
         (run)))
 

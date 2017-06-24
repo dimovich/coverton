@@ -1,4 +1,4 @@
 {:require [coverton.core]
  :init-fns [coverton.core/init]
- :compiler-options {:foreign-libs  [{:file "bundle.js"
+ :compiler-options {:foreign-libs  [{:file "src/js/bundle.js"
                                      :provides ["cljsjs.react" "cljsjs.react-dom"]}]}}
