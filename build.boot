@@ -1,5 +1,5 @@
 (set-env!
- :source-paths    #{"src/cljs" "src/clj"}
+ :source-paths    #{"src/cljs" "src/clj" "src/js"}
  :resource-paths  #{"resources" }
  :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
                  [org.clojure/clojurescript "1.9.562" :scope "provided"]
@@ -37,6 +37,8 @@
  '[tolitius.boot-check   :as check])
 
 
+
+
 (swap! boot.repl/*default-dependencies*
        concat '[[cider/cider-nrepl "0.15.0-SNAPSHOT"]])
 
@@ -44,12 +46,16 @@
        conj 'cider.nrepl/cider-middleware)
 
 
+(task-options! jar {:main 'coverton.core :file "coverton.jar"}
+               sift {:include #{#"coverton.jar" #"coverton.js"}})
+
+
 (deftask build-jar
   []
   (comp (aot  :namespace #{'coverton.core})
         (uber)
-        (jar  :main 'coverton.core :file "app.jar")
-        (sift :include #{#"app.jar" #"main.js"})))
+        (jar)
+        (sift)))
 
 
 (deftask run []

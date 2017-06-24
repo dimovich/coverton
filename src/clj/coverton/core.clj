@@ -6,11 +6,10 @@
             [ring.middleware.resource :refer [wrap-resource]]
             [ring.middleware.content-type :refer [wrap-content-type]]
             [ring.middleware.not-modified :refer [wrap-not-modified]]
-            [coverton.templates.editor   :refer [editor]]
             [coverton.templates.devcards :refer [devcards]]
             [coverton.templates.index    :refer [index static-promo]]
             [org.httpkit.server :as server]
-            [namen.core :as w]
+            [namen.core :as namen]
             [cheshire.core :as json])
   (:gen-class))
 
@@ -19,9 +18,9 @@
 (defroutes handler
   (GET "/"         [] (static-promo))
   (GET "/devcards" [] (devcards))
-  (GET "/wordizer" [] (w/frontend))
+  (GET "/wordizer" [] (namen/frontend))
   (GET "/generate" xs (json/generate-string
-                       (w/generate (-> xs :params :words vals))))
+                       (namen/generate (-> xs :params :words vals))))
   (GET "/index"    [] (index))
   (files     "/" {:root "."})   ;; to serve static resources
   (resources "/" {:root "."})   ;; to serve anything else

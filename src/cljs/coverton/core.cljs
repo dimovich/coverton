@@ -14,7 +14,7 @@
   (r/render [app] (sel1 :#app)))
 
 
-(defn ^:export main []
+(defn ^:export init []
   (reload))
 
 
