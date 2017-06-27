@@ -29,17 +29,20 @@
                      :cover/tags ["sea" "boat" "depth" "children"]
                      :cover/marks  [{:mark/id "someid"
                                      :mark/type :text
+                                     :mark/text "Hello"
                                      :mark/pos [0.55 0.7]
                                      :mark/font-size 50
                                      :mark/font-name "GothaPro"}
                                     
                                     {:mark/id "anotherid"
                                      :mark/type :text
+                                     :mark/text "Friend"
                                      :mark/pos [0.55 0.7]
                                      :mark/font-size 50
                                      :mark/font-name "GothaPro"}
 
                                     {:mark/id "someotherid"
+                                     :mark/text "What's up?"
                                      :mark/type :text
                                      :mark/pos [0.55 0.7]
                                      :mark/font-size 50
@@ -58,6 +61,16 @@
                               :where
                               [_ :cover/marks ?mark]
                               [?mark :mark/id ?id]]}))
+
+
+(def data (<!! (client/q conn {:args [db]
+                               :query '[:find
+                                        (pull ?e [*])
+                                        :where
+                                        [?e :cover/id]]})))
+
+
+(:cover/marks (ffirst data))
 
 #_(<!! (client/pull db {:selector '[*]
                         :eid #{17592186045425 17592186045422}}))

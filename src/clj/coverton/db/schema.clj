@@ -40,6 +40,10 @@
                   {:db/ident :mark/type
                    :db/valueType :db.type/ref
                    :db/cardinality :db.cardinality/one}
+
+                  {:db/ident :mark/text
+                   :db/valueType :db.type/string
+                   :db/cardinality :db.cardinality/one}
                   
                   {:db/ident :mark/pos
                    :db/valueType :db.type/float
