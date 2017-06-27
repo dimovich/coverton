@@ -19,8 +19,13 @@
                  [ring/ring-core "1.6.1"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
 
+                 [com.datomic/clj-client "0.8.606"]
+                 [org.clojure/core.async "0.3.443"]
+
                  [namen "0.1.0"]
                  [cheshire "5.6.3"]
+
+                 
                  
                  ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
@@ -39,7 +44,7 @@
 
 
 (swap! boot.repl/*default-dependencies*
-       concat '[[cider/cider-nrepl "0.15.0-SNAPSHOT"]])
+       concat '[[cider/cider-nrepl "0.15.0-SNAPSHOT" :scope "test"]])
 
 (swap! boot.repl/*default-middleware*
        conj 'cider.nrepl/cider-middleware)
