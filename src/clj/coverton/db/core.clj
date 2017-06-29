@@ -5,8 +5,9 @@
             [coverton.db.schema :refer [cover-schema mark-schema sample-data]]))
 
 
-(defn init [schema]
-  (let [conn (->> {:db-name "hello"
+(defn init []
+  (let [schema (concat cover-schema mark-schema)
+        conn (->> {:db-name "hello"
                    :account-id client/PRO_ACCOUNT
                    :secret "admin"
                    :region "none"

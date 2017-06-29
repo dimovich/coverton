@@ -18,6 +18,7 @@
                  [http-kit  "2.2.0"]
                  [ring/ring-core "1.6.1"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
+                 [com.taoensso/timbre "4.8.0"]
 
                  [com.datomic/clj-client "0.8.606"]
                  [org.clojure/core.async "0.3.443"]
