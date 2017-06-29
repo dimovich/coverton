@@ -1,18 +1,21 @@
 (ns coverton.db.core
   (:require [clojure.core.async :refer [<!!]]
             [datomic.client     :as    client]
+            [clojure.pprint     :refer [pprint]]
             [coverton.db.schema :refer [cover-schema mark-schema sample-data]]))
 
 
 (defn init [schema]
-  (let [conn (<!! (client/connect
-                   {:db-name "hello"
-                    :account-id client/PRO_ACCOUNT
-                    :secret "admin"
-                    :region "none"
-                    :endpoint "localhost:8998"
-                    :service "peer-server"
-                    :access-key "admin"}))]
+  (let [conn (->> {:db-name "hello"
+                   :account-id client/PRO_ACCOUNT
+                   :secret "admin"
+                   :region "none"
+                   :endpoint "localhost:8998"
+                   :service "peer-server"
+                   :access-key "admin"}
+                  
+                  client/connect
+                  <!!)]
     
     (<!! (client/transact conn {:tx-data schema}))
     
