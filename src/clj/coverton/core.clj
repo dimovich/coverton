@@ -95,6 +95,6 @@
   (info "started server"))
 
 
-;; transit
-;; save button
-;; author
+;; uniform data schema
+;; use spec for schema
+;; use component to init
