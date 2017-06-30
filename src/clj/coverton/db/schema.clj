@@ -37,6 +37,10 @@
                    :db/valueType :db.type/long
                    :db/cardinality :db.cardinality/one}
 
+                  {:db/ident :mark/color
+                   :db/valueType :db.type/string
+                   :db/cardinality :db.cardinality/one}
+
                   {:db/ident :mark/url
                    :db/valueType :db.type/string
                    :db/cardinality :db.cardinality/one}

@@ -14,26 +14,29 @@
 (def Button (r/adapt-react-class (aget js/window "deps" "semui" "Button")))
 
 
-(defn handle-save-cover [e]
-  (let [cover @(subscribe [::ed-sub/cover])]
-    (POST "/add-cover" {:headers {"Accept" "application/transit+json"}
-                        :handler (fn [res]
-                                   (println res))
-                        :error-handler #(.log js/console (str %))
-                        :params {:cover cover}})))
+(defn save-cover [cover]
+  (POST "/add-cover" {:headers {"Accept" "application/transit+json"}
+                      :handler (fn [res]
+                                 (println res))
+                      :error-handler #(.log js/console (str %))
+                      :params {:cover cover}}))
 
 
 
 (defn index []
   (r/with-let [ ;;_            (dispatch-sync [::evt/initialize])
-               active-panel (subscribe [::sub/active-panel])]
+               active-panel (subscribe [::sub/active-panel])
+               cover        (subscribe [::ed-sub/cover])]
     [:div.index
      [Button {:on-click #(dispatch [::evt/set-active-panel :index])}
       "Index"]
      [Button {:on-click #(dispatch [::evt/set-active-panel :ed])}
       "Editor"]
-     [Button {:on-click handle-save-cover}
-      "Save cover"]
+     [Button {:on-click #(save-cover @cover)}
+      "Save Cover"]
+
+     (when @cover
+       (save-cover @cover))
      
      (condp = @active-panel
        :ed [ed/editor]

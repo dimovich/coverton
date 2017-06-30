@@ -14,6 +14,7 @@
  (fn [db _]
    (:items db))) ;;fixme ::items
 
+;; continuous saving...
 (reg-sub
  ::cover
  :<- [::items]
