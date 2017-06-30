@@ -2,7 +2,7 @@
  :source-paths    #{"src/cljs" "src/clj"}
  :resource-paths  #{"resources" }
  :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
-                 [org.clojure/clojurescript "1.9.660" :scope "provided"]
+                 [org.clojure/clojurescript "1.9.671" :scope "provided"]
 
                  [adzerk/boot-cljs-repl     "0.3.3"]
                  [adzerk/boot-cljs          "2.0.0"  :scope "test"]
