@@ -29,4 +29,3 @@
  active-panel-interceptors
  (fn [_ [panel]]
    panel))
-

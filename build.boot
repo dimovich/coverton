@@ -4,14 +4,14 @@
  :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
                  [org.clojure/clojurescript "1.9.660" :scope "provided"]
 
-                 [adzerk/boot-cljs          "2.0.0"      :scope "test"]
-                 [adzerk/boot-cljs-repl     "0.3.2"      :scope "test"]
-                 [adzerk/boot-reload        "0.5.1"      :scope "test"]
-                 [pandeiro/boot-http        "0.8.3"      :scope "test"]
-                 [com.cemerick/piggieback   "0.2.1"      :scope "test"]
-                 [org.clojure/tools.nrepl   "0.2.13"     :scope "test"]
-                 [weasel                    "0.7.0"      :scope "test"]
-                 [tolitius/boot-check       "0.1.4"      :scope "test"]
+                 [adzerk/boot-cljs-repl     "0.3.3"]
+                 [adzerk/boot-cljs          "2.0.0"  :scope "test"]
+                 [adzerk/boot-reload        "0.5.1"  :scope "test"]
+                 [pandeiro/boot-http        "0.8.3"  :scope "test"]
+                 [com.cemerick/piggieback   "0.2.1"  :scope "test"]
+                 [org.clojure/tools.nrepl   "0.2.13" :scope "test"]
+                 [weasel                    "0.7.0"  :scope "test"]
+                 [tolitius/boot-check       "0.1.4"  :scope "test"]
 
                  [compojure "1.6.0"]
                  [hiccup    "2.0.0-alpha1"]
@@ -19,6 +19,7 @@
                  [ring/ring-core "1.6.1"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
                  [com.taoensso/timbre "4.8.0"]
+                 [ring-middleware-format "0.7.2"]
 
                  [com.datomic/clj-client "0.8.606"]
                  [org.clojure/core.async "0.3.443"]
@@ -26,13 +27,13 @@
                  [namen "0.1.0"]
                  [cheshire "5.6.3"]
 
-                 
-                 
                  ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
+                 
                  [prismatic/dommy "1.1.0"]
                  [reagent  "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 [re-frame "0.9.4"]])
+                 [re-frame "0.9.4"]
+                 [cljs-ajax "0.6.0"]])
 
 
 (require
@@ -45,7 +46,7 @@
 
 
 (swap! boot.repl/*default-dependencies*
-       concat '[[cider/cider-nrepl "0.15.0-SNAPSHOT" :scope "test"]])
+       concat '[[cider/cider-nrepl "0.15.0-SNAPSHOT" :scope "provided"]])
 
 (swap! boot.repl/*default-middleware*
        conj 'cider.nrepl/cider-middleware)
@@ -56,6 +57,7 @@
                sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets" #"namen\.js"}}
                aot   {:namespace #{'coverton.core}}
                cljs  {:ids #{"public/coverton"}}
+               cljs-repl  {:ids #{"public/coverton"}}
                serve {:resource-root "target/public"
                       :handler 'coverton.core/app
                       :reload true

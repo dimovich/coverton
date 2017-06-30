@@ -37,7 +37,7 @@
  ::update-font-size
  items-interceptors
  (fn [items [id size]]
-   (assoc-in items [id :font :font-size] size)))
+   (assoc-in items [id :font-size] size)))
 
 
 (reg-event-db
@@ -71,8 +71,8 @@
         rect (.. e -target -parentNode getBoundingClientRect)
         px (.. rect -left)
         py (.. rect -top)]
-    (dispatch [::add-item {:pos [(- x px) (- y py)]
-                           :font default-font}])))
+    (dispatch [::add-item (merge {:pos [(- x px) (- y py)]}
+                                 default-font)])))
 
 
 

@@ -3,7 +3,8 @@
             [re-frame.core :as rf :refer [subscribe dispatch dispatch-sync]]
             [coverton.components  :as cc]
             [coverton.ed.events   :as evt]
-            [coverton.ed.subs     :as sub]))
+            [coverton.ed.subs     :as sub]
+            [ajax.core            :as ajax :refer [GET]]))
 
 
 (defn item [id]
@@ -18,7 +19,7 @@
      [cc/toolbox {:id id}]
      
      [cc/resizable {:font-size  @size
-                    :update-fn  #(dispatch [::evt/update-item id [:font :font-size] %])}
+                    :update-fn  #(dispatch [::evt/update-item id [:font-size] %])}
       
       [cc/autosize-input {:id          id
                           :key         :input

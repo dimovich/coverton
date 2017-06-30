@@ -140,15 +140,15 @@
       :reagent-render
       (fn [{:keys [labels font-family]}]
         (let [{:keys [img labels]} labels
+              block-family font-family
               img-src (:src img)]
           (into
            [:div.picker-block
             [:img.picker-img {:src img-src}]]
        
            (->> labels
-                (map (fn [{:keys [pos text font id static]}]
+                (map (fn [{:keys [pos text font-size font-family color id static]}]
                        (let [[w h] @size
-                             {:keys [font-size color]} font
                              font-size (* font-size h)
                              [x y] pos
                              x (* x w)
@@ -156,9 +156,9 @@
 
                          ^{:key id}
                          [:span.picker-label
-                          {:on-click #(do (dispatch [::evt/update-item id [:font :font-family] font-family])
+                          {:on-click #(do (dispatch [::evt/update-item id [:font-family] block-family])
                                           (dispatch [::evt/update-item id [:static] true]))
-                           :style {:font-family (if static (:font-family font) font-family)
+                           :style {:font-family (if static font-family block-family)
                                    :font-size font-size
                                    :color color
                                    :top y
@@ -190,9 +190,9 @@
                    :text text
                    :id id
                    :static static
-                   :font {:font-family font-family
-                          :font-size   font-size
-                          :color       color}})))))
+                   :font-family font-family
+                   :font-size   font-size
+                   :color       color})))))
 
 
 
@@ -232,8 +232,7 @@
       (for [font-family coverton.fonts/font-names]
         [picker-block {:key    font-family
                        :labels lbls
-                       :font-family font-family
-                       }]))]))
+                       :font-family font-family}]))]))
 
 
 

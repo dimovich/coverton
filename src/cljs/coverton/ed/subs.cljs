@@ -14,6 +14,14 @@
  (fn [db _]
    (:items db))) ;;fixme ::items
 
+(reg-sub
+ ::cover
+ :<- [::items]
+ (fn [items _]
+   {:image-url "assets/img/coverton.jpg"
+    :size [400 400]
+    :tags ["hello"]
+    :marks (vals items)}))
 
 (reg-sub
  ::item-ids
@@ -40,14 +48,14 @@
  ::item-font-family
  :<- [::items]
  (fn [items [_ id]]
-   (get-in items [id :font :font-family])))
+   (get-in items [id :font-family])))
 
 
 (reg-sub
  ::item-font-size
  :<- [::items]
  (fn [items [_ id]]
-   (get-in items [id :font :font-size])))
+   (get-in items [id :font-size])))
 
 
 (reg-sub

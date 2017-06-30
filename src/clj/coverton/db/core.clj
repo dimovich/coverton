@@ -2,6 +2,7 @@
   (:require [clojure.core.async :refer [<!!]]
             [datomic.client     :as    client]
             [clojure.pprint     :refer [pprint]]
+            [taoensso.timbre    :refer [info]]
             [coverton.db.schema :refer [cover-schema mark-schema sample-data]]))
 
 
@@ -19,6 +20,8 @@
                   <!!)]
     
     (<!! (client/transact conn {:tx-data schema}))
+
+    (info "db initialized")
     
     conn))
 
