@@ -20,7 +20,7 @@
   (:gen-class))
 
 
-(def state (atom nil))
+(defonce state (atom nil))
 
 
 (timbre/set-config!
@@ -42,24 +42,22 @@
 
 
 (def mark-mapping
-  {:pos :mark/pos
-   :font-size :mark/font-size
+  {:pos         :mark/pos
+   :font-size   :mark/font-size
    :font-family :mark/font-family
-   :text :mark/text
-   :color :mark/color})
+   :text        :mark/text
+   :color       :mark/color})
 
 
 (defn add-cover [req]
-  (-> (get-in req [:params :cover])
-      (update-in [:marks]
-                 #(map (fn [m]
-                         (-> (rename-keys m mark-mapping)
-                             (dissoc :static)))
-                       %))
-      (rename-keys cover-mapping)
-      pprint
-      ;;(db/add-data (:conn @state))
-      )
+  (let [cover (-> (get-in req [:params :cover])
+                  (update-in [:marks]
+                             #(map (fn [m]
+                                     (-> (rename-keys m mark-mapping)
+                                         (dissoc :static)))
+                                   %))
+                  (rename-keys cover-mapping))]
+    (info (db/add-data (:conn @state) cover)))
   "")
 
 
@@ -82,19 +80,26 @@
 
 (def app
   (-> handler
-      (wrap-restful-format {:formats [:transit-json :json-kw]})
+      (wrap-restful-format {:formats [:transit-json]})
       (wrap-resource "public")
-      ;;(wrap-content-type)
+      (wrap-content-type)
       (wrap-not-modified)
       (site)))
 
 
+;; boot runs this from another process... so no state in the end
+(defn init []
+  (swap! state merge {:conn (db/init)})
+  (info "state: " @state))
+
+
 (defn -main [& args]
-  (swap! state merge {:server (server/run-server app {:port 80})
-                      :conn   (db/init)})
-  (info "started server"))
+  (swap! state merge {:server (server/run-server app {:port 80})})
+  (info "started server")
+  (init))
 
 
 ;; uniform data schema
 ;; use spec for schema
 ;; use component to init
+

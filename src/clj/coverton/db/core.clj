@@ -6,18 +6,22 @@
             [coverton.db.schema :refer [cover-schema mark-schema sample-data]]))
 
 
+(defn connect []
+  (->> {:db-name "hello"
+        :account-id client/PRO_ACCOUNT
+        :secret "admin"
+        :region "none"
+        :endpoint "localhost:8998"
+        :service "peer-server"
+        :access-key "admin"}
+                  
+       client/connect
+       <!!))
+
+
 (defn init []
   (let [schema (concat cover-schema mark-schema)
-        conn (->> {:db-name "hello"
-                   :account-id client/PRO_ACCOUNT
-                   :secret "admin"
-                   :region "none"
-                   :endpoint "localhost:8998"
-                   :service "peer-server"
-                   :access-key "admin"}
-                  
-                  client/connect
-                  <!!)]
+        conn (connect)]
     
     (<!! (client/transact conn {:tx-data schema}))
 
@@ -26,8 +30,11 @@
     conn))
 
 
+
 (defn add-data [conn data]
-  (<!! (client/transact conn {:tx-data data})))
+  (let [data (if (vector? data) data [data])]
+   (<!! (client/transact conn {:tx-data data}))))
+
 
 
 (defn get-all-covers [conn]

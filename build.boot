@@ -60,6 +60,7 @@
                cljs-repl  {:ids #{"public/coverton"}}
                serve {:resource-root "target/public"
                       :handler 'coverton.core/app
+                      ;;:init 'coverton.core/init
                       :reload true
                       :httpkit true})
 
