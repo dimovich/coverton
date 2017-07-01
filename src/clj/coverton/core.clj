@@ -15,12 +15,16 @@
             [namen.core         :as namen]
             [coverton.db.core   :as db]
             [clojure.pprint     :refer [pprint]]
-            [clojure.set :refer [rename-keys]])
+            [clojure.set :refer [rename-keys]]
+            [ring.util.response :refer [response]]
+            [ring.middleware.transit :refer [wrap-transit-response]])
   
   (:gen-class))
 
 
 (defonce state (atom nil))
+
+(def magic-id #uuid "1d822372-983a-4012-adbc-569f412733fd")
 
 
 (timbre/set-config!
@@ -34,38 +38,42 @@
 
 
 
-(def cover-mapping
+(def cover->db-map
   {:image-url :cover/image-url
    :tags      :cover/tags
    :size      :cover/size
-   :marks     :cover/marks})
+   :marks     :cover/marks
+   :cover-id  :cover/id})
 
 
-(def mark-mapping
-  {:pos         :mark/pos
+(def mark->db-map
+  {:mark-id     :mark/id
+   :pos         :mark/pos
    :font-size   :mark/font-size
    :font-family :mark/font-family
    :text        :mark/text
    :color       :mark/color})
 
 
-(defn add-cover [req]
+
+;; server should gen uuids
+(defn save-cover [req]
   (let [cover (-> (get-in req [:params :cover])
-                  (update-in [:marks]
-                             #(map (fn [m]
-                                     (-> (rename-keys m mark-mapping)
-                                         (dissoc :static)))
-                                   %))
-                  (rename-keys cover-mapping))]
-    (info (db/add-data (:conn @state) cover)))
-  "")
+                  (rename-keys cover->db-map)
+                  (update-in [:cover/marks]
+                             #(map (fn [m] (rename-keys m mark->db-map)) %)))
+        cover-id (or (:cover/id cover) magic-id) ;;generate uuid
+        cover    (assoc cover :cover/id cover-id)]
+    (info (db/add-data cover))
+    (response cover-id)))
+
 
 
 (defroutes handler
   (GET "/"         [] (static-promo))
   (GET "/index"    [] (index))
 
-  (POST "/add-cover" [] add-cover)
+  (POST "/save-cover" [] save-cover)
   
   (GET "/devcards" [] (devcards))
   
@@ -84,17 +92,18 @@
       (wrap-resource "public")
       (wrap-content-type)
       (wrap-not-modified)
+      (wrap-transit-response)
       (site)))
 
 
 ;; boot runs this from another process... so no state in the end
 (defn init []
-  (swap! state merge {:conn (db/init)})
+  (swap! state assoc :conn (db/init))
   (info "state: " @state))
 
 
 (defn -main [& args]
-  (swap! state merge {:server (server/run-server app {:port 80})})
+  (swap! state assoc :server (server/run-server app {:port 80}))
   (info "started server")
   (init))
 

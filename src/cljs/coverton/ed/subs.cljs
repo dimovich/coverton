@@ -1,5 +1,5 @@
 (ns coverton.ed.subs
-  (:require [re-frame.core :refer [reg-sub subscribe]]))
+  (:require [re-frame.core  :refer [reg-sub subscribe]]))
 
 
 (reg-sub
@@ -9,33 +9,37 @@
 
 
 (reg-sub
- ::items
+ ::marks
  :<- [::ed]
  (fn [db _]
-   (:items db))) ;;fixme ::items
+   (:marks db))) ;;fixme ::items
+
 
 ;; continuous saving...
 (reg-sub
  ::cover
- :<- [::items]
- (fn [items _]
-   {:image-url "assets/img/coverton.jpg"
-    :size [400 400]
-    :tags ["hello"]
-    :marks (vals items)}))
+ :<- [::ed]
+ (fn [db _]
+   (-> db
+       (select-keys [:cover-id :image-url :size :tags :marks])
+       (update-in [:marks]
+                  #(map (fn [[k m]]
+                          (select-keys m [:font-size :font-family
+                                          :mark-id :pos :text :color]))
+                        %)))))
 
 (reg-sub
- ::item-ids
- :<- [::items]
- (fn [items _]
-   (keys items)))
+ ::mark-ids
+ :<- [::marks]
+ (fn [marks _]
+   (keys marks)))
 
 
 (reg-sub
- ::item
- :<- [::items]
- (fn [items [_ id]]
-   (get items id)))
+ ::mark
+ :<- [::marks]
+ (fn [marks [_ id]]
+   (get marks id)))
 
 
 (reg-sub
@@ -46,31 +50,31 @@
 
 
 (reg-sub
- ::item-font-family
- :<- [::items]
- (fn [items [_ id]]
-   (get-in items [id :font-family])))
+ ::mark-font-family
+ :<- [::marks]
+ (fn [marks [_ id]]
+   (get-in marks [id :font-family])))
 
 
 (reg-sub
- ::item-font-size
- :<- [::items]
- (fn [items [_ id]]
-   (get-in items [id :font-size])))
+ ::mark-font-size
+ :<- [::marks]
+ (fn [marks [_ id]]
+   (get-in marks [id :font-size])))
 
 
 (reg-sub
- ::item-text
- :<- [::items]
- (fn [items [_ id]]
-   (get-in items [id :text])))
+ ::mark-text
+ :<- [::marks]
+ (fn [marks [_ id]]
+   (get-in marks [id :text])))
 
 
 (reg-sub
- ::item-pos
- :<- [::items]
- (fn [items [_ id]]
-   (get-in items [id :pos])))
+ ::mark-pos
+ :<- [::marks]
+ (fn [marks [_ id]]
+   (get-in marks [id :pos])))
 
 
 #_(reg-sub
@@ -79,3 +83,8 @@
      [(subs/subscribe [:a-sub])
       (subs/subscribe [:b-sub])])
    (fn [[a b] [_]] {:a a :b b}))
+
+
+
+;; load cover (eid)
+

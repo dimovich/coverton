@@ -1,7 +1,7 @@
 (ns coverton.components
-  (:require [reagent.core  :as r]
-            [re-frame.core :as rf :refer [dispatch subscribe]]
-            [dommy.core    :as d  :refer-macros [sel1 sel]]
+  (:require [reagent.core   :as r]
+            [re-frame.core  :as rf :refer [dispatch subscribe]]
+            [dommy.core     :as d  :refer-macros [sel1 sel]]
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]))
 
@@ -156,8 +156,8 @@
 
                          ^{:key id}
                          [:span.picker-label
-                          {:on-click #(do (dispatch [::evt/update-item id [:font-family] block-family])
-                                          (dispatch [::evt/update-item id [:static] true]))
+                          {:on-click #(do (dispatch [::evt/update-mark id [:font-family] block-family])
+                                          (dispatch [::evt/update-mark id [:static] true]))
                            :style {:font-family (if static font-family block-family)
                                    :font-size font-size
                                    :color color
@@ -238,9 +238,9 @@
 
 
 (defn toolbox-font-picker [{:keys [id]}]
-  [:div.label-toolbox-item
+  [:div.label-toolbox-mark
    {:style {:background-color "green"}
-    :on-click #(do (dispatch [::evt/update-item id [:static] false])
+    :on-click #(do (dispatch [::evt/update-mark id [:static] false])
                    (dispatch [::evt/update [:dim] :show-font-picker]))}])
 
 

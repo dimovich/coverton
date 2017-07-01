@@ -7,7 +7,7 @@
 
 
 (def ed-interceptors    [(path :ed)          trim-v])
-(def items-interceptors [(path [:ed :items]) trim-v])
+(def marks-interceptors [(path [:ed :marks]) trim-v])
 (def dim-interceptors   [(path [:ed :dim])   trim-v])
 
 
@@ -35,50 +35,56 @@
 
 (reg-event-db
  ::update-font-size
- items-interceptors
- (fn [items [id size]]
-   (assoc-in items [id :font-size] size)))
+ marks-interceptors
+ (fn [marks [id size]]
+   (assoc-in marks [id :font-size] size)))
 
 
 (reg-event-db
- ::add-item
- items-interceptors
- (fn [items [v]]
-   (assoc items (str (random-uuid)) v)))
+ ::add-mark
+ marks-interceptors
+ (fn [marks [m]]
+   (let [id (or (:mark-id m) (random-uuid))
+         m  (assoc m :mark-id id)]
+     (assoc marks id m))))
 
 
 (reg-event-db
- ::remove-item
- items-interceptors
- (fn [items [id]]
-   (dissoc items id)))
+ ::remove-mark
+ marks-interceptors
+ (fn [marks [id]]
+   (dissoc marks id)))
 
 
 (reg-event-db
- ::update-item
- items-interceptors
- (fn [items [id ks v]]
-   (if (and (get items id)
-            (not= (get-in items (into [id] ks))
+ ::update-mark
+ marks-interceptors
+ (fn [marks [id ks v]]
+   (if (and (get marks id)
+            (not= (get-in marks (into [id] ks))
                   v))
-     (assoc-in items (into [id] ks) v)
-     items)))
+     (assoc-in marks (into [id] ks) v)
+     marks)))
 
 
-(defn handle-add-item [e]
+(defn handle-add-mark [e]
   (let [x (.. e -clientX)
         y (.. e -clientY)
         rect (.. e -target -parentNode getBoundingClientRect)
         px (.. rect -left)
         py (.. rect -top)]
-    (dispatch [::add-item (merge {:pos [(- x px) (- y py)]}
+    (dispatch [::add-mark (merge {:pos [(- x px) (- y py)]}
                                  default-font)])))
 
 
 
-(defn handle-remove-item [e]
+(defn handle-remove-mark [e]
   (let [text (.. e -target -value)
         id   (.. e -target -id)]
     (when (empty? text)
-      (dispatch [::remove-item id]))))
+      (dispatch [::remove-mark id]))))
 
+
+
+(defn update-cover-id [id]
+  (dispatch [::update [:cover-id] id]))

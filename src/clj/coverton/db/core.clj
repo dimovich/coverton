@@ -6,6 +6,9 @@
             [coverton.db.schema :refer [cover-schema mark-schema sample-data]]))
 
 
+(def db-state (atom {:conn nil}))
+
+
 (defn connect []
   (->> {:db-name "hello"
         :account-id client/PRO_ACCOUNT
@@ -18,10 +21,12 @@
        client/connect
        <!!))
 
+(def conn (memoize connect))
+
 
 (defn init []
   (let [schema (concat cover-schema mark-schema)
-        conn (connect)]
+        conn (conn)]
     
     (<!! (client/transact conn {:tx-data schema}))
 
@@ -31,17 +36,20 @@
 
 
 
-(defn add-data [conn data]
+(defn add-data [data]
   (let [data (if (vector? data) data [data])]
-   (<!! (client/transact conn {:tx-data data}))))
+    (->> {:tx-data data}
+         (client/transact (conn))
+         <!!)))
 
 
 
-(defn get-all-covers [conn]
-  (let [db (client/db conn)]
+(defn get-all-covers []
+  (let [conn (conn)
+        db (client/db conn)]
     (->> {:query '[:find (pull ?e [*])
                    :where
-                   [?e :cover/image-url]]
+                   [?e :cover/id]]
           :args [db]}
          (client/q conn)
          <!!
@@ -49,7 +57,12 @@
 
 
 
-
+(defn get-cover [eid]
+  (let [db (client/db (conn))]
+    (->> {:selector '[*]
+          :eid eid}
+         (client/pull db)
+         <!!)))
 
 
 
@@ -68,10 +81,15 @@
        data)
 
 #_(<!! (client/pull db {:selector '[*]
-                        :eid #{17592186045425 17592186045422}}))
+                        :eid 17592186045425}))
 
 
 
 ;; pass data to server
 ;;  - save button
 ;;
+
+
+;; check if only one entity
+;; pass back to client
+;; continuous saving

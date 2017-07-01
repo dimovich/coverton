@@ -1,5 +1,5 @@
 (set-env!
- :source-paths    #{"src/cljs" "src/clj"}
+ :source-paths    #{"src/cljs" "src/clj" "src/cljc"}
  :resource-paths  #{"resources" }
  :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
                  [org.clojure/clojurescript "1.9.671" :scope "provided"]
@@ -20,6 +20,7 @@
                  [javax.servlet/servlet-api "3.0-alpha-1"]
                  [com.taoensso/timbre "4.8.0"]
                  [ring-middleware-format "0.7.2"]
+                 [ring-transit "0.1.6"]
 
                  [com.datomic/clj-client "0.8.606"]
                  [org.clojure/core.async "0.3.443"]

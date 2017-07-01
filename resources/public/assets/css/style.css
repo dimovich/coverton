@@ -97,7 +97,7 @@ body {
     transition: display 2s ease-out;
 }
 
-.label-toolbox-item {
+.label-toolbox-mark {
     display: inline-block;
     width: 38%;
     height: 90%;

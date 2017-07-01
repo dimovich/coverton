@@ -5,21 +5,21 @@
             [coverton.index.events :as evt]
             [coverton.index.subs   :as sub]
             [coverton.ed.views     :as ed]
+            [coverton.ed.events    :as ed-evt]
             [coverton.ed.subs      :as ed-sub]))
-
-
-(enable-console-print!)
 
 
 (def Button (r/adapt-react-class (aget js/window "deps" "semui" "Button")))
 
 
 (defn save-cover [cover]
-  (POST "/add-cover" {:headers {"Accept" "application/transit+json"}
-                      :handler (fn [res]
-                                 (println res))
-                      :error-handler #(.log js/console (str %))
-                      :params {:cover cover}}))
+  (.log js/console "saving cover " cover)
+  (POST "/save-cover" {:headers {"Accept" "application/transit+json"}
+                       :handler (fn [res]
+                                  (ed-evt/update-cover-id res)
+                                  (.log js/console res))
+                       :error-handler #(.log js/console (str %))
+                       :params {:cover cover}}))
 
 
 
@@ -32,11 +32,13 @@
       "Index"]
      [Button {:on-click #(dispatch [::evt/set-active-panel :ed])}
       "Editor"]
-     [Button {:on-click #(save-cover @cover)}
+     [Button {:on-click #(do
+                           (println "here...")
+                           (save-cover @cover))}
       "Save Cover"]
 
-     (when @cover
-       (save-cover @cover))
+     #_(when @cover ;;autosave...
+         (save-cover @cover))
      
      (condp = @active-panel
        :ed [ed/editor]

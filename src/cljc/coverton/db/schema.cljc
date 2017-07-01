@@ -1,6 +1,30 @@
 (ns coverton.db.schema)
 
-(def cover-schema [{:db/ident :cover/author
+
+(def cover->db-map
+  {:image-url :cover/image-url
+   :tags      :cover/tags
+   :size      :cover/size
+   :marks     :cover/marks
+   :cover-id  :cover/id})
+
+
+(def mark->db-map
+  {:mark-id     :mark/id
+   :pos         :mark/pos
+   :font-size   :mark/font-size
+   :font-family :mark/font-family
+   :text        :mark/text
+   :color       :mark/color})
+
+
+(def cover-schema [{:db/ident :cover/id
+                    :db/valueType :db.type/uuid
+                    :db/cardinality :db.cardinality/one
+                    :db/unique :db.unique/identity
+                    :db/doc "Cover id"}
+
+                   {:db/ident :cover/author
                     :db/valueType :db.type/ref
                     :db/cardinality :db.cardinality/one
                     :db/doc "Cover author"}
@@ -29,7 +53,12 @@
 
 
 
-(def mark-schema [{:db/ident :mark/font-family
+(def mark-schema [{:db/ident :mark/id
+                   :db/valueType :db.type/uuid
+                   :db/cardinality :db.cardinality/one
+                   :db/unique :db.unique/identity}
+                  
+                  {:db/ident :mark/font-family
                    :db/valueType :db.type/string
                    :db/cardinality :db.cardinality/one}
                   
