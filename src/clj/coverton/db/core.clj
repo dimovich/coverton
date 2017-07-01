@@ -58,12 +58,27 @@
 
 
 
-(defn get-cover [eid]
+(defn get-cover-by-eid [eid]
   (let [db (client/db (conn))]
     (->> {:selector '[*]
           :eid eid}
          (client/pull db)
          <!!)))
+
+
+(defn get-cover [id]
+  (let [conn (conn)
+        db (client/db conn)]
+    (->> {:query '[:find (pull ?e [*])
+                   :in $ ?id
+                   :where
+                   [?e :cover/id ?id]]
+          :args [db id]}
+         (client/q conn)
+         <!!
+         ffirst)))
+
+
 
 
 

@@ -31,34 +31,34 @@
                    {:db/ident :cover/data
                     :db/valueType :db.type/bytes
                     :db/cardinality :db.cardinality/one
-                    :db/doc "Cover data"}
+                    :db/doc "Cover fressian data"}
                    
-                   #_({:db/ident :cover/author
-                       :db/valueType :db.type/ref
-                       :db/cardinality :db.cardinality/one
-                       :db/doc "Cover author"}
+                   {:db/ident :cover/author
+                    :db/valueType :db.type/ref
+                    :db/cardinality :db.cardinality/one
+                    :db/doc "Cover author"}
 
-                      {:db/ident :cover/image-url
-                       :db/valueType :db.type/string
-                       :db/cardinality :db.cardinality/one
-                       :db/doc "Cover image url"}
+                   {:db/ident :cover/image-url
+                    :db/valueType :db.type/string
+                    :db/cardinality :db.cardinality/one
+                    :db/doc "Cover image url"}
 
-                      {:db/ident :cover/tags
-                       :db/valueType :db.type/string
-                       :db/cardinality :db.cardinality/many
-                       :db/fulltext true
-                       :db/doc "Cover tags"}
+                   {:db/ident :cover/tags
+                    :db/valueType :db.type/string
+                    :db/cardinality :db.cardinality/many
+                    :db/fulltext true
+                    :db/doc "Cover tags"}
 
-                      {:db/ident :cover/size
-                       :db/valueType :db.type/long
-                       :db/cardinality :db.cardinality/many
-                       :db/doc "Cover size [width height"}
+                   {:db/ident :cover/size
+                    :db/valueType :db.type/long
+                    :db/cardinality :db.cardinality/many
+                    :db/doc "Cover size [width height"}
 
-                      {:db/ident :cover/marks
-                       :db/valueType :db.type/ref
-                       :db/cardinality :db.cardinality/many
-                       :db/isComponent true
-                       :db/doc "Cover marks (labels, svgs, etc)"})])
+                   {:db/ident :cover/marks
+                    :db/valueType :db.type/ref
+                    :db/cardinality :db.cardinality/many
+                    :db/isComponent true
+                    :db/doc "Cover marks (labels, svgs, etc)"}])
 
 
 

@@ -28,29 +28,33 @@
 
 
 (defn save-cover [req]
-  (let [cover (-> (get-in req [:body :cover])
-                  (rename-keys cover->db-map)
-                  (update-in [:cover/marks]
-                             #(map (fn [m] (rename-keys m mark->db-map)) %)))
-        cover-id (or (:cover/id cover) magic-id) ;;fixme
-        cover    (assoc cover :cover/id cover-id)]
+  (let [cover (get-in req [:body :cover])
+        cover-id (or (:cover-id cover) magic-id) ;;fixme
+        cover    (assoc cover :cover-id cover-id)]
     (info (db/add-data {:cover/id cover-id
                         :cover/data (.array (fress/write cover))}))
     (response {:cover-id cover-id})))
 
 
+(defn get-cover [req]
+  (let [cover-id (get-in req [:body :id])
+          cover    (db/get-cover cover-id)]
+      (response (fress/read (:cover/data cover)))))
+
+
 
 (defroutes handler
-  (GET "/"         [] (static-promo))
-  (GET "/index"    [] (index))
+  (GET  "/"           [] (static-promo))
+  (GET  "/index"      [] (index))
 
   (POST "/save-cover" [] save-cover)
+  (POST "/get-cover"  [] get-cover)  ;;fixme, GET is json
   
-  (GET "/devcards" [] (devcards))
+  (GET  "/devcards"   [] (devcards))
   
-  (GET "/wordizer" [] (namen/frontend))
-  (GET "/generate" xs (json/generate-string
-                       (namen/generate (-> xs :params :words vals))))
+  (GET  "/wordizer"   [] (namen/frontend))
+  (GET  "/generate"   xs (json/generate-string
+                          (namen/generate (-> xs :params :words vals))))
   
   (files     "/" {:root "."})   ;; to serve static resources
   (resources "/" {:root "."})   ;; to serve anything else
@@ -79,6 +83,14 @@
   (init))
 
 
+
+
+
 ;; use spec for schema
 ;; use component to init
 
+
+
+#_(rename-keys cover->db-map)
+#_(update-in [:cover/marks]
+             #(map (fn [m] (rename-keys m mark->db-map)) %))

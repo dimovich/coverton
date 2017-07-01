@@ -16,7 +16,6 @@
    (:marks db))) ;;fixme ::items
 
 
-;; continuous saving...
 (reg-sub
  ::cover
  :<- [::ed]

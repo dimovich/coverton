@@ -1,13 +1,14 @@
 (ns coverton.index.views
   (:require [reagent.core  :as r]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
-            [ajax.core     :as ajax :refer [POST]]
+            [ajax.core     :as ajax :refer [POST GET]]
             [coverton.index.events :as evt]
             [coverton.index.subs   :as sub]
             [coverton.ed.views     :as ed]
             [coverton.ed.events    :as ed-evt]
             [coverton.ed.subs      :as ed-sub]
-            [coverton.util         :refer [info]]))
+            [coverton.util         :refer [info]]
+            [coverton.db.schema    :refer [magic-id]]))
 
 
 (def Button (r/adapt-react-class (aget js/window "deps" "semui" "Button")))
@@ -21,6 +22,12 @@
                        :params {:cover cover}}))
 
 
+(defn get-cover [id]
+  (POST "/get-cover" {:handler (fn [res]
+                                 (info res))
+                      :error-handler #(info %)
+                      :params {:id id}}))
+
 
 (defn index []
   (r/with-let [ ;;_            (dispatch-sync [::evt/initialize])
@@ -33,6 +40,8 @@
       "Editor"]
      [Button {:on-click #(save-cover @cover)}
       "Save Cover"]
+     [Button {:on-click #(get-cover magic-id)}
+      "Load Cover"]
 
      #_(when @cover ;;autosave...
          (save-cover @cover))
