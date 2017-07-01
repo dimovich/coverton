@@ -1,10 +1,12 @@
 (ns coverton.ed.views
   (:require [reagent.core  :as r]
+            [dommy.core    :as d  :refer-macros [sel1]]
             [re-frame.core :as rf :refer [subscribe dispatch dispatch-sync]]
             [coverton.components  :as cc]
             [coverton.ed.events   :as evt]
             [coverton.ed.subs     :as sub]
-            [ajax.core            :as ajax :refer [GET]]))
+            [ajax.core            :as ajax :refer [GET]]
+            [coverton.util        :refer [info]]))
 
 
 (defn mark [id]
@@ -39,17 +41,26 @@
 
 
 (defn editor []
-  (r/with-let [;;_    (dispatch-sync [::evt/initialize])
-               dim  (subscribe [::sub/dim])
-               mrks (subscribe [::sub/marks])
-               ids  (subscribe [::sub/mark-ids])]
+  (let [_    (dispatch-sync [::evt/initialize])
+        dim  (subscribe [::sub/dim])
+        mrks (subscribe [::sub/marks])
+        ids  (subscribe [::sub/mark-ids])
+        image-url (subscribe [::sub/image-url])]
+    (r/create-class
+     {:display-name "ed"
+      :component-did-mount
+      (fn [this]
+        (let [img (sel1 :.editor-img)]
+          (evt/update-size [(d/px img :height)
+                            (d/px img :height)])))
+      :reagent-render
+      (fn []
+        [:div.editor {:on-blur evt/handle-remove-mark}
 
-    [:div.editor {:on-blur evt/handle-remove-mark}
+         [:img.editor-img {:src @image-url
+                           :on-click evt/handle-add-mark}]
 
-     [:img.editor-img {:src "assets/img/coverton.jpg"
-                       :on-click evt/handle-add-mark}]
-
-     (condp = @dim
-       :show-font-picker [cc/font-picker @mrks]
-       [marks @ids])]))
+         (condp = @dim
+           :show-font-picker [cc/font-picker @mrks]
+           [marks @ids])])})))
 

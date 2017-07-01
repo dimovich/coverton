@@ -1,6 +1,9 @@
 (ns coverton.db.schema)
 
 
+(def magic-id #uuid "1d822372-983a-4012-adbc-569f412733fd")
+
+
 (def cover->db-map
   {:image-url :cover/image-url
    :tags      :cover/tags
@@ -18,38 +21,44 @@
    :color       :mark/color})
 
 
+
 (def cover-schema [{:db/ident :cover/id
                     :db/valueType :db.type/uuid
                     :db/cardinality :db.cardinality/one
                     :db/unique :db.unique/identity
                     :db/doc "Cover id"}
 
-                   {:db/ident :cover/author
-                    :db/valueType :db.type/ref
+                   {:db/ident :cover/data
+                    :db/valueType :db.type/bytes
                     :db/cardinality :db.cardinality/one
-                    :db/doc "Cover author"}
+                    :db/doc "Cover data"}
+                   
+                   #_({:db/ident :cover/author
+                       :db/valueType :db.type/ref
+                       :db/cardinality :db.cardinality/one
+                       :db/doc "Cover author"}
 
-                   {:db/ident :cover/image-url
-                    :db/valueType :db.type/string
-                    :db/cardinality :db.cardinality/one
-                    :db/doc "Cover image url"}
+                      {:db/ident :cover/image-url
+                       :db/valueType :db.type/string
+                       :db/cardinality :db.cardinality/one
+                       :db/doc "Cover image url"}
 
-                   {:db/ident :cover/tags
-                    :db/valueType :db.type/string
-                    :db/cardinality :db.cardinality/many
-                    :db/fulltext true
-                    :db/doc "Cover tags"}
+                      {:db/ident :cover/tags
+                       :db/valueType :db.type/string
+                       :db/cardinality :db.cardinality/many
+                       :db/fulltext true
+                       :db/doc "Cover tags"}
 
-                   {:db/ident :cover/size
-                    :db/valueType :db.type/long
-                    :db/cardinality :db.cardinality/many
-                    :db/doc "Cover size [width height"}
+                      {:db/ident :cover/size
+                       :db/valueType :db.type/long
+                       :db/cardinality :db.cardinality/many
+                       :db/doc "Cover size [width height"}
 
-                   {:db/ident :cover/marks
-                    :db/valueType :db.type/ref
-                    :db/cardinality :db.cardinality/many
-                    :db/isComponent true
-                    :db/doc "Cover marks (labels, svgs, etc)"}])
+                      {:db/ident :cover/marks
+                       :db/valueType :db.type/ref
+                       :db/cardinality :db.cardinality/many
+                       :db/isComponent true
+                       :db/doc "Cover marks (labels, svgs, etc)"})])
 
 
 

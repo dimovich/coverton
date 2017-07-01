@@ -4,5 +4,5 @@
 
 ;;fixme move to higher function
 (def default-value
-  {})
+  {:image-url "assets/img/coverton.jpg"})
 

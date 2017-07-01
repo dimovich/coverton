@@ -1,10 +1,11 @@
 (ns coverton.core
-  (:require [ring.middleware.resource     :refer [wrap-resource]]
-            [ring.middleware.content-type :refer [wrap-content-type]]
-            [ring.middleware.not-modified :refer [wrap-not-modified]]
-            [coverton.templates.devcards  :refer [devcards]]
-            [ring.middleware.format       :refer [wrap-restful-format]]
-            [coverton.templates.index     :refer [index static-promo]]
+  (:require [ring.middleware.resource        :refer [wrap-resource]]
+            [ring.middleware.content-type    :refer [wrap-content-type]]
+            [ring.middleware.not-modified    :refer [wrap-not-modified]]
+            [coverton.templates.devcards     :refer [devcards]]
+            [ring.middleware.transit         :refer [wrap-transit-response wrap-transit-body]]
+            [ring.util.response              :refer [response]]
+            [coverton.templates.index        :refer [index static-promo]]
             [compojure.core     :refer [defroutes GET POST PUT]]
             [compojure.route    :refer [not-found files resources]]
             [compojure.handler  :refer [site]]
@@ -14,58 +15,28 @@
             [cheshire.core      :as json]
             [namen.core         :as namen]
             [coverton.db.core   :as db]
+            [coverton.db.schema :refer [mark->db-map cover->db-map magic-id]]
             [clojure.pprint     :refer [pprint]]
             [clojure.set :refer [rename-keys]]
-            [ring.util.response :refer [response]]
-            [ring.middleware.transit :refer [wrap-transit-response]])
+            [clojure.data.fressian :as fress]
+            [coverton.util])
   
   (:gen-class))
 
 
 (defonce state (atom nil))
 
-(def magic-id #uuid "1d822372-983a-4012-adbc-569f412733fd")
 
-
-(timbre/set-config!
- {:level :info
-  :output-fn (fn [{:keys [timestamp_ level msg_]}]
-               (str
-                (second (clojure.string/split (force timestamp_) #" ")) " "
-                ;;(clojure.string/upper-case (name level)) " "
-                (force msg_)))
-  :appenders {:println (timbre/println-appender {:stream :auto})}})
-
-
-
-(def cover->db-map
-  {:image-url :cover/image-url
-   :tags      :cover/tags
-   :size      :cover/size
-   :marks     :cover/marks
-   :cover-id  :cover/id})
-
-
-(def mark->db-map
-  {:mark-id     :mark/id
-   :pos         :mark/pos
-   :font-size   :mark/font-size
-   :font-family :mark/font-family
-   :text        :mark/text
-   :color       :mark/color})
-
-
-
-;; server should gen uuids
 (defn save-cover [req]
-  (let [cover (-> (get-in req [:params :cover])
+  (let [cover (-> (get-in req [:body :cover])
                   (rename-keys cover->db-map)
                   (update-in [:cover/marks]
                              #(map (fn [m] (rename-keys m mark->db-map)) %)))
-        cover-id (or (:cover/id cover) magic-id) ;;generate uuid
+        cover-id (or (:cover/id cover) magic-id) ;;fixme
         cover    (assoc cover :cover/id cover-id)]
-    (info (db/add-data cover))
-    (response cover-id)))
+    (info (db/add-data {:cover/id cover-id
+                        :cover/data (.array (fress/write cover))}))
+    (response {:cover-id cover-id})))
 
 
 
@@ -88,11 +59,11 @@
 
 (def app
   (-> handler
-      (wrap-restful-format {:formats [:transit-json]})
+      (wrap-transit-body)
+      (wrap-transit-response)
       (wrap-resource "public")
       (wrap-content-type)
       (wrap-not-modified)
-      (wrap-transit-response)
       (site)))
 
 
@@ -108,7 +79,6 @@
   (init))
 
 
-;; uniform data schema
 ;; use spec for schema
 ;; use component to init
 

@@ -25,7 +25,8 @@
 
 
 (defn init []
-  (let [schema (concat cover-schema mark-schema)
+  (let [schema (concat cover-schema ;;mark-schema
+                       )
         conn (conn)]
     
     (<!! (client/transact conn {:tx-data schema}))

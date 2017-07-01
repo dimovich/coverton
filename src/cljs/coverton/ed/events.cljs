@@ -1,8 +1,7 @@
 (ns coverton.ed.events
   (:require [re-frame.core :as rf :refer [reg-event-db path trim-v dispatch]]
             [coverton.ed.db :refer [default-value]]
-            [coverton.fonts :refer [default-font]]
-            [dommy.core :as d]))
+            [coverton.fonts :refer [default-font]]))
 
 
 
@@ -15,8 +14,8 @@
 (reg-event-db
  ::initialize
  ed-interceptors
- (fn [_ _]
-   default-value))
+ (fn [db _]
+   (merge default-value db)))
 
 
 (reg-event-db
@@ -46,7 +45,7 @@
  (fn [marks [m]]
    (let [id (or (:mark-id m) (random-uuid))
          m  (assoc m :mark-id id)]
-     (assoc marks id m))))
+     (assoc marks (str id) m))))
 
 
 (reg-event-db
@@ -88,3 +87,11 @@
 
 (defn update-cover-id [id]
   (dispatch [::update [:cover-id] id]))
+
+
+(defn update-size [size]
+  (dispatch [::update [:size] size]))
+
+
+(defn update-image-url [url]
+  (dispatch [::update [:image-url] url]))

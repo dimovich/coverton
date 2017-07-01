@@ -13,24 +13,23 @@
                  [weasel                    "0.7.0"  :scope "test"]
                  [tolitius/boot-check       "0.1.4"  :scope "test"]
 
-                 [compojure "1.6.0"]
-                 [hiccup    "2.0.0-alpha1"]
-                 [http-kit  "2.2.0"]
+                 [compojure      "1.6.0"]
                  [ring/ring-core "1.6.1"]
+                 [ring-transit   "0.1.6"]
+                 [hiccup         "2.0.0-alpha1"]
+                 [http-kit       "2.2.0"]
+                 [com.taoensso/timbre       "4.8.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
-                 [com.taoensso/timbre "4.8.0"]
-                 [ring-middleware-format "0.7.2"]
-                 [ring-transit "0.1.6"]
 
                  [com.datomic/clj-client "0.8.606"]
                  [org.clojure/core.async "0.3.443"]
+                 [org.clojure/data.fressian "0.2.1"]
 
                  [namen "0.1.0"]
                  [cheshire "5.6.3"]
 
                  ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
-                 
                  [prismatic/dommy "1.1.0"]
                  [reagent  "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.9.4"]
@@ -61,7 +60,6 @@
                cljs-repl  {:ids #{"public/coverton"}}
                serve {:resource-root "target/public"
                       :handler 'coverton.core/app
-                      ;;:init 'coverton.core/init
                       :reload true
                       :httpkit true})
 
@@ -80,7 +78,6 @@
                  cljs-repl {:nrepl-opts {:port 3311}}
                  target    {:dir #{"target"}})
   identity)
-
 
 
 (deftask build-jar

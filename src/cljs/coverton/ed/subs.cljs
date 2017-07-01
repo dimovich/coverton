@@ -1,5 +1,6 @@
 (ns coverton.ed.subs
-  (:require [re-frame.core  :refer [reg-sub subscribe]]))
+  (:require [re-frame.core :refer [reg-sub]]
+            [coverton.db.schema :refer [mark->db-map cover->db-map]]))
 
 
 (reg-sub
@@ -21,11 +22,10 @@
  :<- [::ed]
  (fn [db _]
    (-> db
-       (select-keys [:cover-id :image-url :size :tags :marks])
+       (select-keys (keys cover->db-map))
        (update-in [:marks]
                   #(map (fn [[k m]]
-                          (select-keys m [:font-size :font-family
-                                          :mark-id :pos :text :color]))
+                          (select-keys m (keys mark->db-map)))
                         %)))))
 
 (reg-sub
@@ -76,6 +76,12 @@
  (fn [marks [_ id]]
    (get-in marks [id :pos])))
 
+
+(reg-sub
+ ::image-url
+ :<- [::ed]
+ (fn [db _]
+   (:image-url db)))
 
 #_(reg-sub
    :a-b-sub
