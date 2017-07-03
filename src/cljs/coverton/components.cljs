@@ -167,6 +167,8 @@
                           text])))))))})))
 
 
+;; 
+
 ;; export
 (defn export-labels [labels]
   (let [img (.. (sel1 :.editor-img) getBoundingClientRect)]
@@ -193,6 +195,30 @@
                    :font-family font-family
                    :font-size   font-size
                    :color       color})))))
+
+
+
+(defn export-cover [cover]
+  (if-let [img (.. (sel1 :.editor-img) getBoundingClientRect)]
+    (-> cover
+        (update-in
+         [:marks]
+         (fn [ms]
+           (map (fn [m]
+                  (if-let [mrk  (sel1 (keyword (str "#" (:mark-id m))))] ;;fixme
+                    (let [rect (.. mrk getBoundingClientRect)
+                          x   (- (.. rect -left) (.. img -left))
+                          y   (- (.. rect -top) (.. img -top))
+                          w   (.. img -width) ;;(:size cover)
+                          h   (.. img -height)
+                          x   (/ x w)
+                          y   (/ y h)
+                          font-size   (/ (:font-size m) h)]
+                      (merge m {:pos [x y]
+                                :font-size   font-size}))
+                    (println "error selecting mark " (:mark-id m))))
+                ms))))
+    (println "error selecting editor image")))
 
 
 
