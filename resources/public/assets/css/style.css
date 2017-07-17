@@ -17,6 +17,9 @@ body {
 /*455 x 90*/
 .content {
     padding: 80px;
+}
+
+.motto {
     margin: auto;
     width: 455px;
     font-family : 'GothaPro';

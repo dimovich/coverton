@@ -109,3 +109,5 @@
 ;; check if only one entity
 ;; pass back to client
 ;; continuous saving
+
+;; bin/run -m datomic.peer-server -h localhost -p 8998 -a admin,admin -d hello,datomic:mem://hello

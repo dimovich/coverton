@@ -34,10 +34,11 @@
             :type "image/x-icon"}]]
    [:body
     [:div {:class "content vcenter"}
-     [:img.logo {:src "assets/svg/logo.svg"}]
-     [:p.text
-      "a publishing platform for cover makers"
-      [:br]
-      "is coming soon."]]]))
+     [:div.motto
+      [:img.logo {:src "assets/svg/logo.svg"}]
+      [:p.text
+       "a publishing platform for cover makers"
+       [:br]
+       "is coming soon."]]]]))
 
 

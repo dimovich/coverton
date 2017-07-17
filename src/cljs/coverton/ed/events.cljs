@@ -14,7 +14,7 @@
 (reg-event-db
  ::initialize
  ed-interceptors
- (fn [db _]
+ (fn [db _] ;; second parameter could be the image-url
    (merge default-value db)))
 
 
@@ -95,3 +95,11 @@
 
 (defn update-image-url [url]
   (dispatch [::update [:image-url] url]))
+
+
+
+;; does rect values update?
+(defn relpos [origin]
+  (let []
+   (fn [el]
+     )))

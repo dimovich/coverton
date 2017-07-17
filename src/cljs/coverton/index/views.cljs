@@ -49,7 +49,7 @@
      (condp = @active-panel
        :ed [ed/editor]
        
-       [:div {:class "content vcenter"
+       [:div {:class "motto vcenter"
               :style {:text-align :left}}
         [:img.logo {:src "assets/svg/logo.svg"}]
         [:p.text
