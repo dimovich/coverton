@@ -8,8 +8,10 @@
 
 (enable-console-print!)
 
-(def react-drag   (r/adapt-react-class (aget js/window "deps" "draggable")))
-(def react-resize (r/adapt-react-class (aget js/window "deps" "resizable")))
+(def react-drag   (r/adapt-react-class
+                   (goog.object/getValueByKeys js/window "deps" "draggable")))
+(def react-resize (r/adapt-react-class
+                   (goog.object/getValueByKeys js/window "deps" "resizable")))
 
 
 
@@ -36,9 +38,11 @@
 
 
 
-(defn autosize-input [{:keys [id update-fn text font-family ref]}]
+
+(defn autosize-input [{:keys [id update-fn text font-family ref pos]}]
   (let [state   (r/atom (or text ""))
-        update  #(set-width (r/dom-node %) @state)]
+        update  #(set-width (r/dom-node %) @state)
+        [x y]   pos] ;;todo
     
     (r/create-class
      {:display-name "autosize-input"
@@ -113,16 +117,15 @@
 
 
 
-(defn draggable [{:keys [pos update-fn]}]
-  (r/with-let [this (r/current-component)
-               [x y] pos];;prevents redrawing on db update
+(defn draggable [{:keys [update-fn]}]
+  (r/with-let [this (r/current-component)]
     [react-drag {:cancel ".cancel-drag"
                  :on-stop (fn [e d]
-                            (let [el (aget d "node")]
-                              (update-fn (relative-pos el))))}
+                            (update-fn)
+                            #_(let [el (aget d "node")]))}
      
      (into
-      [:div.react-draggable-child {:style {:left x :top y}}]
+      [:div.react-draggable-child]
       (r/children this))]))
 
 

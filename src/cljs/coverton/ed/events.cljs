@@ -1,7 +1,8 @@
 (ns coverton.ed.events
   (:require [re-frame.core :as rf :refer [reg-event-db path trim-v dispatch]]
             [coverton.ed.db :refer [default-value]]
-            [coverton.fonts :refer [default-font]]))
+            [coverton.fonts :refer [default-font]]
+            [dommy.core :as d :refer [sel1]]))
 
 
 
@@ -89,8 +90,10 @@
   (dispatch [::update [:cover-id] id]))
 
 
+
 (defn update-size [size]
   (dispatch [::update [:size] size]))
+
 
 
 (defn update-image-url [url]
@@ -98,8 +101,6 @@
 
 
 
-;; does rect values update?
-(defn relpos [origin]
-  (let []
-   (fn [el]
-     )))
+(defn update-pos [id pos]
+  (dispatch [::update-mark id [:pos] pos]))
+

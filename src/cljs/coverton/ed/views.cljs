@@ -9,25 +9,56 @@
             [coverton.util        :refer [info]]))
 
 
+
+(defn relative-xy [pivot el]
+  (let [rect1 (.. pivot getBoundingClientRect)
+        rect2 (.. el    getBoundingClientRect)
+        x (- (.. rect2 -left)
+             (.. rect1 -left))
+        y (- (.. rect2 -top)
+             (.. rect1 -top))
+        height (.. rect1 -height)
+        width  (.. rect1 -width)
+        w     (/ x width)
+        h     (/ y height)]
+    [w h]))
+
+
+
+;; elements with "id" will set their position
+;;
+;;
 (defn mark [id]
-  (r/with-let [text  (subscribe [::sub/mark-text        id])
-               pos   (subscribe [::sub/mark-pos         id])
-               font  (subscribe [::sub/mark-font-family id])
-               size  (subscribe [::sub/mark-font-size   id])]
-    
-    [cc/draggable {:update-fn #(dispatch [::evt/update-mark id [:pos] %])
-                   :pos       @pos}
+  (let [text  (subscribe [::sub/mark-text        id])
+        pos   (subscribe [::sub/mark-pos         id]) ;;fixme: automatic conversion to absolute values
+        font  (subscribe [::sub/mark-font-family id])
+        size  (subscribe [::sub/mark-font-size   id])
+        state (r/atom nil)]
+
+    (r/create-class
+     {:display-name "mark"
+      :component-did-mount
+      (fn [this]
+        (let [el    (sel1 (str "#" id))
+              pivot (sel1 ".editor-img")]
+          (reset! state {:el    el
+                         :pivot pivot})))
+      :reagent-render
+      (fn []
+        [cc/draggable {:update-fn #(evt/update-pos (relative-xy (:pivot @state)
+                                                                (:el    @state)))}
      
-     [cc/toolbox {:id id}]
+         [cc/toolbox {:id id}]
      
-     [cc/resizable {:font-size  @size
-                    :update-fn  #(dispatch [::evt/update-mark id [:font-size] %])}
+         [cc/resizable {:font-size  @size
+                        :update-fn  #(dispatch [::evt/update-mark id [:font-size] %])}
       
-      [cc/autosize-input {:id          id
-                          :key         :input
-                          :text        @text
-                          :font-family @font
-                          :update-fn   #(dispatch [::evt/update-mark id [:text] %])}]]]))
+          [cc/autosize-input {:id          id
+                              :key         :input
+                              :text        @text
+                              :font-family @font
+                              :pos         @pos
+                              :update-fn   #(dispatch [::evt/update-mark id [:text] %])}]]])})))
 
 
 

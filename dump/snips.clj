@@ -1,3 +1,7 @@
+
+
+;;[ContainerDimensions {} (fn [height] (r/as-element [my-component {:height height}]))]
+
 ;; scp -rp release/* root@coverton.co:/var/www/coverton-co/
 
 
