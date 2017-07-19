@@ -24,13 +24,21 @@
     [w h]))
 
 
+(defn absolute-xy [pivot [x y]]
+  (let [rect (.. pivot getBoundingClientRect)
+        top  (.. rect -top)
+        left (.. rect -left)]
+    [(+ x left)
+     (+ y top)]))
+
+
 
 ;; elements with "id" will set their position
 ;;
 ;;
 (defn mark [id]
   (let [text  (subscribe [::sub/mark-text        id])
-        pos   (subscribe [::sub/mark-pos         id]) ;;fixme: automatic conversion to absolute values
+        pos   (subscribe [::sub/mark-pos         id])
         font  (subscribe [::sub/mark-font-family id])
         size  (subscribe [::sub/mark-font-size   id])
         state (r/atom nil)]
@@ -45,20 +53,21 @@
                          :pivot pivot})))
       :reagent-render
       (fn []
-        [cc/draggable {:update-fn #(evt/update-pos (relative-xy (:pivot @state)
-                                                                (:el    @state)))}
+        (let [abspos (absolute-xy (:pivot @state) @pos)]
+          [cc/draggable {:update-fn #(evt/update-pos id (relative-xy (:pivot @state)
+                                                                     (:el    @state)))}
      
-         [cc/toolbox {:id id}]
+           [cc/toolbox {:id id}]
      
-         [cc/resizable {:font-size  @size
-                        :update-fn  #(dispatch [::evt/update-mark id [:font-size] %])}
+           [cc/resizable {:font-size  @size
+                          :update-fn  #(dispatch [::evt/update-mark id [:font-size] %])}
       
-          [cc/autosize-input {:id          id
-                              :key         :input
-                              :text        @text
-                              :font-family @font
-                              :pos         @pos
-                              :update-fn   #(dispatch [::evt/update-mark id [:text] %])}]]])})))
+            [cc/autosize-input {:id          id
+                                :key         :input
+                                :text        @text
+                                :font-family @font
+                                :pos         abspos
+                                :update-fn   #(dispatch [::evt/update-mark id [:text] %])}]]]))})))
 
 
 
@@ -82,6 +91,7 @@
       :component-did-mount
       (fn [this]
         (let [img (sel1 :.editor-img)]
+          ;; save image size
           (evt/update-size [(d/px img :height)
                             (d/px img :height)])))
       :reagent-render

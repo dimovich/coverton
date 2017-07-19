@@ -39,16 +39,19 @@
 
 
 
-(defn autosize-input [{:keys [id update-fn text font-family ref pos]}]
+(defn autosize-input
+  [{:keys [id update-fn text font-family ref pos]}]
+  
   (let [state   (r/atom (or text ""))
         update  #(set-width (r/dom-node %) @state)
-        [x y]   pos] ;;todo
+        [x y]   pos]
     
     (r/create-class
      {:display-name "autosize-input"
       
       :component-did-mount
       (fn [this]
+        ;;for the outer component who modifies size or attributes
         (ref #(update this))
         (update this))
 
@@ -65,7 +68,8 @@
                                         false))
                  :class "label-input cancel-drag"
                  :style {:font-size   "1em"
-                         :font-family font-family}
+                         :font-family font-family
+                         :left x, :top  y}
                  :id id
                  :auto-focus true}])})))
 

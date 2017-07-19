@@ -23,9 +23,15 @@
    (-> db
        (select-keys (keys cover->db-map))
        (update-in [:marks]
-                  #(map (fn [[k m]]
-                          (select-keys m (keys mark->db-map)))
-                        %)))))
+                  #(map
+                    (fn [[k m]] (select-keys m (keys mark->db-map)))
+                    %)))))
+
+(reg-sub
+ ::size
+ :<- [::ed]
+ (fn [db _]
+   (:size db)))
 
 (reg-sub
  ::mark-ids
@@ -72,8 +78,13 @@
 (reg-sub
  ::mark-pos
  :<- [::marks]
- (fn [marks [_ id]]
-   (get-in marks [id :pos])))
+ :<- [::size]
+ (fn [[marks size] [_ id]]
+   ;; convert relative to absolute xy
+   (let [[x y] (get-in marks [id :pos])
+         [w h] size]
+     [(* x w)
+      (* y h)])))
 
 
 (reg-sub

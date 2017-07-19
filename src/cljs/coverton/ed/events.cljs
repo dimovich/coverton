@@ -6,7 +6,7 @@
 
 
 
-(def ed-interceptors    [(path :ed)          trim-v])
+(def ed-interceptors    [(path [:ed])        trim-v])
 (def marks-interceptors [(path [:ed :marks]) trim-v])
 (def dim-interceptors   [(path [:ed :dim])   trim-v])
 
