@@ -8,7 +8,7 @@
             [ajax.core            :as ajax :refer [GET]]
             [coverton.util        :refer [info]]))
 
-
+(enable-console-print!)
 
 (defn relative-xy [pivot el]
   (let [rect1 (.. pivot getBoundingClientRect)
@@ -33,8 +33,7 @@
 
 
 
-;; elements with "id" will set their position
-;;
+;; elements with "id" will set their position (by themselves!)
 ;;
 (defn mark [id]
   (let [text  (subscribe [::sub/mark-text        id])
@@ -47,30 +46,33 @@
      {:display-name "mark"
       :component-did-mount
       (fn [this]
-        (let [el    (sel1 (str "#" id))
-              pivot (sel1 ".editor-img")]
+        (let [el     (sel1 (str "#" id))
+              pivot  (sel1 ".editor-img")
+              abspos (absolute-xy pivot @pos)
+              _      (println "pivot" pivot)]
           (reset! state {:el    el
-                         :pivot pivot})))
+                         :pivot pivot
+                         :pos   abspos})))
       :reagent-render
       (fn []
-        (let [abspos (absolute-xy (:pivot @state) @pos)]
-          [cc/draggable {:update-fn #(evt/update-pos id (relative-xy (:pivot @state)
-                                                                     (:el    @state)))}
-     
-           [cc/toolbox {:id id}]
-     
-           [cc/resizable {:font-size  @size
-                          :update-fn  #(dispatch [::evt/update-mark id [:font-size] %])}
-      
-            [cc/autosize-input {:id          id
-                                :key         :input
-                                :text        @text
-                                :font-family @font
-                                :pos         abspos
-                                :update-fn   #(dispatch [::evt/update-mark id [:text] %])}]]]))})))
+        [cc/draggable {:update-fn #(evt/update-pos id (relative-xy (:pivot @state)
+                                                                   (:el    @state)))}
+         
+         [cc/toolbox {:id id}]
+         
+         [cc/resizable {:font-size  @size
+                        :update-fn  #(dispatch [::evt/update-mark id [:font-size] %])}
+          
+          [cc/autosize-input {:id          id
+                              :key         :input
+                              :text        @text
+                              :font-family @font
+                              :pos         abspos
+                              :update-fn   #(dispatch [::evt/update-mark id [:text] %])}]]])})))
 
 
 
+;; get access to .editor-img by moving this function editor
 (defn marks [ids]
   (into [:div]
         (for [id ids]

@@ -64,7 +64,7 @@
                  :on-blur #(update-fn @state)
                  :on-key-down (fn [e] (condp = (.. e -keyCode)
                                         46 (do (reset! state "")) ;; delete
-                                        27 (.. e -target blur)
+                                        27 (.. e -target blur)    ;; esc
                                         false))
                  :class "label-input cancel-drag"
                  :style {:font-size   "1em"
