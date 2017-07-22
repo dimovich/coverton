@@ -67,14 +67,10 @@
      marks)))
 
 
-(defn handle-add-mark [e]
-  (let [x  (.. e -clientX)
-        y  (.. e -clientY)
-        rect (.. e -target -parentNode getBoundingClientRect)
-        px (.. rect -left)
-        py (.. rect -top)]
-    (dispatch [::add-mark (merge {:pos [(- x px) (- y py)]}
-                                 default-font)])))
+
+(defn handle-add-mark [pos]
+  (dispatch [::add-mark (merge {:pos pos}
+                               default-font)]))
 
 
 

@@ -32,27 +32,18 @@
      (+ y top)]))
 
 
-
-;; elements with "id" will set their position (by themselves!)
-;;
-(defn mark [id]
+(defn mark [{:keys [id parent]}]
   (let [text  (subscribe [::sub/mark-text        id])
         pos   (subscribe [::sub/mark-pos         id])
         font  (subscribe [::sub/mark-font-family id])
-        size  (subscribe [::sub/mark-font-size   id])
-        state (r/atom nil)]
+        size  (subscribe [::sub/mark-font-size   id])]
 
     (r/create-class
      {:display-name "mark"
+
       :component-did-mount
-      (fn [this]
-        (let [el     (sel1 (str "#" id))
-              pivot  (sel1 ".editor-img")
-              abspos (absolute-xy pivot @pos)
-              _      (println "pivot" pivot)]
-          (reset! state {:el    el
-                         :pivot pivot
-                         :pos   abspos})))
+      (fn [this])
+      
       :reagent-render
       (fn []
         [cc/draggable {:update-fn #(evt/update-pos id (relative-xy (:pivot @state)
@@ -72,38 +63,59 @@
 
 
 
-;; get access to .editor-img by moving this function editor
 (defn marks [ids]
   (into [:div]
-        (for [id ids]
-          ^{:key id}
-          [mark id])))
+        ))
+
+
+
+(defn on-click-add-mark [parent e]
+  (let [rect (.. (r/dom-node parent) getBoundingClientRect)
+        rx   (.. rect -left)
+        ry   (.. rect -top)
+        x    (- (.. e -clientX) rx)
+        y    (- (.. e -clientY) ry)
+        h    (.. rect -height)]  ;; fixme: use @size instead
+    (evt/handle-add-mark [(/ x h) (/ y h)])))
+
+
+
+(defn editor-img []
+  (r/with-let [this      (r/current-component)
+               image-url (subscribe [::sub/image-url])
+               ids       (subscribe [::sub/mark-ids])]
+
+    (r/create-class
+     {:display-name "editor-img"
+
+      :component-did-mount
+      (fn [this]
+        ;; save image size
+        (let [h (d/px (r/dom-node this) :height)]
+          (evt/update-size [h h])))
+
+      :reagent-render
+      (fn []
+        (into
+         [:img.editor-img {:src      @image-url
+                           :on-click (partial on-click-add-mark this)}]
+         (for [id @ids
+               :let [dom (r/dom-node this)]]
+           ^{:key id} [mark {:id id :parent dom}])))})))
 
 
 
 
 (defn editor []
-  (let [_    (dispatch-sync [::evt/initialize])
-        dim  (subscribe [::sub/dim])
-        mrks (subscribe [::sub/marks])
-        ids  (subscribe [::sub/mark-ids])
-        image-url (subscribe [::sub/image-url])]
-    (r/create-class
-     {:display-name "ed"
-      :component-did-mount
-      (fn [this]
-        (let [img (sel1 :.editor-img)]
-          ;; save image size
-          (evt/update-size [(d/px img :height)
-                            (d/px img :height)])))
-      :reagent-render
-      (fn []
-        [:div.editor {:on-blur evt/handle-remove-mark}
+  (r/with-let [_    (dispatch-sync [::evt/initialize])
+               dim  (subscribe [::sub/dim])
+               mrks (subscribe [::sub/marks])
+               ids  (subscribe [::sub/mark-ids])]
 
-         [:img.editor-img {:src @image-url
-                           :on-click evt/handle-add-mark}]
+    [:div.editor {:on-blur evt/handle-remove-mark}
 
-         (condp = @dim
-           :show-font-picker [cc/font-picker @mrks]
-           [marks @ids])])})))
+     (condp = @dim
+       :show-font-picker [cc/font-picker @mrks]
+       
+       [editor-img])]))
 
