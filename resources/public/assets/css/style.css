@@ -46,44 +46,37 @@ body {
     margin: 0 auto;
     border: 0px solid green;
     position: relative;
-    background-color: #0c0c0c;
     width: 100%;
     height: 100%;
     text-align: center;
-    background-color: #0c0c0c;
+    margin-top: 33px;
 }
 
 
 .editor-img {
-    height: 80vh;
+    height: 75vh;
     border: 0px solid black;
     padding: 0;
-    position: absolute;
-    top: 10vh;
-    transform: translatex(-50%);
 }
 
+.editor-img-wrap {
+    display: inline-block;
+    position: relative;
+}
 
-.label-container {
-    font-size: 30px;
+.mark {
     position: absolute;
-    width: 0px;
-    height: 0px;
-    margin: 0;
-    padding: 0;
 }
 
 
 .label-resize {
     border: 2px solid transparent;
     transition : border .2s ease-in;
-    /*transition-delay: 1.3s;*/
     transition-delay: 0;
     margin: 0;
     padding: 10px;
-    position: relative;
-    display: inline-block;
 }
+
 
 .label-toolbox {
     position: absolute;
@@ -101,6 +94,7 @@ body {
     transition: display 2s ease-out;
 }
 
+
 .label-toolbox-mark {
     display: inline-block;
     width: 38%;
@@ -113,20 +107,15 @@ body {
     position: relative;
 }
 
+
 .react-draggable:hover .label-toolbox {
-    display: block;
+    display: inline-block;
 }
+
 
 .border .label-resize, .react-draggable:hover .label-resize {
     border: 2px solid grey;
     transition-delay: 0;
-}
-
-
-.item {
-    display: inline-block;
-    width: auto;
-    height: auto;
 }
 
 
@@ -142,13 +131,14 @@ body {
     width: 1em;
     margin: 0;
     padding: 0;
-    position: relative;
     text-align: left;
 }
+
 
 .label-input:focus {
     user-select: default;
 }
+
 
 .react-draggable {
     -webkit-user-select: none;
@@ -163,8 +153,8 @@ body {
 
 
 .react-draggable-child {
-    position: absolute;
-    display: inline-block;
+/*    position: absolute;*/
+/*    display: inline-block;*/
 }
 
 
@@ -173,11 +163,13 @@ body {
     min-height: 100px;
 }
 
+
 .logo {
     height: 20px;
     width: 20px;
     margin-bottom: 0.5em;
 }
+
 
 .text {
     color : #1A1A1A;
@@ -203,6 +195,7 @@ body {
     margin: auto;
 }
 
+
 .picker-block {
     position: relative;
     border: 0;
@@ -213,10 +206,12 @@ body {
     display: inline-block;
 }
 
+
 .picker-img {
     max-width: 100%;
     max-height: 100%;
 }
+
 
 .picker-label {
     position: absolute;
@@ -226,6 +221,7 @@ body {
     white-space: nowrap;
     cursor: pointer;
 }
+
 
 .picker-label:hover {
     opacity: 0.7;

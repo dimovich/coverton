@@ -1,5 +1,6 @@
-- aget
-- react-track
+- save position
+- resize track
+- disable click when dragging and resizing
 
 
 - datomic tutorials

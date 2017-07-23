@@ -3,8 +3,6 @@
             [dommy.core :as d :refer-macros [sel1]]
             [coverton.index.views  :as index]))
 
-(enable-console-print!)
-
 
 (defn app []
   [index/index])

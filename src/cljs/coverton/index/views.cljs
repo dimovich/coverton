@@ -10,6 +10,8 @@
             [coverton.util         :refer [info]]
             [coverton.db.schema    :refer [magic-id]]))
 
+(enable-console-print!)
+
 
 (def Button (r/adapt-react-class (aget js/window "deps" "semui" "Button")))
 
