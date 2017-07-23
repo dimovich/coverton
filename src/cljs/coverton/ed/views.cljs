@@ -23,19 +23,14 @@
     [w h]))
 
 
-(defn absolute-xy [pivot [x y]]
-  (let [rect (.. pivot getBoundingClientRect)
-        top  (.. rect -top)
-        left (.. rect -left)]
-    [(+ x left)
-     (+ y top)]))
 
-
-(defn mark [{:keys [id]}]
+(defn mark [{:keys [id parent]}]
   (let [text  (subscribe [::sub/mark-text        id])
         pos   (subscribe [::sub/mark-pos         id])
         font  (subscribe [::sub/mark-font-family id])
-        size  (subscribe [::sub/mark-font-size   id])]
+        font-size  (subscribe [::sub/mark-font-size   id])
+        [x y] @pos ;;initial click coords
+        ]
 
     (r/create-class
      {:display-name "mark"
@@ -45,18 +40,17 @@
       
       :reagent-render
       (fn []
-        (let [[x y] @pos
-              _ (println "hello" x y)]
+        (let [[x y] @pos] ;;slow... use SVG maybe?
           [:div.mark {:style {:left x :top y}}
-           [cc/draggable {:update-fn identity
-                          #_(evt/update-pos id (relative-xy (:pivot @state)
-                                                            (:el    @state)))}
-         
-            [cc/toolbox {:id id}]
-         
-            [cc/resizable {:font-size  @size
-                           :update-fn  #(dispatch [::evt/update-mark id [:font-size] %])}
+           [cc/draggable {:update-fn #(evt/update-pos id %)
+                          :start-pos [x y] ;;we get deltas, so we need the initial coords
+                          }
           
+            [cc/toolbox {:id id}]
+          
+            [cc/resizable {:font-size  @font-size
+                           :update-fn  #(dispatch [::evt/update-mark id [:font-size] %])}
+           
              [cc/autosize-input {:id          id
                                  :key         :input
                                  :text        @text
@@ -67,13 +61,14 @@
 
 
 (defn on-click-add-mark [parent e]
-  (let [rect (.. parent getBoundingClientRect)
+  (let [ ;;[w h] @(subscribe [::sub/size])
+        rect (.. parent getBoundingClientRect)
         rx   (.. rect -left)
         ry   (.. rect -top)
         x    (- (.. e -clientX) rx)
         y    (- (.. e -clientY) ry)
         h    (.. rect -height)
-        w    (.. rect -height)] ;; fixme: use @size instead
+        w    (.. rect -height)]
     (evt/handle-add-mark [(/ x h) (/ y h)])))
 
 
@@ -88,18 +83,20 @@
 
       :component-did-mount
       (fn [this]
-        ;; save image size
-        (let [h (d/px (r/dom-node this) :height)
-              w (d/px (r/dom-node this) :height)]
-          (evt/update-size [w h])))
+        ;; detect resize and update state
+        (-> cc/resize-detector
+            (.listenTo (r/dom-node this)
+                       (fn [e]
+                         ;; fixme, why height is +5 px?
+                         (evt/update-size [(.. e -offsetWidth)
+                                           (.. e -offsetWidth)])))))
 
       :reagent-render
       (fn []
         (into
-         [:div.editor-img-wrap {:on-click #(on-click-add-mark (r/dom-node this) %)}
-          [:img.editor-img {:src @image-url}]
-          #_[:div.mark {:style {:top "10%" :left "20%"
-                                :width "20%" :height "20%"}}]]
+         [:div.editor-img-wrap
+          [:img.editor-img {:on-click #(on-click-add-mark (r/dom-node this) %)
+                            :src @image-url}]]
 
          ;; marks
          (for [id @ids]

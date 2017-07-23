@@ -10,9 +10,11 @@
 
 (def react-drag   (r/adapt-react-class
                    (goog.object/getValueByKeys js/window "deps" "draggable")))
+
 (def react-resize (r/adapt-react-class
                    (goog.object/getValueByKeys js/window "deps" "resizable")))
 
+(def resize-detector ((goog.object/getValueByKeys js/window "deps" "resize-detector")))
 
 
 ;;
@@ -119,12 +121,14 @@
 
 
 
-(defn draggable [{:keys [update-fn]}]
-  (r/with-let [this (r/current-component)]
+(defn draggable [{:keys [update-fn start-pos]}]
+  (r/with-let [this  (r/current-component)
+               [x y] start-pos]
     [react-drag {:cancel ".cancel-drag"
-                 :on-stop (fn [e d]
-                            (update-fn)
-                            #_(let [el (aget d "node")]))}
+                 :on-stop (fn [_ d]
+                            (let [d (js->clj d)]
+                              (update-fn [(+ x (d "x"))
+                                          (+ y (d "y"))])))}
      
      (into
       [:div.react-draggable-child]

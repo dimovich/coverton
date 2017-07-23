@@ -27,6 +27,16 @@
 
 
 (reg-event-db
+ ::update-mark-pos
+ ed-interceptors
+ (fn [db [id pos]]
+   (let [[w h] (:size db)
+         [x y] pos]
+     (assoc-in db [:marks id :pos] [(/ x w)
+                                    (/ y h)]))))
+
+
+(reg-event-db
  ::dim
  dim-interceptors
  (fn [dim _]
@@ -98,5 +108,5 @@
 
 
 (defn update-pos [id pos]
-  (dispatch [::update-mark id [:pos] pos]))
+  (dispatch [::update-mark-pos id pos]))
 

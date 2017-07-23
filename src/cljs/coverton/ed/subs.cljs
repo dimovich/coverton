@@ -81,7 +81,6 @@
  :<- [::size]
  (fn [[marks size] [_ id]]
    ;; convert relative to absolute xy
-   ;; fixme: add top/left of editor-img
    (let [[x y] (get-in marks [id :pos])
          [w h] size]
      [(* x w)

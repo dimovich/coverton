@@ -6,7 +6,8 @@ window.deps = {
     'react-dom' : require('react-dom'),
     'draggable': Draggable,
     'resizable': Resizable,
-    'semui': require ('semantic-ui-react')
+    'semui': require ('semantic-ui-react'),
+    'resize-detector': require("element-resize-detector")
 };
 
 window.React = window.deps['react'];

@@ -17,6 +17,7 @@
       "webpack": "2.5.1",
       "react-draggable": "2.2.3",
       "react-resizable-box": "2.0.4",
-      "semantic-ui-react": "0.68.5"
+      "semantic-ui-react": "0.68.5",
+      "element-resize-detector": "1.1.12"
   }
 }

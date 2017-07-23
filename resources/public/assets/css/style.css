@@ -66,6 +66,7 @@ body {
 
 .mark {
     position: absolute;
+    display: inline-block
 }
 
 
