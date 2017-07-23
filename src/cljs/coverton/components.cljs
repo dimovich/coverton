@@ -165,8 +165,9 @@
 
                          ^{:key id}
                          [:span.picker-label
-                          {:on-click #(do (dispatch [::evt/update-mark id [:font-family] block-family])
-                                          (dispatch [::evt/update-mark id [:static] true]))
+                          {:on-click #(do (evt/update-font-family id block-family)
+                                          (evt/update-mark-static id true))
+                           
                            :style {:font-family (if static font-family block-family)
                                    :font-size font-size
                                    :color color
@@ -176,9 +177,7 @@
                           text])))))))})))
 
 
-;; 
 
-;; export
 (defn export-labels [labels]
   (let [img (.. (sel1 :.editor-img) getBoundingClientRect)]
     (assoc-in {:img {:src "assets/img/coverton.jpg"}} [:labels]

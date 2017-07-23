@@ -24,51 +24,43 @@
 
 
 
-(defn mark [{:keys [id parent]}]
-  (let [text  (subscribe [::sub/mark-text        id])
-        pos   (subscribe [::sub/mark-pos         id])
-        font  (subscribe [::sub/mark-font-family id])
-        font-size  (subscribe [::sub/mark-font-size   id])
-        [x y] @pos ;;initial click coords
-        ]
+(defn mark [{:keys [id]}]
+  (r/with-let [text  (subscribe [::sub/mark-text        id])
+               pos   (subscribe [::sub/mark-pos         id])
+               font  (subscribe [::sub/mark-font-family id])
+               font-size  (subscribe [::sub/mark-font-size   id])
+               ;;initial click coords
+               [x y] @pos]
 
-    (r/create-class
-     {:display-name "mark"
-
-      :component-did-mount
-      (fn [this])
+    [:div.mark {:style {:left x :top y}}
+     [cc/draggable {:update-fn #(evt/update-pos id %)
+                    ;;we get deltas, so we need the initial coords
+                    :start-pos [x y]}
       
-      :reagent-render
-      (fn []
-        (let [[x y] @pos] ;;slow... use SVG maybe?
-          [:div.mark {:style {:left x :top y}}
-           [cc/draggable {:update-fn #(evt/update-pos id %)
-                          :start-pos [x y] ;;we get deltas, so we need the initial coords
-                          }
-          
-            [cc/toolbox {:id id}]
-          
-            [cc/resizable {:font-size  @font-size
-                           :update-fn  #(dispatch [::evt/update-mark id [:font-size] %])}
-           
-             [cc/autosize-input {:id          id
-                                 :key         :input
-                                 :text        @text
-                                 :font-family @font
-                                 :update-fn   #(dispatch [::evt/update-mark id [:text] %])}]]]]))})))
+      [cc/toolbox {:id id}]
+      
+      [cc/resizable {:font-size  @font-size
+                     :update-fn  #(evt/update-font-size id %)}
+       
+       [cc/autosize-input {:id          id
+                           :key         :input
+                           :text        @text
+                           :font-family @font
+                           :update-fn   #(evt/update-text id %)}]]]]))
 
 
 
 
 (defn on-click-add-mark [parent e]
-  (let [ ;;[w h] @(subscribe [::sub/size])
+  (let [[w h] @(subscribe [::sub/size])
         rect (.. parent getBoundingClientRect)
         rx   (.. rect -left)
         ry   (.. rect -top)
         x    (- (.. e -clientX) rx)
         y    (- (.. e -clientY) ry)
-        h    (.. rect -height)
-        w    (.. rect -height)]
+        ;;h    (.. rect -height)
+        ;;w    (.. rect -height)
+        ]
     (evt/handle-add-mark [(/ x h) (/ y h)])))
 
 
@@ -83,18 +75,18 @@
 
       :component-did-mount
       (fn [this]
-        ;; detect resize and update state
-        (-> cc/resize-detector
-            (.listenTo (r/dom-node this)
-                       (fn [e]
-                         ;; fixme, why height is +5 px?
-                         (evt/update-size [(.. e -offsetWidth)
-                                           (.. e -offsetWidth)])))))
+        ;;set size
+        ;;fixme: why height is +5 px?
+        ;;todo: set size based on window size
+        (let [w (d/px (r/dom-node this) :width)
+              h (d/px (r/dom-node this) :height)]
+          (evt/update-size [h h])))
 
       :reagent-render
       (fn []
         (into
-         [:div.editor-img-wrap
+         [:div.editor-img-wrap {:on-blur evt/handle-remove-mark}
+          
           [:img.editor-img {:on-click #(on-click-add-mark (r/dom-node this) %)
                             :src @image-url}]]
 
@@ -111,7 +103,7 @@
                mrks (subscribe [::sub/marks])
                ids  (subscribe [::sub/mark-ids])]
 
-    [:div.editor {:on-blur evt/handle-remove-mark}
+    [:div.editor 
 
      (condp = @dim
        :show-font-picker [cc/font-picker @mrks]

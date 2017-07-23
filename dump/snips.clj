@@ -1,4 +1,15 @@
 
+;; detect resize and update state
+;; fixme: it's slow. use relative units, or svg viewport
+#_(-> cc/resize-detector
+              (.listenTo (r/dom-node this)
+                         (fn [e]
+                           (evt/update-size [(.. e -offsetWidth)
+                                             (.. e -offsetWidth)]))))
+
+
+
+
 
 ;;[ContainerDimensions {} (fn [height] (r/as-element [my-component {:height height}]))]
 

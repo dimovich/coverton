@@ -44,13 +44,6 @@
 
 
 (reg-event-db
- ::update-font-size
- marks-interceptors
- (fn [marks [id size]]
-   (assoc-in marks [id :font-size] size)))
-
-
-(reg-event-db
  ::add-mark
  marks-interceptors
  (fn [marks [m]]
@@ -77,11 +70,9 @@
      marks)))
 
 
-
 (defn handle-add-mark [pos]
   (dispatch [::add-mark (merge {:pos pos}
                                default-font)]))
-
 
 
 (defn handle-remove-mark [e]
@@ -91,22 +82,33 @@
       (dispatch [::remove-mark id]))))
 
 
-
 (defn update-cover-id [id]
   (dispatch [::update [:cover-id] id]))
-
 
 
 (defn update-size [size]
   (dispatch [::update [:size] size]))
 
 
-
 (defn update-image-url [url]
   (dispatch [::update [:image-url] url]))
-
 
 
 (defn update-pos [id pos]
   (dispatch [::update-mark-pos id pos]))
 
+
+(defn update-font-size [id size]
+  (dispatch [::update-mark id [:font-size] size]))
+
+
+(defn update-font-family [id family]
+  (dispatch [::update-mark id [:font-family] family]))
+
+
+(defn update-text [id text]
+  (dispatch [::update-mark id [:text] text]))
+
+
+(defn update-mark-static [id static]
+  (dispatch [::update-mark id [:static] static]))
