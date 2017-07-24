@@ -18,7 +18,8 @@
    :font-size   :mark/font-size
    :font-family :mark/font-family
    :text        :mark/text
-   :color       :mark/color})
+   :color       :mark/color
+   :static      :mark/static})
 
 
 

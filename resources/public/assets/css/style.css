@@ -179,6 +179,7 @@ body {
 }
 
 
+/*for measuring text width*/
 #span-measure {
     position:absolute;
     top:0px;
@@ -214,7 +215,7 @@ body {
 }
 
 
-.picker-label {
+.picker-mark {
     position: absolute;
     margin: 0;
     padding: 0;

@@ -37,6 +37,14 @@
 
 
 (reg-event-db
+ ::update-mark-font-size
+ ed-interceptors
+ (fn [db [id fsize]]
+   (let [[w h] (:size db)]
+     (assoc-in db [:marks id :font-size] (/ fsize h)))))
+
+
+(reg-event-db
  ::dim
  dim-interceptors
  (fn [dim _]
@@ -98,8 +106,8 @@
   (dispatch [::update-mark-pos id pos]))
 
 
-(defn update-font-size [id size]
-  (dispatch [::update-mark id [:font-size] size]))
+(defn update-font-size [id fsize]
+  (dispatch [::update-mark-font-size id fsize]))
 
 
 (defn update-font-family [id family]
@@ -112,3 +120,7 @@
 
 (defn update-mark-static [id static]
   (dispatch [::update-mark id [:static] static]))
+
+
+(defn update-dim [panel]
+  (dispatch [::update [:dim] panel]))

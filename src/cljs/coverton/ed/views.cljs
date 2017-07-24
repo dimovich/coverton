@@ -5,7 +5,6 @@
             [coverton.components  :as cc]
             [coverton.ed.events   :as evt]
             [coverton.ed.subs     :as sub]
-            [ajax.core            :as ajax :refer [GET]]
             [coverton.util        :refer [info]]))
 
 
@@ -106,7 +105,7 @@
     [:div.editor 
 
      (condp = @dim
-       :show-font-picker [cc/font-picker @mrks]
+       :show-font-picker [cc/font-picker]
        
        [editor-img])]))
 

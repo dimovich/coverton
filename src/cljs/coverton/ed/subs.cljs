@@ -64,8 +64,11 @@
 (reg-sub
  ::mark-font-size
  :<- [::marks]
- (fn [marks [_ id]]
-   (get-in marks [id :font-size])))
+ :<- [::size]
+ (fn [[marks size] [_ id]]
+   (let [[w h] size
+         fs    (get-in marks [id :font-size])]
+     (* fs h))))
 
 
 (reg-sub

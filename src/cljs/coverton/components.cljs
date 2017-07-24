@@ -3,7 +3,8 @@
             [re-frame.core  :as rf :refer [dispatch subscribe]]
             [dommy.core     :as d  :refer-macros [sel1 sel]]
             [coverton.fonts :refer [default-font]]
-            [coverton.ed.events :as evt]))
+            [coverton.ed.events :as evt]
+            [coverton.ed.subs   :as sub]))
 
 
 (enable-console-print!)
@@ -14,7 +15,7 @@
 (def react-resize (r/adapt-react-class
                    (goog.object/getValueByKeys js/window "deps" "resizable")))
 
-(def resize-detector ((goog.object/getValueByKeys js/window "deps" "resize-detector")))
+;;(def resize-detector ((goog.object/getValueByKeys js/window "deps" "resize-detector")))
 
 
 ;;
@@ -111,16 +112,6 @@
 
 
 
-(defn relative-pos [el]
-  (let [er (.. el getBoundingClientRect)
-        pr (.. el -parentNode getBoundingClientRect)
-        x  (- (.. er -left) (.. pr -left))
-        y  (- (.. er -top)  (.. pr -top))]
-    [x y]))
-
-
-
-
 (defn draggable [{:keys [update-fn start-pos]}]
   (r/with-let [this  (r/current-component)
                [x y] start-pos]
@@ -136,35 +127,38 @@
 
 
 
-(defn picker-block [{:keys [labels font-family]}]
+;; fixme: pos does not include drag and resize
+;;
+(defn picker-block [{:keys [cover font-family]}]
   
   (let [size (r/atom nil)]
     (r/create-class
      {:display-name "picker-block"
 
       :component-did-mount
-      #(let [w (d/px (sel1 :.picker-img) :width)]
-         (reset! size [w w]))
+      (fn [this]
+        (let [w (d/px (sel1 :.picker-img) :width)]
+          (reset! size [w w])))
       
       :reagent-render
-      (fn [{:keys [labels font-family]}]
-        (let [{:keys [img labels]} labels
-              block-family font-family
-              img-src (:src img)]
+      (fn []
+        (let [marks (:marks cover)
+              block-family font-family]
           (into
            [:div.picker-block
-            [:img.picker-img {:src img-src}]]
+            [:img.picker-img {:src (:image-url cover)}]]
        
-           (->> labels
-                (map (fn [{:keys [pos text font-size font-family color id static]}]
-                       (let [[w h] @size
+           (->> marks
+                (map (fn [{:keys [mark-id pos text font-size font-family color static]}]
+                       (let [id (str mark-id)
+                             [w h] @size
                              font-size (* font-size h)
                              [x y] pos
                              x (* x w)
                              y (* y h)]
 
                          ^{:key id}
-                         [:span.picker-label
+                         [:span.picker-mark
                           {:on-click #(do (evt/update-font-family id block-family)
                                           (evt/update-mark-static id true))
                            
@@ -178,63 +172,10 @@
 
 
 
-(defn export-labels [labels]
-  (let [img (.. (sel1 :.editor-img) getBoundingClientRect)]
-    (assoc-in {:img {:src "assets/img/coverton.jpg"}} [:labels]
-              (for [lbl (sel :.label-input)]
-                (let [rect (.. lbl getBoundingClientRect)
-                      x   (- (.. rect -left) (.. img -left))
-                      y   (- (.. rect -top) (.. img -top))
-                      w   (.. img -width)
-                      h   (.. img -height)
-                      x   (/ x w)
-                      y   (/ y h)
-                      font-family (d/style lbl :font-family)
-                      font-size   (/ (d/px lbl :font-size) h)
-                      color       (d/style lbl :color)
-                      text        (.. lbl -value)
-                      id          (.. lbl -id)
-                      static      (:static (get labels id))]
-
-                  {:pos [x y]
-                   :text text
-                   :id id
-                   :static static
-                   :font-family font-family
-                   :font-size   font-size
-                   :color       color})))))
-
-
-
-(defn export-cover [cover]
-  (if-let [img (.. (sel1 :.editor-img) getBoundingClientRect)]
-    (-> cover
-        (update-in
-         [:marks]
-         (fn [ms]
-           (map (fn [m]
-                  (if-let [mrk  (sel1 (keyword (str "#" (:mark-id m))))] ;;fixme
-                    (let [rect (.. mrk getBoundingClientRect)
-                          x   (- (.. rect -left) (.. img -left))
-                          y   (- (.. rect -top) (.. img -top))
-                          w   (.. img -width) ;;(:size cover)
-                          h   (.. img -height)
-                          x   (/ x w)
-                          y   (/ y h)
-                          font-size   (/ (:font-size m) h)]
-                      (merge m {:pos [x y]
-                                :font-size   font-size}))
-                    (println "error selecting mark " (:mark-id m))))
-                ms))))
-    (println "error selecting editor image")))
-
-
-
-
 (defn dimmer []
   (r/with-let [this  (r/current-component)
                body  (sel1 :body)
-               close #(dispatch [::evt/update [:dim] false])
+               close #(evt/update-dim false)
                esc   #(when (= (.. % -keyCode) 27) (close))
                _     (d/listen! body :keyup esc)]
     (r/create-class
@@ -258,14 +199,14 @@
 
 
 
-(defn font-picker [labels]
-  (r/with-let [lbls (export-labels labels)]
+(defn font-picker []
+  (r/with-let [cover @(subscribe [::sub/cover])]
     [dimmer
      (into
       [:div.picker-container]
       (for [font-family coverton.fonts/font-names]
-        [picker-block {:key    font-family
-                       :labels lbls
+        ^{:key font-family}
+        [picker-block {:cover cover
                        :font-family font-family}]))]))
 
 
@@ -274,8 +215,8 @@
 (defn toolbox-font-picker [{:keys [id]}]
   [:div.label-toolbox-mark
    {:style {:background-color "green"}
-    :on-click #(do (dispatch [::evt/update-mark id [:static] false])
-                   (dispatch [::evt/update [:dim] :show-font-picker]))}])
+    :on-click #(do (evt/update-mark-static id false)
+                   (evt/update-dim :show-font-picker))}])
 
 
 
