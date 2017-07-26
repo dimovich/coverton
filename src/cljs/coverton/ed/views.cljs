@@ -60,11 +60,8 @@
         rx   (.. rect -left)
         ry   (.. rect -top)
         x    (- (.. e -clientX) rx)
-        y    (- (.. e -clientY) ry)
-        ;;h    (.. rect -height)
-        ;;w    (.. rect -height)
-        ]
-    (evt/handle-add-mark [(/ x h) (/ y h)])))
+        y    (- (.. e -clientY) ry)]
+    (evt/handle-add-mark [(/ x w) (/ y h)])))
 
 
 

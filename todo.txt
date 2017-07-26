@@ -1,6 +1,5 @@
-- save position
+- try D3 for editor
 - resize track
-- disable click when dragging and resizing
 
 
 - datomic tutorials
