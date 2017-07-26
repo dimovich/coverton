@@ -28,20 +28,24 @@
                pos   (subscribe [::sub/mark-pos         id])
                font  (subscribe [::sub/mark-font-family id])
                font-size  (subscribe [::sub/mark-font-size   id])
+               ref (atom nil)
                ;;initial click coords
                [x y] @pos]
 
     [:div.mark {:style {:left x :top y}}
      [cc/draggable {:update-fn #(evt/update-pos id %)
                     ;;we get deltas, so we need the initial coords
-                    :start-pos [x y]}
+                    :start-pos [x y]
+                    :ref ref}
       
       [cc/toolbox {:id id}]
       
       [cc/resizable {:font-size  @font-size
+                     :ref ref
                      :update-fn  #(evt/update-font-size id %)}
        
        [cc/autosize-input {:id          id
+                           :set-ref     #(reset! ref %)
                            :key         :input
                            :text        @text
                            :font-family @font

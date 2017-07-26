@@ -22,16 +22,17 @@
 ;; calculate text width in px for font type and size
 ;; and change element width
 ;;
-(defn set-width [el text]
+(defn set-width [el]
   (let [font (d/style el :font-family)
         size (d/style el :font-size)
-        span (sel1 :#span-measure)]
+        span (sel1 :#span-measure)
+        _    (println )]
 
     ;; copy styles to span
     (d/set-style! span :font-size size)
     (d/set-style! span :font-family font)
     (d/set-html!  span "")
-    (d/append!    span (d/create-text-node text))
+    (d/append!    span (d/create-text-node (d/value el))) ;;fixme: memleak?
 
     ;; get normal width (has issues with whitespace),
     ;; so possibly extend to scroll width
@@ -41,12 +42,11 @@
 
 
 
-
 (defn autosize-input
-  [{:keys [id update-fn text font-family ref]}]
+  [{:keys [id update-fn text font-family set-ref]}]
   
   (let [state   (r/atom (or text ""))
-        update  #(set-width (r/dom-node %) @state)]
+        update  #(set-width (r/dom-node %))]
     
     (r/create-class
      {:display-name "autosize-input"
@@ -54,7 +54,7 @@
       :component-did-mount
       (fn [this]
         ;;for the outer component who modifies size or attributes
-        (ref #(update this))
+        (set-ref (r/dom-node this))
         (update this))
 
       :component-did-update update
@@ -68,7 +68,7 @@
                                         46 (do (reset! state "")) ;; delete
                                         27 (.. e -target blur)    ;; esc
                                         false))
-                 :class "label-input cancel-drag"
+                 :class "mark-input cancel-drag"
                  :style {:font-size   "1em"
                          :font-family font-family}
                  :id id
@@ -77,13 +77,12 @@
 
 
 
-(defn resizable [{:keys [font-size update-fn]}]
+(defn resizable [{:keys [font-size update-fn ref]}]
   (r/with-let [this  (r/current-component)
                start (atom nil)
-               size  (atom nil)
-               ref   (atom nil)]
+               size  (atom nil)]
     (into
-     [react-resize {:class-name "label-resize"
+     [react-resize {:class-name "mark-resize"
                     :width "1em" :height "1em"
                     :style {:font-size font-size}
                     :lock-aspect-ratio true
@@ -105,14 +104,13 @@
 
                                  (d/set-px! el :font-size @size)
 
-                                 ;; run child update fn
-                                 (@ref))}]
-     (-> (r/children this)
-         (update-in [0 1] assoc :ref #(reset! ref %))))))
+                                 ;; update child
+                                 (set-width @ref))}]
+     (r/children this))))
 
 
 
-(defn draggable [{:keys [update-fn start-pos]}]
+(defn draggable [{:keys [update-fn start-pos ref]}]
   (r/with-let [this  (r/current-component)
                [x y] start-pos]
     [react-drag {:cancel ".cancel-drag"
@@ -213,7 +211,7 @@
 
 
 (defn toolbox-font-picker [{:keys [id]}]
-  [:div.label-toolbox-mark
+  [:div.mark-toolbox-wrap
    {:style {:background-color "green"}
     :on-click #(do (evt/update-mark-static id false)
                    (evt/update-dim :show-font-picker))}])
@@ -222,6 +220,6 @@
 
 
 (defn toolbox [props]
-  [:div.label-toolbox.cancel-drag
+  [:div.mark-toolbox.cancel-drag
    [toolbox-font-picker props]])
 

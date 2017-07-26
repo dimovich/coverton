@@ -70,7 +70,7 @@ body {
 }
 
 
-.label-resize {
+.mark-resize {
     border: 2px solid transparent;
     transition : border .2s ease-in;
     transition-delay: 0;
@@ -79,7 +79,7 @@ body {
 }
 
 
-.label-toolbox {
+.mark-toolbox {
     position: absolute;
     overflow: visible;
     top: -20px;
@@ -96,7 +96,7 @@ body {
 }
 
 
-.label-toolbox-mark {
+.mark-toolbox-wrap {
     display: inline-block;
     width: 38%;
     height: 90%;
@@ -109,18 +109,18 @@ body {
 }
 
 
-.react-draggable:hover .label-toolbox {
+.react-draggable:hover .mark-toolbox {
     display: inline-block;
 }
 
 
-.border .label-resize, .react-draggable:hover .label-resize {
+.border .mark-resize, .react-draggable:hover .mark-resize {
     border: 2px solid grey;
     transition-delay: 0;
 }
 
 
-.label-input {
+.mark-input {
     white-space: nowrap;
     font-size: 1em;
     font-family: 'GothaPro';
@@ -136,7 +136,7 @@ body {
 }
 
 
-.label-input:focus {
+.mark-input:focus {
     user-select: default;
 }
 
@@ -154,8 +154,6 @@ body {
 
 
 .react-draggable-child {
-/*    position: absolute;*/
-/*    display: inline-block;*/
 }
 
 
@@ -225,7 +223,7 @@ body {
 }
 
 
-.picker-label:hover {
+.picker-mark:hover {
     opacity: 0.7;
 }
 
