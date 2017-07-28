@@ -26,10 +26,10 @@
                        :params {:cover cover}}))
 
 
-(defn get-cover [id]
+(defn get-cover [id cb]
   (POST "/get-cover" {:handler (fn [cover]
                                  (info cover)
-                                 (ed-evt/import-cover cover))
+                                 (cb cover))
                       :error-handler #(info %)
                       :params {:id id}}))
 
@@ -38,7 +38,8 @@
   (r/with-let [ ;;_            (dispatch-sync [::evt/initialize])
                active-panel (subscribe [::sub/active-panel])
                cover        (subscribe [::ed-sub/cover])
-               ed-t         (subscribe [::ed-sub/t])]
+               state        (atom nil)
+               set-cover    #(swap! state assoc-in [:cover] %)]
     [:div.index
      [Button {:on-click #(dispatch [::evt/set-active-panel :index])}
       "Index"]
@@ -46,14 +47,14 @@
       "Editor"]
      [Button {:on-click #(save-cover @cover)}
       "Save Cover"]
-     [Button {:on-click #(get-cover magic-id)}
+     [Button {:on-click #(get-cover magic-id set-cover)}
       "Load Cover"]
 
      #_(when @cover ;;autosave...
          (save-cover @cover))
      
      (condp = @active-panel
-       :ed ^{:key @ed-t} [ed/editor] ;;memleaks?
+       :ed [ed/editor (:cover @state)] ;;^{:key @ed-t}
        
        [:div {:class "motto vcenter"
               :style {:text-align :left}}

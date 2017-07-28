@@ -116,8 +116,8 @@
 
 
 
-(defn editor []
-  (r/with-let [ ;;_    (dispatch-sync [::evt/initialize])
+(defn editor [cover]
+  (r/with-let [_    (dispatch-sync [::evt/initialize cover])
                dim  (subscribe [::sub/dim])
                mrks (subscribe [::sub/marks])
                ids  (subscribe [::sub/mark-ids])

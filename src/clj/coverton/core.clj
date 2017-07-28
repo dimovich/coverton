@@ -4,10 +4,10 @@
             [ring.middleware.not-modified    :refer [wrap-not-modified]]
             [coverton.templates.devcards     :refer [devcards]]
             [ring.middleware.transit         :refer [wrap-transit-response wrap-transit-body]]
-            [ring.util.response              :refer [response]]
+            [ring.util.response              :refer [response not-found]]
             [coverton.templates.index        :refer [index static-promo]]
             [compojure.core     :refer [defroutes GET POST PUT]]
-            [compojure.route    :refer [not-found files resources]]
+            [compojure.route    :refer [files resources]]
             [compojure.handler  :refer [site]]
             [ring.util.response :refer [file-response]]
             [org.httpkit.server :as server]
@@ -38,8 +38,11 @@
 
 (defn get-cover [req]
   (let [cover-id (get-in req [:body :id])
-          cover    (db/get-cover cover-id)]
-      (response (fress/read (:cover/data cover)))))
+        _ (println cover-id)
+        cover    (db/get-cover cover-id)]
+    (if (:cover/data cover)
+      (response (fress/read (:cover/data cover)))
+      (not-found (str cover-id)))))
 
 
 
@@ -58,7 +61,7 @@
   
   (files     "/" {:root "."})   ;; to serve static resources
   (resources "/" {:root "."})   ;; to serve anything else
-  (not-found "Page Not Found")) ;; page not found
+  (compojure.route/not-found "Page Not Found")) ;; page not found
 
 
 (def app
@@ -73,8 +76,7 @@
 
 ;; boot runs this from another process... so no state in the end
 (defn init []
-  (swap! state assoc :conn (db/init))
-  (info "state: " @state))
+  (db/init))
 
 
 (defn -main [& args]

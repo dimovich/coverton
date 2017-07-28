@@ -6,29 +6,27 @@
             [coverton.db.schema :refer [cover-schema mark-schema sample-data]]))
 
 
-(def db-state (atom {:conn nil}))
+(def db-state (atom {}))
 
 
 (defn connect []
-  (->> {:db-name "hello"
-        :account-id client/PRO_ACCOUNT
-        :secret "admin"
-        :region "none"
-        :endpoint "localhost:8998"
-        :service "peer-server"
-        :access-key "admin"}
+  (-> {:db-name "hello"
+       :account-id client/PRO_ACCOUNT
+       :secret "admin"
+       :region "none"
+       :endpoint "localhost:8998"
+       :service "peer-server"
+       :access-key "admin"}
                   
-       client/connect
-       <!!))
-
-(def conn (memoize connect))
+      client/connect
+      <!!))
 
 
 (defn init []
-  (let [schema (concat cover-schema ;;mark-schema
-                       )
-        conn (conn)]
-    
+  (let [schema (concat cover-schema) ;;mark-schema
+        conn (connect)
+        _    (println conn)]
+    (swap! db-state assoc :conn conn)
     (<!! (client/transact conn {:tx-data schema}))
 
     (info "db initialized")
@@ -36,30 +34,35 @@
     conn))
 
 
+(defn current-db []
+  (println "db-state " @db-state)
+  (client/db (:conn @db-state)))
+
 
 (defn add-data [data]
-  (let [data (if (vector? data) data [data])]
+  (let [data (if (vector? data) data [data])
+        conn (:conn @db-state)
+        _ (println "add-date:   " conn)]
     (->> {:tx-data data}
-         (client/transact (conn))
+         (client/transact (:conn @db-state))
          <!!)))
 
 
 
 (defn get-all-covers []
-  (let [conn (conn)
-        db (client/db conn)]
+  (let [db (current-db)]
     (->> {:query '[:find (pull ?e [*])
                    :where
                    [?e :cover/id]]
           :args [db]}
-         (client/q conn)
+         (client/q (:conn @db-state))
          <!!
          (map first))))
 
 
 
 (defn get-cover-by-eid [eid]
-  (let [db (client/db (conn))]
+  (let [db (current-db)]
     (->> {:selector '[*]
           :eid eid}
          (client/pull db)
@@ -67,14 +70,13 @@
 
 
 (defn get-cover [id]
-  (let [conn (conn)
-        db (client/db conn)]
+  (let [db (current-db)]
     (->> {:query '[:find (pull ?e [*])
                    :in $ ?id
                    :where
                    [?e :cover/id ?id]]
           :args [db id]}
-         (client/q conn)
+         (client/q (:conn @db-state))
          <!!
          ffirst)))
 

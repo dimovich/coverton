@@ -22,6 +22,7 @@
      (merge default-value cover {:t t}))))
 
 
+
 (reg-event-db
  ::update
  ed-interceptors
@@ -130,4 +131,5 @@
 
 
 (defn import-cover [cover]
+  (dispatch [::initialize {}]) ;;reset
   (dispatch [::initialize cover]))
