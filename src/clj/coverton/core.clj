@@ -17,7 +17,7 @@
             [coverton.db.core   :as db]
             [coverton.db.schema :refer [mark->db-map cover->db-map magic-id]]
             [clojure.pprint     :refer [pprint]]
-            [clojure.set :refer [rename-keys]]
+            [clojure.set        :refer [rename-keys]]
             [clojure.data.fressian :as fress]
             [coverton.util])
   

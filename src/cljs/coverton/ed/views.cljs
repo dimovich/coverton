@@ -23,33 +23,45 @@
 
 
 
-(defn mark [{:keys [id]}]
-  (r/with-let [text  (subscribe [::sub/mark-text        id])
-               pos   (subscribe [::sub/mark-pos         id])
-               font  (subscribe [::sub/mark-font-family id])
-               font-size  (subscribe [::sub/mark-font-size   id])
-               ref (atom nil)
-               ;;initial click coords
-               [x y] @pos]
+;; use center of element for position
+;; how to recover? (in
 
-    [:div.mark {:style {:left x :top y}}
-     [cc/draggable {:update-fn #(evt/update-pos id %)
-                    ;;we get deltas, so we need the initial coords
-                    :start-pos [x y]
-                    :ref ref}
+(defn mark [{:keys [id]}]
+  (let [text  (subscribe [::sub/mark-text        id])
+        pos   (subscribe [::sub/mark-pos         id])
+        font-family  (subscribe [::sub/mark-font-family id])
+        font-size    (subscribe [::sub/mark-font-size   id])
+        ref (atom nil)
+        ;;initial click coords
+        [x y] @pos
+        _ (println @pos text)]
+
+    (r/create-class
+     {:display-name "mark"
+      :component-did-mount
+      (fn [this]
+        (let [_ (println "mark mounted")]))
       
-      [cc/toolbox {:id id}]
+      :reagent-render
+      (fn []
+        [:div.mark {:style {:left x :top y}}
+         [cc/draggable {:update-fn #(evt/update-pos id %)
+                        ;;we get deltas, so we need the initial coords
+                        :start-pos [x y]
+                        :ref ref}
       
-      [cc/resizable {:font-size  @font-size
-                     :ref ref
-                     :update-fn  #(evt/update-font-size id %)}
+          [cc/toolbox {:id id}]
+      
+          [cc/resizable {:font-size  @font-size
+                         :ref ref
+                         :update-fn  #(evt/update-font-size id %)}
        
-       [cc/autosize-input {:id          id
-                           :set-ref     #(reset! ref %)
-                           :key         :input
-                           :text        @text
-                           :font-family @font
-                           :update-fn   #(evt/update-text id %)}]]]]))
+           [cc/autosize-input {:id          id
+                               :set-ref     #(reset! ref %)
+                               :key         :input
+                               :text        @text
+                               :font-family @font-family
+                               :update-fn   #(evt/update-text id %)}]]]])})))
 
 
 
@@ -71,7 +83,8 @@
 (defn editor-img []
   (let [this      (r/current-component)
         image-url (subscribe [::sub/image-url])
-        ids       (subscribe [::sub/mark-ids])]
+        ids       (subscribe [::sub/mark-ids])
+        size      (subscribe [::sub/size])]
 
     (r/create-class
      {:display-name "editor-img"
@@ -82,7 +95,8 @@
         ;;fixme: why height is +5 px?
         ;;todo: set size based on window size
         (let [w (d/px (r/dom-node this) :width)
-              h (d/px (r/dom-node this) :height)]
+              h (d/px (r/dom-node this) :height)
+              _ (println "editor-img mounted")]
           (evt/update-size [h h])))
 
       :reagent-render
@@ -94,17 +108,20 @@
                             :src @image-url}]]
 
          ;; marks
-         (for [id @ids]
-           ^{:key id} [mark {:id id}])))})))
+         ;; make sure we have the size set
+         (when @size
+           (for [id @ids]
+             ^{:key id} [mark {:id id}]))))})))
 
 
 
 
 (defn editor []
-  (r/with-let [_    (dispatch-sync [::evt/initialize])
+  (r/with-let [ ;;_    (dispatch-sync [::evt/initialize])
                dim  (subscribe [::sub/dim])
                mrks (subscribe [::sub/marks])
-               ids  (subscribe [::sub/mark-ids])]
+               ids  (subscribe [::sub/mark-ids])
+               _ (println "editor mounted")]
 
     [:div.editor 
 

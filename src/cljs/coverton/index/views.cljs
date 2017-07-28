@@ -12,8 +12,10 @@
 
 (enable-console-print!)
 
+(defonce kcover (atom nil))
 
-(def Button (r/adapt-react-class (aget js/window "deps" "semui" "Button")))
+(def Button (r/adapt-react-class
+             (goog.object/getValueByKeys js/window "deps" "semui" "Button")))
 
 
 (defn save-cover [cover]
@@ -25,8 +27,9 @@
 
 
 (defn get-cover [id]
-  (POST "/get-cover" {:handler (fn [res]
-                                 (info res))
+  (POST "/get-cover" {:handler (fn [cover]
+                                 (info cover)
+                                 (ed-evt/import-cover cover))
                       :error-handler #(info %)
                       :params {:id id}}))
 
@@ -34,7 +37,8 @@
 (defn index []
   (r/with-let [ ;;_            (dispatch-sync [::evt/initialize])
                active-panel (subscribe [::sub/active-panel])
-               cover        (subscribe [::ed-sub/cover])]
+               cover        (subscribe [::ed-sub/cover])
+               ed-t         (subscribe [::ed-sub/t])]
     [:div.index
      [Button {:on-click #(dispatch [::evt/set-active-panel :index])}
       "Index"]
@@ -49,7 +53,7 @@
          (save-cover @cover))
      
      (condp = @active-panel
-       :ed [ed/editor]
+       :ed ^{:key @ed-t} [ed/editor] ;;memleaks?
        
        [:div {:class "motto vcenter"
               :style {:text-align :left}}

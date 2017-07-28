@@ -1,5 +1,5 @@
 (ns coverton.ed.events
-  (:require [re-frame.core :as rf :refer [reg-event-db path trim-v dispatch]]
+  (:require [re-frame.core :as rf :refer [reg-event-db path trim-v dispatch dispatch-sync]]
             [coverton.ed.db :refer [default-value]]
             [coverton.fonts :refer [default-font]]
             [dommy.core :as d :refer [sel1]]))
@@ -15,8 +15,11 @@
 (reg-event-db
  ::initialize
  ed-interceptors
- (fn [db _] ;; second parameter could be the image-url
-   (merge default-value db)))
+ (fn [db [cover]]
+   (let [t (inc (:t db))
+         cover (or cover db)
+         _ (println "initializing with " cover)]
+     (merge default-value cover {:t t}))))
 
 
 (reg-event-db
@@ -99,7 +102,7 @@
 
 
 (defn update-image-url [url]
-  (dispatch [::update [:image-url] url]))
+  (dispatch-sync [::update [:image-url] url]))
 
 
 (defn update-pos [id pos]
@@ -124,3 +127,7 @@
 
 (defn update-dim [panel]
   (dispatch [::update [:dim] panel]))
+
+
+(defn import-cover [cover]
+  (dispatch [::initialize cover]))

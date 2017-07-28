@@ -25,8 +25,7 @@
 (defn set-width [el]
   (let [font (d/style el :font-family)
         size (d/style el :font-size)
-        span (sel1 :#span-measure)
-        _    (println )]
+        span (sel1 :#span-measure)]
 
     ;; copy styles to span
     (d/set-style! span :font-size size)
@@ -53,6 +52,7 @@
       
       :component-did-mount
       (fn [this]
+        (let [_ (println "initializing input with " text)])
         ;;for the outer component who modifies size or attributes
         (set-ref (r/dom-node this))
         (update this))
@@ -112,7 +112,8 @@
 
 (defn draggable [{:keys [update-fn start-pos ref]}]
   (r/with-let [this  (r/current-component)
-               [x y] start-pos]
+               [x y] start-pos
+               _ (println "initializing draggable with " start-pos)]
     [react-drag {:cancel ".cancel-drag"
                  :on-stop (fn [_ d]
                             (let [d (js->clj d)]
@@ -147,7 +148,7 @@
             [:img.picker-img {:src (:image-url cover)}]]
        
            (->> marks
-                (map (fn [{:keys [mark-id pos text font-size font-family color static]}]
+                (map (fn [[_ {:keys [mark-id pos text font-size font-family color static]}]]
                        (let [id (str mark-id)
                              [w h] @size
                              font-size (* font-size h)

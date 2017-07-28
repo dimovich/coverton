@@ -9,6 +9,13 @@
    (:ed db)))
 
 
+;; time (datomic shnizzle)
+(reg-sub
+ ::t
+ :<- [::ed]
+ (fn [db _]
+   (:t db)))
+
 (reg-sub
  ::marks
  :<- [::ed]
@@ -21,11 +28,13 @@
  :<- [::ed]
  (fn [db _]
    (-> db
+       ;; extract saveable fields
        (select-keys (keys cover->db-map))
        (update-in [:marks]
-                  #(map
-                    (fn [[k m]] (select-keys m (keys mark->db-map)))
-                    %)))))
+                  #(reduce (fn [m [k v]]
+                             (assoc m k (select-keys v (keys mark->db-map))))
+                           {}
+                           %)))))
 
 (reg-sub
  ::size

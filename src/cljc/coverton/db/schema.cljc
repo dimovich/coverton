@@ -7,7 +7,7 @@
 (def cover->db-map
   {:image-url :cover/image-url
    :tags      :cover/tags
-   :size      :cover/size
+   ;;:size      :cover/size
    :marks     :cover/marks
    :cover-id  :cover/id})
 
