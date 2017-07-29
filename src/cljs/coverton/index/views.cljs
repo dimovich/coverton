@@ -12,7 +12,7 @@
 
 (enable-console-print!)
 
-(defonce kcover (atom nil))
+(def kcover (r/atom nil))
 
 (def Button (r/adapt-react-class
              (goog.object/getValueByKeys js/window "deps" "semui" "Button")))
@@ -38,8 +38,8 @@
   (r/with-let [ ;;_            (dispatch-sync [::evt/initialize])
                active-panel (subscribe [::sub/active-panel])
                cover        (subscribe [::ed-sub/cover])
-               state        (atom nil)
-               set-cover    #(swap! state assoc-in [:cover] %)]
+               state        (r/atom {})
+               set-cover    #(swap! state assoc :cover %)]
     [:div.index
      [Button {:on-click #(dispatch [::evt/set-active-panel :index])}
       "Index"]
@@ -54,7 +54,7 @@
          (save-cover @cover))
      
      (condp = @active-panel
-       :ed [ed/editor (:cover @state)] ;;^{:key @ed-t}
+       :ed [ed/editor {:cover (:cover @state)}] ;;^{:key @ed-t}
        
        [:div {:class "motto vcenter"
               :style {:text-align :left}}

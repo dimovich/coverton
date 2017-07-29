@@ -113,13 +113,16 @@
 
 
 
-(defn editor [cover]
+(defn editor [{:keys [cover]}]
+  ;; 
   (r/with-let [_    (dispatch-sync [::evt/initialize cover])
                dim  (subscribe [::sub/dim])
                mrks (subscribe [::sub/marks])
                ids  (subscribe [::sub/mark-ids])
+               ed-t (subscribe [::sub/t])
                _ (println "editor mounted")]
 
+    ^{:key @ed-t}
     [:div.editor 
 
      (condp = @dim

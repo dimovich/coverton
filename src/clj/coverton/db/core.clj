@@ -17,14 +17,22 @@
        :endpoint "localhost:8998"
        :service "peer-server"
        :access-key "admin"}
-                  
+      
       client/connect
       <!!))
 
 
+(defn get-connection []
+  (if-let [conn (:conn @db-state)]
+    conn
+    (let [conn (connect)]
+      (swap! db-state assoc :conn conn)
+      conn)))
+
+
 (defn init []
   (let [schema (concat cover-schema) ;;mark-schema
-        conn (connect)
+        conn (get-connection)
         _    (println conn)]
     (swap! db-state assoc :conn conn)
     (<!! (client/transact conn {:tx-data schema}))
@@ -36,26 +44,27 @@
 
 (defn current-db []
   (println "db-state " @db-state)
-  (client/db (:conn @db-state)))
+  (client/db (get-connection)))
 
 
 (defn add-data [data]
   (let [data (if (vector? data) data [data])
-        conn (:conn @db-state)
-        _ (println "add-date:   " conn)]
+        conn (get-connection)
+        _ (println "add-data:   " conn)]
     (->> {:tx-data data}
-         (client/transact (:conn @db-state))
+         (client/transact conn)
          <!!)))
 
 
 
 (defn get-all-covers []
-  (let [db (current-db)]
+  (let [db (current-db)
+        conn (get-connection)]
     (->> {:query '[:find (pull ?e [*])
                    :where
                    [?e :cover/id]]
           :args [db]}
-         (client/q (:conn @db-state))
+         (client/q conn)
          <!!
          (map first))))
 
@@ -70,13 +79,14 @@
 
 
 (defn get-cover [id]
-  (let [db (current-db)]
+  (let [db (current-db)
+        conn (get-connection)]
     (->> {:query '[:find (pull ?e [*])
                    :in $ ?id
                    :where
                    [?e :cover/id ?id]]
           :args [db id]}
-         (client/q (:conn @db-state))
+         (client/q conn)
          <!!
          ffirst)))
 
