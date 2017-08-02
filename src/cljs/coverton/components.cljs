@@ -15,6 +15,10 @@
 (def react-resize (r/adapt-react-class
                    (goog.object/getValueByKeys js/window "deps" "resizable")))
 
+(def Button       (r/adapt-react-class
+                   (goog.object/getValueByKeys js/window "deps" "semui" "Button")))
+
+
 ;;(def resize-detector ((goog.object/getValueByKeys js/window "deps" "resize-detector")))
 
 

@@ -7,9 +7,15 @@
  (fn [db _]
    (:index db)))
 
+(reg-sub
+ ::panel-stack
+ :<- [::index]
+ (fn [db _]
+   (:panel-stack db)))
+
 
 (reg-sub
  ::active-panel
- :<- [::index]
- (fn [index _]
-   (:active-panel index)))
+ :<- [::panel-stack]
+ (fn [panels _]
+   (first panels)))

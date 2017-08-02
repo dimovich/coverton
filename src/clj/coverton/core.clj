@@ -79,6 +79,7 @@
   (db/init))
 
 
+;; TODO: option to initialize db
 (defn -main [& args]
   (swap! state assoc :server (server/run-server app {:port 80}))
   (info "started server")

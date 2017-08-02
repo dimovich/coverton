@@ -2,10 +2,13 @@
   (:require [reagent.core  :as r]
             [dommy.core    :as d  :refer-macros [sel1]]
             [re-frame.core :as rf :refer [subscribe dispatch dispatch-sync]]
+            [ajax.core     :as ajax :refer [POST GET]]
+            [coverton.db.schema   :refer [magic-id]]
             [coverton.components  :as cc]
             [coverton.ed.events   :as evt]
             [coverton.ed.subs     :as sub]
-            [coverton.util        :refer [info]]))
+            [coverton.util        :refer [info]]
+            [coverton.index.events :as evt-index]))
 
 
 (defn relative-xy [pivot el]
@@ -112,18 +115,43 @@
 
 
 
+(defn save-cover [cover]
+  (POST "/save-cover" {:handler (fn [res]
+                                  (evt/update-cover-id (:cover-id res))
+                                  (info res))
+                       :error-handler #(.log js/console (str %))
+                       :params {:cover cover}}))
+
+
+(defn get-cover [id]
+  (POST "/get-cover" {:handler (fn [cover]
+                                 (info cover)
+                                 (evt/initialize cover))
+                      :error-handler #(info %)
+                      :params {:id id}}))
+
+
+
 
 (defn editor [{:keys [cover]}]
-  ;; 
-  (r/with-let [_    (dispatch-sync [::evt/initialize cover])
-               dim  (subscribe [::sub/dim])
-               mrks (subscribe [::sub/marks])
-               ids  (subscribe [::sub/mark-ids])
-               ed-t (subscribe [::sub/t])
-               _ (println "editor mounted")]
 
-    ^{:key @ed-t}
-    [:div.editor 
+  (r/with-let [_    (evt/initialize cover)
+               dim  (subscribe [::sub/dim])]
+
+    [:div.editor
+     
+     [:div.editor-toolbar-top
+      [cc/Button {:on-click #(save-cover @(subscribe [::sub/cover]))}
+       "Save"]
+     
+      [cc/Button {:on-click #(get-cover magic-id)}
+       "Load"]
+
+      [cc/Button {:on-click #(evt/initialize cover)}
+       "Reset"]
+
+      [cc/Button {:on-click #(evt-index/pop-panel)}
+       "Close"]]
 
      (condp = @dim
        :show-font-picker [cc/font-picker]

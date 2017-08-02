@@ -1,11 +1,11 @@
 (set-env!
  :source-paths    #{"src/cljs" "src/clj" "src/cljc"}
  :resource-paths  #{"resources" }
- :dependencies '[[org.clojure/clojure "1.9.0-alpha17" :scope "provided"]
-                 [org.clojure/clojurescript "1.9.671" :scope "provided"]
+ :dependencies '[[org.clojure/clojure "1.9.0-alpha17"]
+                 [org.clojure/clojurescript "1.9.854"]
 
                  [adzerk/boot-cljs-repl     "0.3.3"]
-                 [adzerk/boot-cljs          "2.0.0"  :scope "test"]
+                 [adzerk/boot-cljs          "2.1.1"  :scope "test"]
                  [adzerk/boot-reload        "0.5.1"  :scope "test"]
                  [pandeiro/boot-http        "0.8.3"  :scope "test"]
                  [com.cemerick/piggieback   "0.2.1"  :scope "test"]
@@ -14,7 +14,7 @@
                  [tolitius/boot-check       "0.1.4"  :scope "test"]
 
                  [compojure      "1.6.0"]
-                 [ring/ring-core "1.6.1"]
+                 [ring/ring-core "1.6.2"]
                  [ring-transit   "0.1.6"]
                  [hiccup         "2.0.0-alpha1"]
                  [http-kit       "2.2.0"]
@@ -31,7 +31,7 @@
                  ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]
-                 [reagent  "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
+                 [reagent  "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.9.4"]
                  [cljs-ajax "0.6.0"]])
 

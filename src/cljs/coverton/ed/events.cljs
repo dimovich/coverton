@@ -130,6 +130,5 @@
   (dispatch [::update [:dim] panel]))
 
 
-(defn import-cover [cover]
-  (dispatch [::initialize {}]) ;;reset
-  (dispatch [::initialize cover]))
+(defn initialize [cover]
+  (dispatch-sync [::initialize cover]))
