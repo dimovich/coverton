@@ -32,8 +32,7 @@
 
 (defn init []
   (let [schema (concat cover-schema) ;;mark-schema
-        conn (get-connection)
-        _    (println conn)]
+        conn (get-connection)]
     (swap! db-state assoc :conn conn)
     (<!! (client/transact conn {:tx-data schema}))
 
@@ -43,14 +42,12 @@
 
 
 (defn current-db []
-  (println "db-state " @db-state)
   (client/db (get-connection)))
 
 
 (defn add-data [data]
   (let [data (if (vector? data) data [data])
-        conn (get-connection)
-        _ (println "add-data:   " conn)]
+        conn (get-connection)]
     (->> {:tx-data data}
          (client/transact conn)
          <!!)))

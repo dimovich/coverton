@@ -136,8 +136,10 @@
 (defn editor [{:keys [cover]}]
 
   (r/with-let [_    (evt/initialize cover)
-               dim  (subscribe [::sub/dim])]
+               dim  (subscribe [::sub/dim])
+               ed-t (subscribe [::sub/t])]
 
+    ^{:key @ed-t}
     [:div.editor
      
      [:div.editor-toolbar-top
