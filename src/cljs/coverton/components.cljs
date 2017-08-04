@@ -18,6 +18,9 @@
 (def Button       (r/adapt-react-class
                    (goog.object/getValueByKeys js/window "deps" "semui" "Button")))
 
+(def color-picker       (r/adapt-react-class
+                         (goog.object/getValueByKeys js/window "deps" "color-picker")))
+
 
 ;;(def resize-detector ((goog.object/getValueByKeys js/window "deps" "resize-detector")))
 
@@ -222,9 +225,16 @@
                    (evt/update-dim :show-font-picker))}])
 
 
+;;#FF9933
+(defn toolbox-color-picker [{:keys [id ref]}]
+  (let [update-color #(d/set-px! ref :font-color (str "#" %))]
+    [:div.mark-toolbox-wrap
+     {:style {:background-color "#FF9933"}}]))
+
 
 
 (defn toolbox [props]
   [:div.mark-toolbox.cancel-drag
-   [toolbox-font-picker props]])
+   [toolbox-font-picker props]
+   [toolbox-color-picker props]])
 

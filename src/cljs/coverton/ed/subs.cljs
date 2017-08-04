@@ -16,31 +16,34 @@
  (fn [db _]
    (:t db)))
 
+
 (reg-sub
- ::marks
+ ::dimmer
  :<- [::ed]
  (fn [db _]
-   (:marks db))) ;;fixme ::items
+   (:dimmer db)))
 
 
 (reg-sub
  ::cover
  :<- [::ed]
  (fn [db _]
-   (-> db
-       ;; extract saveable fields
-       (select-keys (keys cover->db-map))
-       (update-in [:marks]
-                  #(reduce (fn [m [k v]]
-                             (assoc m k (select-keys v (keys mark->db-map))))
-                           {}
-                           %)))))
+   (:cover db)))
+
+
+(reg-sub
+ ::marks
+ :<- [::cover]
+ (fn [db _]
+   (:marks db)))
+
 
 (reg-sub
  ::size
- :<- [::ed]
+ :<- [::cover]
  (fn [db _]
    (:size db)))
+
 
 (reg-sub
  ::mark-ids
@@ -56,11 +59,7 @@
    (get marks id)))
 
 
-(reg-sub
-  ::dim
- :<- [::ed]
- (fn [db _]
-   (:dim db)))
+
 
 
 (reg-sub
@@ -101,9 +100,33 @@
 
 (reg-sub
  ::image-url
- :<- [::ed]
+ :<- [::cover]
  (fn [db _]
    (:image-url db)))
+
+
+
+(reg-sub
+ ::panels
+ :<- [::ed]
+ (fn [db _]
+   (:panels db)))
+
+
+
+
+(defn export-cover []
+  ;; extract saveable fields
+  (-> @(subscribe [::cover])
+      (select-keys (keys cover->db-map))
+      (update-in [:marks]
+                 #(reduce (fn [m [k v]]
+                            (assoc m k (select-keys v (keys mark->db-map))))
+                          {}
+                          %))))
+
+
+
 
 #_(reg-sub
    :a-b-sub
@@ -111,8 +134,3 @@
      [(subs/subscribe [:a-sub])
       (subs/subscribe [:b-sub])])
    (fn [[a b] [_]] {:a a :b b}))
-
-
-
-;; load cover (eid)
-

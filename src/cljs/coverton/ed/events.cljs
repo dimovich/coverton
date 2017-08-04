@@ -6,21 +6,22 @@
 
 
 
-(def ed-interceptors    [(path [:ed])        trim-v])
-(def marks-interceptors [(path [:ed :marks]) trim-v])
-(def dim-interceptors   [(path [:ed :dim])   trim-v])
+(def ed-interceptors     [(path [:ed])         trim-v])
+(def cover-interceptors  [(path [:ed :cover])  trim-v])
+(def dimmer-interceptors [(path [:ed :dimmer]) trim-v])
+(def marks-interceptors  [(path [:ed :cover :marks]) trim-v])
 
 
 
+;; FINISH
 (reg-event-db
  ::initialize
  ed-interceptors
  (fn [db [cover]]
    (let [t (inc (:t db))
-         cover (or cover db)
+         cover (or cover (:cover db))
          _ (println "initializing with " cover)]
      (merge default-value cover {:t t}))))
-
 
 
 (reg-event-db
@@ -48,11 +49,36 @@
      (assoc-in db [:marks id :font-size] (/ fsize h)))))
 
 
+
 (reg-event-db
  ::dim
  dim-interceptors
  (fn [dim _]
    (not dim)))
+
+
+(reg-event-db
+ ::push-panel
+ panel-interceptors
+ (fn [panels [p]]
+   (list* p panels)))
+
+
+(reg-event-db
+ ::pop-panel
+ panel-interceptors
+ (fn [panels _]
+   (rest panels)))
+
+
+(defn push-panel [p]
+  (dispatch [::push-panel p]))
+
+
+(defn pop-panel []
+  (dispatch [::pop-panel]))
+
+
 
 
 (reg-event-db

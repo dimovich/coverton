@@ -38,7 +38,7 @@
 
 (defn get-cover [req]
   (let [cover-id (get-in req [:body :id])
-        _ (println cover-id)
+        _        (info "getting" cover-id)
         cover    (db/get-cover cover-id)]
     (if (:cover/data cover)
       (response (fress/read (:cover/data cover)))

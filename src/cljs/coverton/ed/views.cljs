@@ -11,21 +11,6 @@
             [coverton.index.events :as evt-index]))
 
 
-(defn relative-xy [pivot el]
-  (let [rect1 (.. pivot getBoundingClientRect)
-        rect2 (.. el    getBoundingClientRect)
-        x (- (.. rect2 -left)
-             (.. rect1 -left))
-        y (- (.. rect2 -top)
-             (.. rect1 -top))
-        height (.. rect1 -height)
-        width  (.. rect1 -width)
-        w     (/ x width)
-        h     (/ y height)]
-    [w h]))
-
-
-
 ;; use center of element for position
 ;; how to recover? (in
 
@@ -53,7 +38,8 @@
                         :start-pos [x y]
                         :ref ref}
       
-          [cc/toolbox {:id id}]
+          [cc/toolbox {:id id
+                       :ref ref}]
       
           [cc/resizable {:font-size  @font-size
                          :ref ref
@@ -115,6 +101,7 @@
 
 
 
+
 (defn save-cover [cover]
   (POST "/save-cover" {:handler (fn [res]
                                   (evt/update-cover-id (:cover-id res))
@@ -154,6 +141,7 @@
 
       [cc/Button {:on-click #(evt-index/pop-panel)}
        "Close"]]
+
 
      (condp = @dim
        :show-font-picker [cc/font-picker]
