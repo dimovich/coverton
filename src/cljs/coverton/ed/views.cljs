@@ -33,7 +33,7 @@
       :reagent-render
       (fn []
         [:div.mark {:style {:left x :top y}}
-         [cc/draggable {:update-fn #(evt/update-pos id %)
+         [cc/draggable {:update-fn #(evt/set-pos id %)
                         ;;we get deltas, so we need the initial coords
                         :start-pos [x y]
                         :ref ref}
@@ -43,14 +43,14 @@
       
           [cc/resizable {:font-size  @font-size
                          :ref ref
-                         :update-fn  #(evt/update-font-size id %)}
+                         :update-fn  #(evt/set-font-size id %)}
        
            [cc/autosize-input {:id          id
                                :set-ref     #(reset! ref %)
                                :key         :input
                                :text        @text
                                :font-family @font-family
-                               :update-fn   #(evt/update-text id %)}]]]])})))
+                               :update-fn   #(evt/set-text id %)}]]]])})))
 
 
 
@@ -81,9 +81,8 @@
         ;;fixme: why height is +5 px?
         ;;todo: set size based on window size
         (let [w (d/px (r/dom-node this) :width)
-              h (d/px (r/dom-node this) :height)
-              _ (println "editor-img mounted")]
-          (evt/update-size [h h])))
+              h (d/px (r/dom-node this) :height)]
+          (evt/set-size [h h])))
 
       :reagent-render
       (fn []
@@ -104,7 +103,7 @@
 
 (defn save-cover [cover]
   (POST "/save-cover" {:handler (fn [res]
-                                  (evt/update-cover-id (:cover-id res))
+                                  (evt/set-cover-id (:cover-id res))
                                   (info res))
                        :error-handler #(.log js/console (str %))
                        :params {:cover cover}}))
@@ -121,12 +120,11 @@
 
 
 (defn editor [{:keys [cover]}]
+  (r/with-let [_       (evt/initialize cover)
+               dimmer  (subscribe [::sub/dimmer])
+               ed-t    (subscribe [::sub/t])]
 
-  (r/with-let [_    (evt/initialize cover)
-               dim  (subscribe [::sub/dim])
-               ed-t (subscribe [::sub/t])]
-
-    ^{:key @ed-t}
+    ^{:key @ed-t} ;;forces re-mount when cover is re-initialized
     [:div.editor
      
      [:div.editor-toolbar-top
@@ -143,8 +141,10 @@
        "Close"]]
 
 
-     (condp = @dim
-       :show-font-picker [cc/font-picker]
+     (condp = @dimmer
+       :font-picker [cc/font-picker]
        
-       [editor-img])]))
+       [editor-img])
+
+     [cc/color-picker]]))
 

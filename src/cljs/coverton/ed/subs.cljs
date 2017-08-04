@@ -1,5 +1,5 @@
 (ns coverton.ed.subs
-  (:require [re-frame.core :refer [reg-sub]]
+  (:require [re-frame.core :refer [reg-sub subscribe]]
             [coverton.db.schema :refer [mark->db-map cover->db-map]]))
 
 
@@ -60,8 +60,6 @@
 
 
 
-
-
 (reg-sub
  ::mark-font-family
  :<- [::marks]
@@ -103,14 +101,6 @@
  :<- [::cover]
  (fn [db _]
    (:image-url db)))
-
-
-
-(reg-sub
- ::panels
- :<- [::ed]
- (fn [db _]
-   (:panels db)))
 
 
 

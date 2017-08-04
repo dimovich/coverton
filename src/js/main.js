@@ -1,6 +1,6 @@
 import Draggable from 'react-draggable';
 import Resizable from 'react-resizable-box';
-import { SketchPicker } from 'react-color';
+import { SliderPicker } from 'react-color';
 
 window.deps = {
     'react' : require('react'),
@@ -9,7 +9,7 @@ window.deps = {
     'resizable': Resizable,
     'semui': require ('semantic-ui-react'),
     'resize-detector': require("element-resize-detector"),
-    'color-picker': SketchPicker
+    'color-picker': SliderPicker
 };
 
 window.React = window.deps['react'];

@@ -2,6 +2,7 @@
   (:require [reagent.core   :as r]
             [re-frame.core  :as rf :refer [dispatch subscribe]]
             [dommy.core     :as d  :refer-macros [sel1 sel]]
+            [coverton.util  :refer [arc info]]
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]
             [coverton.ed.subs   :as sub]))
@@ -9,17 +10,11 @@
 
 (enable-console-print!)
 
-(def react-drag   (r/adapt-react-class
-                   (goog.object/getValueByKeys js/window "deps" "draggable")))
 
-(def react-resize (r/adapt-react-class
-                   (goog.object/getValueByKeys js/window "deps" "resizable")))
-
-(def Button       (r/adapt-react-class
-                   (goog.object/getValueByKeys js/window "deps" "semui" "Button")))
-
-(def color-picker       (r/adapt-react-class
-                         (goog.object/getValueByKeys js/window "deps" "color-picker")))
+(def react-drag   (arc "deps" "draggable"))
+(def react-resize (arc "deps" "resizable"))
+(def Button       (arc "deps" "semui" "Button"))
+(def color-picker (arc "deps" "color-picker"))
 
 
 ;;(def resize-detector ((goog.object/getValueByKeys js/window "deps" "resize-detector")))
@@ -59,7 +54,6 @@
       
       :component-did-mount
       (fn [this]
-        (let [_ (println "initializing input with " text)])
         ;;for the outer component who modifies size or attributes
         (set-ref (r/dom-node this))
         (update this))
@@ -73,12 +67,13 @@
                  :on-blur #(update-fn @state)
                  :on-key-down (fn [e] (condp = (.. e -keyCode)
                                         46 (do (reset! state "")) ;; delete
-                                        27 (.. e -target blur)    ;; esc
+                                        27 (.. e -target blur) ;; esc
                                         false))
                  :class "mark-input cancel-drag"
                  :style {:font-size   "1em"
                          :font-family font-family}
                  :id id
+                 :on-mouse-over #(info "mouse-over")
                  :auto-focus true}])})))
 
 
@@ -119,8 +114,7 @@
 
 (defn draggable [{:keys [update-fn start-pos ref]}]
   (r/with-let [this  (r/current-component)
-               [x y] start-pos
-               _ (println "initializing draggable with " start-pos)]
+               [x y] start-pos]
     [react-drag {:cancel ".cancel-drag"
                  :on-stop (fn [_ d]
                             (let [d (js->clj d)]
@@ -165,8 +159,8 @@
 
                          ^{:key id}
                          [:span.picker-mark
-                          {:on-click #(do (evt/update-font-family id block-family)
-                                          (evt/update-mark-static id true))
+                          {:on-click #(do (evt/set-font-family id block-family)
+                                          (evt/set-mark-static id true))
                            
                            :style {:font-family (if static font-family block-family)
                                    :font-size font-size
@@ -181,7 +175,7 @@
 (defn dimmer []
   (r/with-let [this  (r/current-component)
                body  (sel1 :body)
-               close #(evt/update-dim false)
+               close #(evt/set-dimmer nil)
                esc   #(when (= (.. % -keyCode) 27) (close))
                _     (d/listen! body :keyup esc)]
     (r/create-class
@@ -206,7 +200,7 @@
 
 
 (defn font-picker []
-  (r/with-let [cover @(subscribe [::sub/cover])]
+  (r/with-let [cover (sub/export-cover)]
     [dimmer
      (into
       [:div.picker-container]
@@ -221,8 +215,8 @@
 (defn toolbox-font-picker [{:keys [id]}]
   [:div.mark-toolbox-wrap
    {:style {:background-color "green"}
-    :on-click #(do (evt/update-mark-static id false)
-                   (evt/update-dim :show-font-picker))}])
+    :on-click #(do (evt/set-mark-static id false)
+                   (evt/set-dimmer :font-picker))}])
 
 
 ;;#FF9933
@@ -235,6 +229,5 @@
 
 (defn toolbox [props]
   [:div.mark-toolbox.cancel-drag
-   [toolbox-font-picker props]
-   [toolbox-color-picker props]])
+   [toolbox-font-picker props]])
 
