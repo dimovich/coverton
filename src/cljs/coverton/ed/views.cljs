@@ -15,21 +15,20 @@
 ;; how to recover? (in
 
 (defn mark [{:keys [id]}]
-  (let [text  (subscribe [::sub/mark-text        id])
-        pos   (subscribe [::sub/mark-pos         id])
+  (let [text  (subscribe [::sub/mark-text id])
+        pos   (subscribe [::sub/mark-pos  id])
+        color (subscribe [::sub/color     id])
         font-family  (subscribe [::sub/mark-font-family id])
         font-size    (subscribe [::sub/mark-font-size   id])
         ref (atom nil)
         ;;initial click coords
-        [x y] @pos
-        _ (println @pos text)]
+        [x y] @pos]
 
     (r/create-class
      {:display-name "mark"
       :component-did-mount
-      (fn [this]
-        (let [_ (println "mark mounted")]))
-      
+      (fn [this])
+
       :reagent-render
       (fn []
         [:div.mark {:style {:left x :top y}}
@@ -49,6 +48,7 @@
                                :set-ref     #(reset! ref %)
                                :key         :input
                                :text        @text
+                               :color       @color
                                :font-family @font-family
                                :update-fn   #(evt/set-text id %)}]]]])})))
 

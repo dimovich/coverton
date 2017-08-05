@@ -103,6 +103,11 @@
    (:image-url db)))
 
 
+(reg-sub
+ ::color
+ :<- [::marks]
+ (fn [marks [_ id]]
+   (get-in marks [id :color])))
 
 
 (defn export-cover []

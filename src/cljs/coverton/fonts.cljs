@@ -16,7 +16,7 @@
 
 (def default-font {:font-size 0.13 ;; % of height
                    :font-family "GothaPro"
-                   :color "orange"})
+                   :color "#FF9933"})
 
 (defn for-css []
   (->> font-names

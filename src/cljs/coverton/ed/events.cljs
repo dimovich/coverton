@@ -124,6 +124,10 @@
   (dispatch [::update-mark id [:font-family] family]))
 
 
+(defn set-color [id color]
+  (dispatch [::update-mark id [:color] color]))
+
+
 (defn set-text [id text]
   (dispatch [::update-mark id [:text] text]))
 
@@ -136,5 +140,9 @@
   (dispatch [::update [:dimmer] panel]))
 
 
+(defn set-active-mark [id]
+  (dispatch [::update [:active-mark] id]))
+
+
 (defn initialize [cover]
-  (dispatch-sync [::initialize cover]))
+  (dispatch [::initialize cover]))

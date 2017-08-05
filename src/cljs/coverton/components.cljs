@@ -14,7 +14,7 @@
 (def react-drag   (arc "deps" "draggable"))
 (def react-resize (arc "deps" "resizable"))
 (def Button       (arc "deps" "semui" "Button"))
-(def color-picker (arc "deps" "color-picker"))
+(def react-color  (arc "deps" "color-picker"))
 
 
 ;;(def resize-detector ((goog.object/getValueByKeys js/window "deps" "resize-detector")))
@@ -44,7 +44,7 @@
 
 
 (defn autosize-input
-  [{:keys [id update-fn text font-family set-ref]}]
+  [{:keys [id update-fn text font-family color set-ref]}]
   
   (let [state   (r/atom (or text ""))
         update  #(set-width (r/dom-node %))]
@@ -71,7 +71,8 @@
                                         false))
                  :class "mark-input cancel-drag"
                  :style {:font-size   "1em"
-                         :font-family font-family}
+                         :font-family font-family
+                         :color       color}
                  :id id
                  :on-mouse-over #(info "mouse-over")
                  :auto-focus true}])})))
@@ -231,3 +232,7 @@
   [:div.mark-toolbox.cancel-drag
    [toolbox-font-picker props]])
 
+
+
+(defn color-picker []
+  [react-color])
