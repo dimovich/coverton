@@ -1,6 +1,7 @@
 (ns coverton.ed.subs
-  (:require [re-frame.core :refer [reg-sub subscribe]]
-            [coverton.db.schema :refer [mark->db-map cover->db-map]]))
+  (:require [re-frame.core      :refer [reg-sub subscribe]]
+            [coverton.db.schema :refer [mark->db-map cover->db-map]]
+            [coverton.fonts     :refer [default-font]]))
 
 
 (reg-sub
@@ -108,6 +109,30 @@
  :<- [::marks]
  (fn [marks [_ id]]
    (get-in marks [id :color])))
+
+
+(reg-sub
+ ::active-mark
+ :<- [::ed]
+ (fn [db _]
+   (:active-mark db)))
+
+
+(reg-sub
+ ::active-color
+ :<- [::marks]
+ :<- [::active-mark]
+ (fn [[marks id] _]
+   (or (get-in marks [id :color])
+       (:color default-font))))
+
+
+(reg-sub
+ ::ref
+ :<- [::marks]
+ (fn [marks [_ id]]
+   (get-in marks [id :ref])))
+
 
 
 (defn export-cover []

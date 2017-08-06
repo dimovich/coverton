@@ -14,7 +14,7 @@
 (def react-drag   (arc "deps" "draggable"))
 (def react-resize (arc "deps" "resizable"))
 (def Button       (arc "deps" "semui" "Button"))
-(def react-color  (arc "deps" "color-picker"))
+(def react-color  (arc "deps" "react-color"))
 
 
 ;;(def resize-detector ((goog.object/getValueByKeys js/window "deps" "resize-detector")))
@@ -56,12 +56,13 @@
       (fn [this]
         ;;for the outer component who modifies size or attributes
         (set-ref (r/dom-node this))
+        (evt/set-ref id (r/dom-node this))
         (update this))
 
       :component-did-update update
       
       :reagent-render
-      (fn [{:keys [font-family]}]
+      (fn [{:keys [font-family color]}]
         [:input {:value @state
                  :on-change #(reset! state (.. % -target -value))
                  :on-blur #(update-fn @state)
@@ -74,7 +75,7 @@
                          :font-family font-family
                          :color       color}
                  :id id
-                 :on-mouse-over #(info "mouse-over")
+                 :on-click #(evt/set-active-mark id)
                  :auto-focus true}])})))
 
 
@@ -220,7 +221,6 @@
                    (evt/set-dimmer :font-picker))}])
 
 
-;;#FF9933
 (defn toolbox-color-picker [{:keys [id ref]}]
   (let [update-color #(d/set-px! ref :font-color (str "#" %))]
     [:div.mark-toolbox-wrap
@@ -235,4 +235,19 @@
 
 
 (defn color-picker []
-  [react-color])
+  (r/with-let [id           (subscribe [::sub/active-mark])
+               active-color (subscribe [::sub/active-color])
+
+               set-color    #(when @id
+                               (evt/set-color @id ((js->clj %) "hex")))
+               
+               ;; fixme: doesn't update
+               #_(update-color #(when @id
+                                  (d/set-px! @(subscribe [::sub/ref @id])
+                                             :color ((js->clj %) "hex"))))]
+    
+    [react-color {:on-change-complete set-color
+                  ;;:on-change update-color
+                  :color @active-color}]))
+
+

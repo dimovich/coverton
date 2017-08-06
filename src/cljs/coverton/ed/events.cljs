@@ -64,9 +64,10 @@
  ::add-mark
  marks-interceptors
  (fn [marks [m]]
-   (let [id (or (:mark-id m) (random-uuid))
-         m  (assoc m :mark-id id)]
-     (assoc marks (str id) m))))
+   (let [id  (or (:mark-id m) (random-uuid))
+         m   (assoc m :mark-id id)
+         sid (str id)]
+     (assoc marks sid m))))
 
 
 
@@ -88,9 +89,17 @@
      marks)))
 
 
+(defn set-active-mark [id]
+  (dispatch [::update [:active-mark] id]))
+
+
 (defn handle-add-mark [pos]
-  (dispatch [::add-mark (merge {:pos pos}
-                               default-font)]))
+  (let [id (random-uuid)
+        sid (str id)]
+    (dispatch [::add-mark (merge {:pos     pos
+                                  :mark-id id}
+                                 default-font)])
+    (set-active-mark sid)))
 
 
 (defn handle-remove-mark [e]
@@ -128,6 +137,10 @@
   (dispatch [::update-mark id [:color] color]))
 
 
+(defn set-ref [id ref]
+  (dispatch [::update-mark id [:ref] ref]))
+
+
 (defn set-text [id text]
   (dispatch [::update-mark id [:text] text]))
 
@@ -138,10 +151,6 @@
 
 (defn set-dimmer [panel]
   (dispatch [::update [:dimmer] panel]))
-
-
-(defn set-active-mark [id]
-  (dispatch [::update [:active-mark] id]))
 
 
 (defn initialize [cover]

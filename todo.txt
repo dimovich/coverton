@@ -1,5 +1,6 @@
-- try D3 for editor
-- resize track
+- re-write ref spreading
+- track resize
+- coverton.jar --init-db --export-db --import-db
 
 
 - datomic tutorials

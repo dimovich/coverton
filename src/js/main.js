@@ -9,7 +9,7 @@ window.deps = {
     'resizable': Resizable,
     'semui': require ('semantic-ui-react'),
     'resize-detector': require("element-resize-detector"),
-    'color-picker': SliderPicker
+    'react-color': SliderPicker
 };
 
 window.React = window.deps['react'];
