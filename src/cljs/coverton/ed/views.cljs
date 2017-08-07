@@ -128,7 +128,7 @@
     [:div.editor
      
      [:div.editor-toolbar-top
-      [cc/Button {:on-click #(save-cover @(subscribe [::sub/cover]))}
+      [cc/Button {:on-click #(save-cover (sub/export-cover))}
        "Save"]
      
       [cc/Button {:on-click #(get-cover magic-id)}
