@@ -1,13 +1,13 @@
+- spec
+- undo/redo (https://github.com/Day8/re-frame-undo)
 - re-write ref spreading
 - track resize
 - coverton.jar --init-db --export-db --import-db
+- upload image (cloud image / imgur)
+- colorpick
 
 
-- datomic tutorials
-- upload images
-- save labels
-
-- experiment with double space (similar to pick-block)
+! fix export label coordinates
 
 
 + auth  https://github.com/lambdaisland/booklog
@@ -16,9 +16,6 @@
 
 + dynamic line-height
 
-+ color picker
-
-! fix export label coordinates
 
 
 ansible
