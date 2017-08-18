@@ -7,6 +7,10 @@
 - colorpick
 
 
+- file upload
+https://groups.google.com/forum/#!topic/clojurescript/xB_ul9HrtiE
+
+
 ! fix export label coordinates
 
 
