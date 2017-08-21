@@ -54,7 +54,6 @@
 
 
 
-
 (defn on-click-add-mark [parent e]
   (let [[w h] @(subscribe [::sub/size])
         rect (.. parent getBoundingClientRect)
@@ -118,6 +117,19 @@
 
 
 
+(defn image-picker []
+  [:span
+   [cc/Button {:on-click #(.click (sel1 :#image-input))}
+    "Select Image"]
+   [:input#image-input
+    {:type "file"
+     :accept "image/*"
+     :style {:display :none}
+     :on-change #(evt/set-image-url
+                  (.createObjectURL js/URL (-> % .-target .-files (aget 0))))}]])
+
+
+
 
 (defn editor [{:keys [cover]}]
   (r/with-let [_       (evt/initialize cover)
@@ -128,6 +140,9 @@
     [:div.editor
      
      [:div.editor-toolbar-top
+
+      [image-picker]
+      
       [cc/Button {:on-click #(save-cover (sub/export-cover))}
        "Save"]
      
