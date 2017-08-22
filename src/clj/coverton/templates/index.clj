@@ -17,7 +17,8 @@
     [:div.wrap
      [:div#app]]
     [:span#span-measure]
-    (include-js "coverton.js")]))
+    (include-js "coverton.js")
+    [:script "coverton.core.init();"]]))
 
 
 
