@@ -65,26 +65,27 @@
 
 
 ;; todo: image time key
-(defn image []
-  (let [image-url (subscribe [::sub/image-url])
-        this      (r/current-component)]
+(defn image [{:keys [url]}]
+  (let [this        (r/current-component)
+        update-size (fn [this]
+                      (let [w (d/px (r/dom-node this) :width)
+                            h (d/px (r/dom-node this) :height)]
+                        (println w h (.. (r/dom-node this) getBoundingClientRect -width))
+                        (evt/set-size [w h])))]
     (r/create-class
      {:display-name "image"
-      :component-did-mount
-      (fn [this]
-        (let [w (d/px (r/dom-node this) :width)
-              h (d/px (r/dom-node this) :height)]
-          (println w h)
-          (evt/set-size [w h])))
+      :component-did-mount  update-size
+      :component-did-update update-size
       :reagent-render
-      (fn []
+      (fn [{:keys [url]}]
         [:img.editor-img {:on-click #(on-click-add-mark (r/dom-node this) %)
-                          :src @image-url}])})))
+                          :src url}])})))
 
 
 (defn editor-img []
   (let [ids       (subscribe [::sub/mark-ids])
-        size      (subscribe [::sub/size])]
+        size      (subscribe [::sub/size])
+        image-url (subscribe [::sub/image-url])]
 
     (r/create-class
      {:display-name "editor-img"
@@ -97,7 +98,7 @@
         (into
          [:div.editor-img-wrap {:on-blur evt/handle-remove-mark}
 
-          [image]
+          [image {:url @image-url}]
           
           (when @size
             (for [id @ids]

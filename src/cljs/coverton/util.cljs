@@ -2,9 +2,7 @@
   (:require [reagent.core :as r]))
 
 
-
 (defn info [& args]
-  ;;(enable-console-print!)
   (apply println args))
 
 

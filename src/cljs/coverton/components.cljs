@@ -8,9 +8,6 @@
             [coverton.ed.subs   :as sub]))
 
 
-(enable-console-print!)
-
-
 (def react-drag   (arc "deps" "draggable"))
 (def react-resize (arc "deps" "resizable"))
 (def Button       (arc "deps" "semui" "Button"))
@@ -139,8 +136,10 @@
 
       :component-did-mount
       (fn [this]
-        (let [w (d/px (sel1 :.picker-img) :width)]
-          (reset! size [w w])))
+        (let [img (sel1 :.picker-img)
+              w (d/px img :width)
+              h (d/px img :height)]
+          (reset! size [w h])))
       
       :reagent-render
       (fn []

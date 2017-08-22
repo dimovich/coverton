@@ -9,9 +9,6 @@
             [coverton.util         :refer [info]]
             [coverton.db.schema    :refer [magic-id]]))
 
-(enable-console-print!)
-
-
 
 (defn test-fn []
   (let [_ (println "test-fn init")]

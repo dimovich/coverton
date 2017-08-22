@@ -57,11 +57,14 @@
                sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets" #"namen\.js"}}
                aot   {:namespace #{'coverton.core}}
                cljs  { ;;:ids #{"public/coverton"}
-                      :compiler-options {:output-to "public/coverton.js"
+                      :compiler-options {:output-to  "public/coverton.js"
+                                         :output-dir "public/out"
+                                         :asset-path "out"
+                                         ;;:preloads   '[coverton.dev]
                                          :parallel-build true
                                          :foreign-libs  [{:file "src/js/bundle.js"
                                                           :provides ["cljsjs.react" "cljsjs.react-dom"]}]}}
-               cljs-repl  {:ids #{"public/coverton"}}
+               ;;cljs-repl  {:ids #{"public/coverton"}}
                serve {:resource-root "target/public"
                       :handler 'coverton.core/app
                       :reload true
