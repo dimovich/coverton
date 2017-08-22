@@ -64,38 +64,48 @@
     (evt/handle-add-mark [(/ x w) (/ y h)])))
 
 
+;; todo: image time key
+(defn image []
+  (let [image-url (subscribe [::sub/image-url])
+        this      (r/current-component)]
+    (r/create-class
+     {:display-name "image"
+      :component-did-mount
+      (fn [this]
+        (let [w (d/px (r/dom-node this) :width)
+              h (d/px (r/dom-node this) :height)]
+          (println w h)
+          (evt/set-size [w h])))
+      :reagent-render
+      (fn []
+        [:img.editor-img {:on-click #(on-click-add-mark (r/dom-node this) %)
+                          :src @image-url}])})))
+
 
 (defn editor-img []
-  (let [this      (r/current-component)
-        image-url (subscribe [::sub/image-url])
-        ids       (subscribe [::sub/mark-ids])
+  (let [ids       (subscribe [::sub/mark-ids])
         size      (subscribe [::sub/size])]
 
     (r/create-class
      {:display-name "editor-img"
 
       :component-did-mount
-      (fn [this]
-        ;;set size
-        ;;fixme: why height is +5 px?
-        ;;todo: set size based on window size
-        (let [w (d/px (r/dom-node this) :width)
-              h (d/px (r/dom-node this) :height)]
-          (evt/set-size [h h])))
+      (fn [this])
 
       :reagent-render
       (fn []
         (into
          [:div.editor-img-wrap {:on-blur evt/handle-remove-mark}
+
+          [image]
           
-          [:img.editor-img {:on-click #(on-click-add-mark (r/dom-node this) %)
-                            :src @image-url}]]
+          (when @size
+            (for [id @ids]
+              ^{:key id} [mark {:id id}]))]
 
          ;; marks
          ;; make sure we have the size set
-         (when @size
-           (for [id @ids]
-             ^{:key id} [mark {:id id}]))))})))
+         ))})))
 
 
 
