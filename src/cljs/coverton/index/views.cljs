@@ -13,9 +13,6 @@
 
 
 
-
-
-
 (defn test-fn []
   (let [_ (println "test-fn init")]
     (r/create-class

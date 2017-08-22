@@ -3,12 +3,14 @@
 - re-write ref spreading
 - track resize
 - coverton.jar --init-db --export-db --import-db
-- upload image (cloud image / imgur)
-- colorpick
 
+- colorpick
 
 - file upload
 https://groups.google.com/forum/#!topic/clojurescript/xB_ul9HrtiE
+https://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
+https://github.com/reagent-project/reagent-cookbook/tree/master/recipes/file-upload
+https://mrmcc3.github.io/post/csv-with-clojurescript/
 
 
 ! fix export label coordinates
