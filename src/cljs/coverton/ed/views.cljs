@@ -32,6 +32,7 @@
       :reagent-render
       (fn []
         [:div.mark {:style {:left x :top y}}
+         ;; move inner, because static now
          [cc/draggable {:update-fn #(evt/set-pos id %)
                         ;;we get deltas, so we need the initial coords
                         :start-pos [x y]

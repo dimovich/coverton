@@ -12,7 +12,7 @@
   (r/render [app] (sel1 :#app)))
 
 
-(defn init []
+(defn ^:export init []
   (reload))
 
 

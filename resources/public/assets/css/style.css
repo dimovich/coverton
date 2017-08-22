@@ -57,7 +57,7 @@ body {
 
 
 .editor-img {
-    height: 75vh;
+    height: 70vh;
     width: auto;
     border: 0px solid black;
     padding: 0;
@@ -66,6 +66,9 @@ body {
 .editor-img-wrap {
     display: inline-block;
     position: relative;
+    padding: 5px;
+    border: 2px solid gray;
+    margin-bottom: 10px;
 }
 
 .mark {
@@ -137,6 +140,16 @@ body {
     margin: 0;
     padding: 0;
     text-align: left;
+}
+
+.mark-static {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    background-color: transparent;
+    position: absolute;
+    white-space: nowrap;
 }
 
 
@@ -241,4 +254,8 @@ body {
     z-index: 100;
     background-color: #0c0c0c;
     margin: auto;
+}
+
+
+.color-picker {
 }

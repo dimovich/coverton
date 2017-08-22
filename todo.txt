@@ -1,3 +1,4 @@
+! add delay before checking size of editor-img
 - spec
 - undo/redo (https://github.com/Day8/re-frame-undo)
 - re-write ref spreading

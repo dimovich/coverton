@@ -44,7 +44,11 @@
   [{:keys [id update-fn text font-family color set-ref]}]
   
   (let [state   (r/atom (or text ""))
-        update  #(set-width (r/dom-node %))]
+        update  #(set-width (r/dom-node %))
+        edit?   (r/atom true)
+        enable-label #(do (reset! edit? false)
+                          (reset! state @state)
+                          (update-fn @state))]
     
     (r/create-class
      {:display-name "autosize-input"
@@ -60,20 +64,31 @@
       
       :reagent-render
       (fn [{:keys [font-family color]}]
-        [:input {:value @state
-                 :on-change #(reset! state (.. % -target -value))
-                 :on-blur #(update-fn @state)
-                 :on-key-down (fn [e] (condp = (.. e -keyCode)
-                                        46 (do (reset! state "")) ;; delete
-                                        27 (.. e -target blur) ;; esc
-                                        false))
-                 :class "mark-input cancel-drag"
-                 :style {:font-size   "1em"
-                         :font-family font-family
-                         :color       color}
-                 :id id
-                 :on-click #(evt/set-active-mark id)
-                 :auto-focus true}])})))
+        (let [common {:id id
+                      :style {:font-size   "1em"
+                              :font-family font-family
+                              :color       color}}
+              
+              input {:value @state
+                     :on-change #(reset! state (.. % -target -value))
+                     :on-blur enable-label
+                     :on-mouse-leave enable-label
+                     
+                     :on-key-press (fn [e] (condp = (.. e -charCode)
+                                             13 (enable-label) ;;enter
+                                             46 (reset! state "") ;; delete
+                                             27 (.. e -target blur) ;; esc
+                                             false))
+                     :class "mark-input cancel-drag"
+                     :on-click #(evt/set-active-mark id)
+                     :auto-focus true}
+              
+              span {:on-double-click #(reset! edit? true)
+                    :class "mark-static"}]
+          
+          (if @edit?
+            [:input (merge common input)]
+            [:div (merge common span) @state])))})))
 
 
 
@@ -247,6 +262,7 @@
     
     [react-color {:on-change-complete set-color
                   ;;:on-change update-color
-                  :color @active-color}]))
+                  :color @active-color
+                  :class "color-picker"}]))
 
 
