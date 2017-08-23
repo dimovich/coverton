@@ -149,7 +149,10 @@ body {
     text-align: left;
     background-color: transparent;
     white-space: nowrap;
-    display: inline-block;
+}
+
+.cursor-move {
+    cursor: move;
 }
 
 

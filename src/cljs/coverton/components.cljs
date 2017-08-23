@@ -45,9 +45,9 @@
   
   (let [state   (r/atom (or text ""))
         update  #(set-width (r/dom-node %))
-        edit?   (r/atom true)
-        enable-static #(do (reset! edit? false)
-                           (reset! state @state)
+        read-only?   (r/atom false)
+        enable-static #(do (reset! read-only? true)
+                           ;;(reset! state @state)
                            (update-fn @state))]
     
     (r/create-class
@@ -65,31 +65,32 @@
       :reagent-render
       (fn [{:keys [font-family color]}]
         (let [common {:id id
+                      :value @state
+                      :on-click #(evt/set-active-mark id)
                       :style {:font-size   "1em"
                               :font-family font-family
                               :color       color}}
               
-              input {:value @state
-                     :on-change #(reset! state (.. % -target -value))
-                     :on-blur #(update-fn @state)
-                     ;;:on-mouse-leave enable-label
-                     
-                     :on-key-press (fn [e] (condp = (.. e -charCode)
-                                             13 (enable-static) ;;enter
-                                             46 (reset! state "") ;; delete
-                                             27 (enable-static) ;; esc
-                                             false))
+              editable {:on-change #(reset! state (.. % -target -value))
+                        :on-blur #(update-fn @state)
+                        :on-mouse-leave enable-static
+                        :on-key-down (fn [e]
+                                       (condp = (.. e -key)
+                                         "Enter" (enable-static) ;;enter
+                                         "Escape" (enable-static) ;; esc
+                                         "Delete" (reset! state "") ;; delete
+                                         false))
 
-                     :class "mark-input cancel-drag"
-                     :on-click #(evt/set-active-mark id)
-                     :auto-focus true}
+                        :class "mark-input cancel-drag"
+                        :auto-focus true}
               
-              label {:on-double-click #(reset! edit? true)
-                     :class "mark-static"}]
+              static {:on-double-click #(reset! read-only? false)
+                      :read-only true
+                      :class "mark-input"
+                      :style {:cursor :move}}]
           
-          (if @edit?
-            [:input (merge common input)]
-            [:div (merge common label) @state])))})))
+          [:input
+           (merge-with merge common (if @read-only? static editable))]))})))
 
 
 
@@ -261,7 +262,8 @@
                                   (d/set-px! @(subscribe [::sub/ref @id])
                                              :color ((js->clj %) "hex"))))]
     
-    [react-color {:on-change-complete set-color
+    [react-color { ;;:on-change-complete set-color
+                  :on-change set-color
                   ;;:on-change update-color
                   :color @active-color
                   :class "color-picker"}]))
