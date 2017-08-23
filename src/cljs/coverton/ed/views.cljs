@@ -32,19 +32,19 @@
       :reagent-render
       (fn []
         [:div.mark {:style {:left x :top y}}
-         ;; move inner, because static now
-         [cc/draggable {:update-fn #(evt/set-pos id %)
-                        ;;we get deltas, so we need the initial coords
-                        :start-pos [x y]
-                        :ref ref}
-      
-          [cc/toolbox {:id id
-                       :ref ref}]
-      
-          [cc/resizable {:font-size  @font-size
-                         :ref ref
-                         :update-fn  #(evt/set-font-size id %)}
-       
+         
+         [cc/toolbox {:id id
+                      :ref ref}]
+         
+         [cc/resizable {:font-size  @font-size
+                        :ref ref
+                        :update-fn  #(evt/set-font-size id %)}
+          
+          [cc/draggable {:update-fn #(evt/set-pos id %)
+                         ;;we get deltas, so we need the initial coords
+                         :start-pos [x y]
+                         :ref ref}
+           
            [cc/autosize-input {:id          id
                                :set-ref     #(reset! ref %)
                                :key         :input

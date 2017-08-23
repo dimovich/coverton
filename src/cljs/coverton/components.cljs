@@ -47,7 +47,7 @@
         update  #(set-width (r/dom-node %))
         read-only?   (r/atom false)
         enable-static #(do (reset! read-only? true)
-                           ;;(reset! state @state)
+                           (reset! state @state)
                            (update-fn @state))]
     
     (r/create-class

@@ -116,12 +116,12 @@ body {
 }
 
 
-.react-draggable:hover .mark-toolbox {
+.mark:hover .mark-toolbox {
     display: inline-block;
 }
 
 
-.border .mark-resize, .react-draggable:hover .mark-resize {
+.border .mark-resize, .mark:hover .mark-resize {
     border: 2px solid grey;
     transition-delay: 0;
 }
