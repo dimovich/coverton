@@ -44,8 +44,8 @@
   [{:keys [id update-fn text font-family color set-ref]}]
   
   (let [state   (r/atom (or text ""))
-        update  #(set-width (r/dom-node %))
-        read-only?   (r/atom false)
+        update-width  #(set-width (r/dom-node %))
+        read-only?    (r/atom false)
         enable-static #(do (reset! read-only? true)
                            (reset! state @state)
                            (update-fn @state))]
@@ -58,9 +58,9 @@
         ;;for the outer component who modifies size or attributes
         (set-ref (r/dom-node this))
         (evt/set-ref id (r/dom-node this))
-        (update this))
+        (update-width this))
 
-      :component-did-update update
+      :component-did-update update-width
       
       :reagent-render
       (fn [{:keys [font-family color]}]
