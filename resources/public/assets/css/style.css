@@ -148,8 +148,8 @@ body {
     padding: 0;
     text-align: left;
     background-color: transparent;
-    position: absolute;
     white-space: nowrap;
+    display: inline-block;
 }
 
 

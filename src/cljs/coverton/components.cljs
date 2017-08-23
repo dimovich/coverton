@@ -46,9 +46,9 @@
   (let [state   (r/atom (or text ""))
         update  #(set-width (r/dom-node %))
         edit?   (r/atom true)
-        enable-label #(do (reset! edit? false)
-                          (reset! state @state)
-                          (update-fn @state))]
+        enable-static #(do (reset! edit? false)
+                           (reset! state @state)
+                           (update-fn @state))]
     
     (r/create-class
      {:display-name "autosize-input"
@@ -71,24 +71,25 @@
               
               input {:value @state
                      :on-change #(reset! state (.. % -target -value))
-                     :on-blur enable-label
-                     :on-mouse-leave enable-label
+                     :on-blur #(update-fn @state)
+                     ;;:on-mouse-leave enable-label
                      
                      :on-key-press (fn [e] (condp = (.. e -charCode)
-                                             13 (enable-label) ;;enter
+                                             13 (enable-static) ;;enter
                                              46 (reset! state "") ;; delete
-                                             27 (.. e -target blur) ;; esc
+                                             27 (enable-static) ;; esc
                                              false))
+
                      :class "mark-input cancel-drag"
                      :on-click #(evt/set-active-mark id)
                      :auto-focus true}
               
-              span {:on-double-click #(reset! edit? true)
-                    :class "mark-static"}]
+              label {:on-double-click #(reset! edit? true)
+                     :class "mark-static"}]
           
           (if @edit?
             [:input (merge common input)]
-            [:div (merge common span) @state])))})))
+            [:div (merge common label) @state])))})))
 
 
 

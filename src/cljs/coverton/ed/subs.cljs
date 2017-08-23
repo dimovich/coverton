@@ -134,6 +134,11 @@
    (get-in marks [id :ref])))
 
 
+(reg-sub
+ ::monitor
+ (fn [db _]
+   (:ed db)))
+
 
 (defn export-cover []
   ;; extract saveable fields
