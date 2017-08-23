@@ -128,6 +128,7 @@
 
 
 
+;; move draggable to resizable? and try to see if the no-item error still appears
 (defn draggable [{:keys [update-fn start-pos ref]}]
   (r/with-let [this  (r/current-component)
                [x y] start-pos]
