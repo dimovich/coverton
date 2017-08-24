@@ -1,4 +1,5 @@
-! add delay before checking size of editor-img
+! after font-picker, keep marks static
+
 - spec
 - undo/redo (https://github.com/Day8/re-frame-undo)
 - re-write ref spreading
