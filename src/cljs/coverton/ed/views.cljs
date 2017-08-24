@@ -37,7 +37,8 @@
                         ;;we get deltas, so we need the initial coords
                         :start-pos [x y]
                         :ref ref}
-          
+
+          ;; fixme: move toolbox to inner
           [cc/toolbox {:id id
                        :ref ref}]
          
@@ -65,7 +66,9 @@
     (evt/handle-add-mark [(/ x w) (/ y h)])))
 
 
-;; todo: image time key
+
+
+;; TODO: add :on-load
 (defn image [{:keys [url]}]
   (let [this        (r/current-component)
         update-size (fn [this]
@@ -79,7 +82,7 @@
       :component-did-update update-size
       :reagent-render
       (fn [{:keys [url]}]
-        [:img.editor-img {:on-click #(on-click-add-mark (r/dom-node this) %)
+        [:img.editor-img {:on-click #(on-click-add-mark (r/dom-node this) %e)
                           :src url}])})))
 
 
