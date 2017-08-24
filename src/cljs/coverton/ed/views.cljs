@@ -68,22 +68,18 @@
 
 
 
-;; TODO: add :on-load
 (defn image [{:keys [url]}]
-  (let [this        (r/current-component)
-        update-size (fn [this]
-                      (let [w (d/px (r/dom-node this) :width)
-                            h (d/px (r/dom-node this) :height)]
-                        (println w h (.. (r/dom-node this) getBoundingClientRect -width))
-                        (evt/set-size [w h])))]
-    (r/create-class
-     {:display-name "image"
-      :component-did-mount  update-size
-      :component-did-update update-size
-      :reagent-render
-      (fn [{:keys [url]}]
-        [:img.editor-img {:on-click #(on-click-add-mark (r/dom-node this) %e)
-                          :src url}])})))
+  (r/with-let [this        (r/current-component)
+               update-size (fn [_]
+                             (let [el (r/dom-node this)
+                                   w  (.. el getBoundingClientRect -width)
+                                   h  (.. el getBoundingClientRect -height)]
+                               (println w h )
+                               (evt/set-size [w h])))]
+    
+    [:img.editor-img {:on-click #(on-click-add-mark (r/dom-node this) %)
+                      :on-load  update-size ;; image loads later than component mounts
+                      :src      url}]))
 
 
 (defn editor-img []
@@ -132,7 +128,7 @@
 
 
 
-(defn image-picker []
+(defn image-picker-button []
   [:span
    [cc/Button {:on-click #(.click (sel1 :#image-input))}
     "Select Image"]
@@ -156,7 +152,7 @@
      
      [:div.editor-toolbar-top
 
-      [image-picker]
+      [image-picker-button]
       
       [cc/Button {:on-click #(save-cover (sub/export-cover))}
        "Save"]
