@@ -1,8 +1,8 @@
 (ns coverton.ed.db
-  (:require [re-frame.core :as rf]))
+  (:require [coverton.fonts :refer [default-font]]))
 
 
 ;;fixme move to higher function
-(def default-value
-  {:image-url "assets/img/coverton.jpg"})
-
+(def default-db
+  {:image-url "assets/img/coverton.jpg"
+   :font      default-font})

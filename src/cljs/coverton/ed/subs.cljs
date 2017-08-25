@@ -113,18 +113,19 @@
 
 (reg-sub
  ::active-mark
- :<- [::ed]
+ :<- [::cover]
  (fn [db _]
    (:active-mark db)))
 
 
 (reg-sub
  ::active-color
- :<- [::marks]
+ :<- [::cover]
  :<- [::active-mark]
- (fn [[marks id] _]
-   (or (get-in marks [id :color])
-       (:color default-font))))
+ (fn [[cover id] _]
+   (if id
+     (get-in cover [:marks id :color])
+     (get-in cover [:font :color]))))
 
 
 (reg-sub
@@ -134,10 +135,6 @@
    (get-in marks [id :ref])))
 
 
-(reg-sub
- ::monitor
- (fn [db _]
-   (:ed db)))
 
 
 (defn export-cover []

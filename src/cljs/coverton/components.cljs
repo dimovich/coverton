@@ -43,11 +43,11 @@
 (defn autosize-input
   [{:keys [id update-fn text font-family color set-ref]}]
   
-  (let [state   (r/atom (or text ""))
+  (let [state         (r/atom (or text ""))
         update-width  #(set-width (r/dom-node %))
         read-only?    (r/atom false)
         enable-static #(do (reset! read-only? true)
-                           (reset! state @state)
+                           ;;(reset! state @state)
                            (update-fn @state))]
     
     (r/create-class
@@ -72,8 +72,8 @@
                               :color       color}}
               
               editable {:on-change #(reset! state (.. % -target -value))
-                        :on-blur #(update-fn @state)
-                        :on-mouse-leave enable-static
+                        :on-blur enable-static ;;#(update-fn @state)
+                        ;;:on-mouse-leave enable-static
                         :on-key-down (fn [e]
                                        (condp = (.. e -key)
                                          "Enter" (enable-static) ;;enter
@@ -238,6 +238,7 @@
                    (evt/set-dimmer :font-picker))}])
 
 
+
 (defn toolbox-color-picker [{:keys [id ref]}]
   (let [update-color #(d/set-px! ref :font-color (str "#" %))]
     [:div.mark-toolbox-wrap
@@ -254,10 +255,9 @@
 (defn color-picker []
   (r/with-let [id           (subscribe [::sub/active-mark])
                active-color (subscribe [::sub/active-color])
-
                set-color    #(when @id
                                (evt/set-color @id ((js->clj %) "hex")))
-               
+
                ;; fixme: doesn't update
                #_(update-color #(when @id
                                   (d/set-px! @(subscribe [::sub/ref @id])

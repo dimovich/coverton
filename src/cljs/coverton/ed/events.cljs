@@ -1,16 +1,15 @@
 (ns coverton.ed.events
   (:require [re-frame.core :as rf :refer [reg-event-db path trim-v dispatch dispatch-sync]]
-            [coverton.ed.db :refer [default-value]]
-            [coverton.fonts :refer [default-font]]
+            [coverton.ed.db :refer [default-db]]
             [coverton.util  :refer [info]]
             [dommy.core :as d :refer [sel1]]))
 
 
 
-(def ed-interceptors     [(path [:ed])               trim-v])
-(def dimmer-interceptors [(path [:ed :dimmer])       trim-v])
-(def cover-interceptors  [(path [:ed :cover])        trim-v])
-(def marks-interceptors  [(path [:ed :cover :marks]) trim-v])
+(def ed-interceptors      [(path [:ed])               trim-v])
+(def dimmer-interceptors  [(path [:ed :dimmer])       trim-v])
+(def cover-interceptors   [(path [:ed :cover])        trim-v])
+(def marks-interceptors   [(path [:ed :cover :marks]) trim-v])
 
 
 
@@ -20,7 +19,7 @@
  (fn [db [cover]]
    (let [cover (or cover (:cover db))
          _     (info "initializing with " cover)]
-     {:cover (merge default-value cover)
+     {:cover (merge default-db cover)
       :t (inc (:t db))})))
 
 
@@ -38,7 +37,6 @@
  cover-interceptors
  (fn [db [ks v]]
    (assoc-in db ks v)))
-
 
 
 (reg-event-db
@@ -62,12 +60,12 @@
 
 (reg-event-db
  ::add-mark
- marks-interceptors
- (fn [marks [m]]
-   (let [id  (or (:mark-id m) (random-uuid))
-         m   (assoc m :mark-id id)
-         sid (str id)]
-     (assoc marks sid m))))
+ cover-interceptors
+ (fn [cover [mark]]
+   (let [id   (or (:mark-id mark) (random-uuid))
+         mark (merge (:font cover) mark {:mark-id id})
+         sid  (str id)]
+     (assoc-in cover [:marks] sid m))))
 
 
 
@@ -90,15 +88,14 @@
 
 
 (defn set-active-mark [id]
-  (dispatch [::update [:active-mark] id]))
+  (dispatch [::update-cover [:active-mark] id]))
 
 
 (defn handle-add-mark [pos]
   (let [id (random-uuid)
         sid (str id)]
     (dispatch [::add-mark (merge {:pos     pos
-                                  :mark-id id}
-                                 default-font)])
+                                  :mark-id id})])
     (set-active-mark sid)))
 
 
@@ -126,15 +123,18 @@
 
 
 (defn set-font-size [id fsize]
-  (dispatch [::update-mark-font-size id fsize]))
+  (dispatch [::update-mark-font-size id fsize])
+  (dispatch [::update-cover [:font :font-size] fsize]))
 
 
 (defn set-font-family [id family]
-  (dispatch [::update-mark id [:font-family] family]))
+  (dispatch [::update-mark id [:font-family] family])
+  (dispatch [::update-cover [:font :font-family] family]))
 
 
 (defn set-color [id color]
-  (dispatch [::update-mark id [:color] color]))
+  (dispatch [::update-mark id [:color] color])
+  (dispatch [::update-cover [:font :color] color]))
 
 
 (defn set-ref [id ref]
