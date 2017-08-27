@@ -135,6 +135,11 @@
    (get-in marks [id :ref])))
 
 
+(reg-sub
+ ::mark-offset
+ :<- [::cover]
+ (fn [db _]
+   (:mark-offset db)))
 
 
 (defn export-cover []

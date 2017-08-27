@@ -46,9 +46,10 @@
   (let [state         (r/atom (or text ""))
         update-width  #(set-width (r/dom-node %))
         read-only?    (r/atom false)
-        enable-static #(do (reset! read-only? true)
-                           ;;(reset! state @state)
-                           (update-fn @state))]
+        enable-static  #(reset! read-only? true)
+        disable-static #(reset! read-only? false)
+        blur          (fn [e]
+                        (.. e -target blur))]
     
     (r/create-class
      {:display-name "autosize-input"
@@ -57,7 +58,7 @@
       (fn [this]
         ;;for the outer component who modifies size or attributes
         (set-ref (r/dom-node this))
-        (evt/set-ref id (r/dom-node this))
+        ;;(evt/set-ref id (r/dom-node this))
         (update-width this))
 
       :component-did-update update-width
@@ -72,19 +73,21 @@
                               :color       color}}
               
               editable {:on-change #(reset! state (.. % -target -value))
-                        :on-blur enable-static ;;#(update-fn @state)
+                        :on-blur #(do (update-fn @state)
+                                      (enable-static))
                         ;;:on-mouse-leave enable-static
                         :on-key-down (fn [e]
                                        (condp = (.. e -key)
-                                         "Enter" (enable-static) ;;enter
-                                         "Escape" (enable-static) ;; esc
-                                         "Delete" (reset! state "") ;; delete
+                                         "Enter" (blur e)
+                                         "Escape" (blur e)
+                                         "Delete" #(do (reset! state "") ;;delete value
+                                                       (blur e)) ;; delete
                                          false))
 
                         :class "mark-input cancel-drag"
                         :auto-focus true}
               
-              static {:on-double-click #(reset! read-only? false)
+              static {:on-double-click disable-static
                       :read-only true
                       :class "mark-input"
                       :style {:cursor :move}}]
@@ -102,7 +105,7 @@
     (into
      [react-resize {:class-name "mark-resize"
                     :width "1em" :height "1em"
-                    :style {:font-size font-size}
+                    :style {:font-size  font-size}
                     :lock-aspect-ratio true
                     :on-resize-start (fn [_ _ el _]
                                        (reset! start (d/px el :font-size))
@@ -154,15 +157,17 @@
 
       :component-did-mount
       (fn [this]
-        (let [img (sel1 :.picker-img)
-              w (d/px img :width)
-              h (d/px img :height)]
+        (let [img (.. (sel1 :.picker-img)
+                      getBoundingClientRect)
+              w (.. img -width)
+              h (.. img -height)]
           (reset! size [w h])))
       
       :reagent-render
       (fn []
         (let [marks (:marks cover)
-              block-family font-family]
+              block-family font-family
+              [offset-x offset-y] @(subscribe [::sub/mark-offset])]
           (into
            [:div.picker-block
             [:img.picker-img {:src (:image-url cover)}]]
@@ -177,17 +182,21 @@
                              y (* y h)]
 
                          ^{:key id}
-                         [:span.picker-mark
-                          {:on-click #(do (evt/set-font-family id block-family)
+                         [:input.picker-mark
+                          {:value text
+                           :on-click #(do (evt/set-font-family id block-family)
                                           (evt/set-mark-static id true))
                            
                            :style {:font-family (if static font-family block-family)
                                    :font-size font-size
+                                   :read-only true
                                    :color color
-                                   :top y
-                                   :left x}}
+                                   :left x
+                                   :top  y
+                                   :padding "15px"}}
                           
-                          text])))))))})))
+                          ;;text
+                          ])))))))})))
 
 
 
@@ -256,16 +265,9 @@
   (r/with-let [id           (subscribe [::sub/active-mark])
                active-color (subscribe [::sub/active-color])
                set-color    #(when @id
-                               (evt/set-color @id ((js->clj %) "hex")))
-
-               ;; fixme: doesn't update
-               #_(update-color #(when @id
-                                  (d/set-px! @(subscribe [::sub/ref @id])
-                                             :color ((js->clj %) "hex"))))]
+                               (evt/set-color @id ((js->clj %) "hex")))]
     
-    [react-color { ;;:on-change-complete set-color
-                  :on-change set-color
-                  ;;:on-change update-color
+    [react-color {:on-change set-color ;;:on-change-complete
                   :color @active-color
                   :class "color-picker"}]))
 

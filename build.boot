@@ -5,8 +5,8 @@
                  [org.clojure/clojurescript "1.9.908"]
 
                  [adzerk/boot-cljs-repl     "0.3.3"]
-                 [adzerk/boot-cljs          "2.1.1"  :scope "test"]
-                 [adzerk/boot-reload        "0.5.1"  :scope "test"]
+                 [adzerk/boot-cljs          "2.1.2"  :scope "test"]
+                 [adzerk/boot-reload        "0.5.2"  :scope "test"]
                  [pandeiro/boot-http        "0.8.3"  :scope "test"]
                  [com.cemerick/piggieback   "0.2.1"  :scope "test"]
                  [org.clojure/tools.nrepl   "0.2.13" :scope "test"]
@@ -56,6 +56,7 @@
 (task-options! jar   {:main 'coverton.core :file "coverton.jar"}
                sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets" #"namen\.js"}}
                aot   {:namespace #{'coverton.core}}
+               ;;reload {:on-jsload coverton.core/reload}
                cljs  { ;;:ids #{"public/coverton"}
                       :compiler-options {:output-to  "public/coverton.js"
                                          :output-dir "public/out"

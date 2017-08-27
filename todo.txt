@@ -1,4 +1,8 @@
 ! after font-picker, keep marks static
+! height of font-picker blocks
+! drag ghost
+! image size mismatch with parent size (which is used for absolute pos)
+
 
 - spec
 - undo/redo (https://github.com/Day8/re-frame-undo)
@@ -15,7 +19,8 @@ https://github.com/reagent-project/reagent-cookbook/tree/master/recipes/file-upl
 https://mrmcc3.github.io/post/csv-with-clojurescript/
 
 
-! fix export label coordinates
+- fonts
+  https://www.filamentgroup.com/lab/font-events.html
 
 
 + auth  https://github.com/lambdaisland/booklog

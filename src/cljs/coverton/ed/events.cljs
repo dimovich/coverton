@@ -155,5 +155,9 @@
   (dispatch [::update [:dimmer] panel]))
 
 
+(defn save-mark-offset [x y]
+  (dispatch [::update-cover [:mark-offset]  [x y]]))
+
+
 (defn initialize [cover]
   (dispatch-sync [::initialize cover]))

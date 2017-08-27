@@ -20,15 +20,13 @@
         color (subscribe [::sub/color     id])
         font-family  (subscribe [::sub/mark-font-family id])
         font-size    (subscribe [::sub/mark-font-size   id])
-        ref (atom nil)
+        child-ref    (atom nil)
+        this         (r/current-component)
         ;;initial click coords
-        [x y] @pos]
+        [x y]        @pos]
 
     (r/create-class
      {:display-name "mark"
-      :component-did-mount
-      (fn [this])
-
       :reagent-render
       (fn []
         [:div.mark {:style {:left x :top y}}
@@ -36,18 +34,18 @@
          [cc/draggable {:update-fn #(evt/set-pos id %)
                         ;;we get deltas, so we need the initial coords
                         :start-pos [x y]
-                        :ref ref}
+                        :ref child-ref}
 
           ;; fixme: move toolbox to inner
           [cc/toolbox {:id id
-                       :ref ref}]
+                       :ref child-ref}]
          
           [cc/resizable {:font-size  @font-size
-                         :ref ref
+                         :ref child-ref
                          :update-fn  #(evt/set-font-size id %)}
           
            [cc/autosize-input {:id          id
-                               :set-ref     #(reset! ref %)
+                               :set-ref     #(reset! child-ref %)
                                :key         :input
                                :text        @text
                                :color       @color
@@ -102,11 +100,7 @@
           
           (when @size
             (for [id @ids]
-              ^{:key id} [mark {:id id}]))]
-
-         ;; marks
-         ;; make sure we have the size set
-         ))})))
+              ^{:key id} [mark {:id id}]))]))})))
 
 
 
@@ -147,7 +141,7 @@
                dimmer  (subscribe [::sub/dimmer])
                ed-t    (subscribe [::sub/t])]
 
-    ;;    ^{:key @ed-t} ;;forces re-mount when cover is re-initialized
+    ^{:key @ed-t} ;;forces re-mount when cover is re-initialized
     [:div.editor
      
      [:div.editor-toolbar-top
@@ -174,3 +168,18 @@
 
      [cc/color-picker]]))
 
+
+
+
+#_(
+   update-offset-fn (fn []
+                      (let [dom    (r/dom-node this)
+                            parent (.. dom getBoundingClientRect)
+                            child  (.. @child-ref getBoundingClientRect)
+                            x      (- (.. child  -left)
+                                      (.. parent -left))
+                            y      (- (.. child  -top)
+                                      (.. parent -top))]
+                             
+                        (evt/save-mark-offset x y)))
+   )

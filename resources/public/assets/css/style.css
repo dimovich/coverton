@@ -73,7 +73,7 @@ body {
 
 .mark {
     position: absolute;
-    display: inline-block
+    display: inline-block;
 }
 
 
@@ -169,6 +169,7 @@ body {
     user-select: none;
     cursor: move;
     padding: 15px;
+    margin: 0;
     box-sizing: border-box;
 }
 
@@ -238,6 +239,7 @@ body {
     margin: 0;
     padding: 0;
     border: 0px solid black;
+    background-color: transparent;
     white-space: nowrap;
     cursor: pointer;
 }

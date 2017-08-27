@@ -8,7 +8,7 @@
   [index/index])
 
 
-(defn reload []
+(defn ^:export reload []
   (r/render [app] (sel1 :#app)))
 
 
