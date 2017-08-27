@@ -65,7 +65,7 @@
    (let [id   (or (:mark-id mark) (random-uuid))
          mark (merge (:font cover) mark {:mark-id id})
          sid  (str id)]
-     (assoc-in cover [:marks] sid m))))
+     (assoc-in cover [:marks sid] mark))))
 
 
 
@@ -124,7 +124,9 @@
 
 (defn set-font-size [id fsize]
   (dispatch [::update-mark-font-size id fsize])
-  (dispatch [::update-cover [:font :font-size] fsize]))
+  ;;use cofx to update default font size
+  ;;(dispatch [::update-cover [:font :font-size] fsize])
+  )
 
 
 (defn set-font-family [id family]
@@ -154,4 +156,4 @@
 
 
 (defn initialize [cover]
-  (dispatch [::initialize cover]))
+  (dispatch-sync [::initialize cover]))

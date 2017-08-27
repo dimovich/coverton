@@ -147,7 +147,7 @@
                dimmer  (subscribe [::sub/dimmer])
                ed-t    (subscribe [::sub/t])]
 
-    ^{:key @ed-t} ;;forces re-mount when cover is re-initialized
+    ;;    ^{:key @ed-t} ;;forces re-mount when cover is re-initialized
     [:div.editor
      
      [:div.editor-toolbar-top
