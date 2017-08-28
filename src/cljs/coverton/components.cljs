@@ -6,7 +6,7 @@
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]
             [coverton.ed.subs   :as sub]
-            jsutils))
+            [jsutils]))
 
 
 (def react-drag   (arc "deps" "draggable"))
@@ -40,13 +40,14 @@
 
 
 
-
+;; fixme: do we need global read-only?, only new ones will be editables, so have a new?
 (defn autosize-input
   [{:keys [id update-fn text font-family color set-ref read-only?]}]
   
   (let [state          (r/atom (or text ""))
         update-width   #(set-width (r/dom-node %))
-        enable-static  #(evt/set-mark-read-only id true)
+        enable-static  (fn []
+                         (evt/set-mark-read-only id true))
         disable-static #(evt/set-mark-read-only id false)
         blur           #(.. % -target blur)]
     
@@ -71,9 +72,10 @@
                               :font-family font-family
                               :color       color}}
               
-              editable {:on-change #(reset! state (.. % -target -value))
-                        :on-blur #(do (update-fn @state)
-                                      (enable-static))
+              editable {:on-change #(do (reset! state (.. % -target -value))
+                                        (info (jsutils/getCaretPosition id)))
+                        :on-blur   #(do (update-fn @state)
+                                        (enable-static))
                         ;;:on-mouse-leave enable-static
                         :on-key-down (fn [e]
                                        (condp = (.. e -key)

@@ -1,7 +1,5 @@
+! mark doesn't get deleted
 ! remember caret position, and on focus restore
-  this.selectionStart
-  setSelectionRange(pos,pos)
-
 ! height of font-picker blocks
 ! image size mismatch with parent size (which is used for absolute pos)
 ! position coords rounding (where is it happening?)

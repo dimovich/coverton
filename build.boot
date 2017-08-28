@@ -63,9 +63,9 @@
                                          :asset-path "out"
                                          ;;:preloads   '[coverton.dev]
                                          :parallel-build true
-                                         :foreign-libs  [{:file        "src/js/util.js"
+                                         :foreign-libs  [{:file        "src/js/jsutils.js"
                                                           :provides    ["jsutils"]
-                                                          :module-type :es6}
+                                                          :module-type :commonjs}
 
                                                          {:file     "src/js/bundle.js"
                                                           :provides ["cljsjs.react" "cljsjs.react-dom"]}]}}

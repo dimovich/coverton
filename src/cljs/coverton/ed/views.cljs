@@ -8,7 +8,8 @@
             [coverton.ed.events   :as evt]
             [coverton.ed.subs     :as sub]
             [coverton.util        :refer [info]]
-            [coverton.index.events :as evt-index]))
+            [coverton.index.events :as evt-index]
+            [jsutils]))
 
 
 ;; use center of element for position
