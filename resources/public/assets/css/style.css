@@ -73,11 +73,14 @@ body {
 
 .mark {
     position: absolute;
-    display: inline-block;
+     /*display: inline-block;*/
+    height: 0;
+    width: 0;
 }
 
 
 .mark-resize {
+    display: inline-block;
     border: 2px solid transparent;
     transition : border .2s ease-in;
     transition-delay: 0;
@@ -171,6 +174,7 @@ body {
     padding: 15px;
     margin: 0;
     box-sizing: border-box;
+    display: inline-block;
 }
 
 

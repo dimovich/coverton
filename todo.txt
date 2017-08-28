@@ -1,6 +1,5 @@
 ! after font-picker, keep marks static
 ! height of font-picker blocks
-! drag ghost
 ! image size mismatch with parent size (which is used for absolute pos)
 
 
