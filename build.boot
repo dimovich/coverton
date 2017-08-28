@@ -46,7 +46,7 @@
 
 
 (swap! boot.repl/*default-dependencies*
-       concat '[[cider/cider-nrepl "0.15.0" :scope "provided"]])
+       concat '[[cider/cider-nrepl "0.15.1-SNAPSHOT" :scope "provided"]])
 
 (swap! boot.repl/*default-middleware*
        conj 'cider.nrepl/cider-middleware)
@@ -63,7 +63,11 @@
                                          :asset-path "out"
                                          ;;:preloads   '[coverton.dev]
                                          :parallel-build true
-                                         :foreign-libs  [{:file "src/js/bundle.js"
+                                         :foreign-libs  [{:file        "src/js/util.js"
+                                                          :provides    ["jsutils"]
+                                                          :module-type :es6}
+
+                                                         {:file     "src/js/bundle.js"
                                                           :provides ["cljsjs.react" "cljsjs.react-dom"]}]}}
                ;;cljs-repl  {:ids #{"public/coverton"}}
                serve {:resource-root "target/public"

@@ -20,6 +20,7 @@
         color (subscribe [::sub/color     id])
         font-family  (subscribe [::sub/mark-font-family id])
         font-size    (subscribe [::sub/mark-font-size   id])
+        read-only?   (subscribe [::sub/mark-read-only?  id])
         child-ref    (atom nil)
         this         (r/current-component)
         ;;initial click coords
@@ -50,6 +51,7 @@
                                :text        @text
                                :color       @color
                                :font-family @font-family
+                               :read-only?  @read-only?
                                :update-fn   #(evt/set-text id %)}]]]])})))
 
 

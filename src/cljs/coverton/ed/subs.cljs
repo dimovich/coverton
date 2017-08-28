@@ -79,6 +79,13 @@
 
 
 (reg-sub
+ ::mark-read-only?
+ :<- [::marks]
+ (fn [marks [_ id]]
+   (get-in marks [id :read-only?])))
+
+
+(reg-sub
  ::mark-text
  :<- [::marks]
  (fn [marks [_ id]]

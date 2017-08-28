@@ -1,8 +1,14 @@
-! after font-picker, keep marks static
+! remember caret position, and on focus restore
+  this.selectionStart
+  setSelectionRange(pos,pos)
+
 ! height of font-picker blocks
 ! image size mismatch with parent size (which is used for absolute pos)
+! position coords rounding (where is it happening?)
+  http://cruft.io/posts/percentage-calculations-in-ie/
 
 
+- svg blobs
 - spec
 - undo/redo (https://github.com/Day8/re-frame-undo)
 - re-write ref spreading

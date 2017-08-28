@@ -1,8 +1,8 @@
 (ns coverton.ed.events
-  (:require [re-frame.core :as rf :refer [reg-event-db path trim-v dispatch dispatch-sync]]
+  (:require [re-frame.core  :as rf :refer [reg-event-db path trim-v dispatch dispatch-sync]]
             [coverton.ed.db :refer [default-db]]
             [coverton.util  :refer [info]]
-            [dommy.core :as d :refer [sel1]]))
+            [dommy.core     :as d :refer [sel1]]))
 
 
 
@@ -37,6 +37,7 @@
  cover-interceptors
  (fn [db [ks v]]
    (assoc-in db ks v)))
+
 
 
 (reg-event-db
@@ -157,6 +158,10 @@
 
 (defn save-mark-offset [x y]
   (dispatch [::update-cover [:mark-offset]  [x y]]))
+
+
+(defn set-mark-read-only [id read-only?]
+  (dispatch [::update-mark id [:read-only?] read-only?]))
 
 
 (defn initialize [cover]

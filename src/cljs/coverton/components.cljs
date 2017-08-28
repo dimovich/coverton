@@ -5,7 +5,8 @@
             [coverton.util  :refer [arc info]]
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]
-            [coverton.ed.subs   :as sub]))
+            [coverton.ed.subs   :as sub]
+            jsutils))
 
 
 (def react-drag   (arc "deps" "draggable"))
@@ -41,15 +42,13 @@
 
 
 (defn autosize-input
-  [{:keys [id update-fn text font-family color set-ref]}]
+  [{:keys [id update-fn text font-family color set-ref read-only?]}]
   
-  (let [state         (r/atom (or text ""))
-        update-width  #(set-width (r/dom-node %))
-        read-only?    (r/atom false)
-        enable-static  #(reset! read-only? true)
-        disable-static #(reset! read-only? false)
-        blur          (fn [e]
-                        (.. e -target blur))]
+  (let [state          (r/atom (or text ""))
+        update-width   #(set-width (r/dom-node %))
+        enable-static  #(evt/set-mark-read-only id true)
+        disable-static #(evt/set-mark-read-only id false)
+        blur           #(.. % -target blur)]
     
     (r/create-class
      {:display-name "autosize-input"
@@ -64,7 +63,7 @@
       :component-did-update update-width
       
       :reagent-render
-      (fn [{:keys [font-family color]}]
+      (fn [{:keys [font-family color read-only?]}]
         (let [common {:id id
                       :value @state
                       :on-click #(evt/set-active-mark id)
@@ -89,11 +88,12 @@
               
               static {:on-double-click disable-static
                       :read-only true
+                      :on-focus blur
                       :class "mark-input"
                       :style {:cursor :move}}]
           
           [:input
-           (merge-with merge common (if @read-only? static editable))]))})))
+           (merge-with merge common (if read-only? static editable))]))})))
 
 
 
@@ -184,6 +184,7 @@
                          ^{:key id}
                          [:input.picker-mark
                           {:value text
+                           :on-focus #(.. % -target blur)
                            :on-click #(do (evt/set-font-family id block-family)
                                           (evt/set-mark-static id true))
                            
