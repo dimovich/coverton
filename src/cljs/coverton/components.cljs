@@ -40,16 +40,20 @@
 
 
 
-;; fixme: do we need global read-only?, only new ones will be editables, so have a new?
 (defn autosize-input
   [{:keys [id update-fn text font-family color set-ref read-only?]}]
   
   (let [state          (r/atom (or text ""))
+        caret-pos      (atom 0)
         update-width   #(set-width (r/dom-node %))
-        enable-static  (fn []
-                         (evt/set-mark-read-only id true))
-        disable-static #(evt/set-mark-read-only id false)
-        blur           #(.. % -target blur)]
+        blur           #(.. % -target blur)
+
+        enable-static  #(do
+                          (evt/set-mark-read-only id true)
+                          (reset! caret-pos (jsutils/getCaretPosition id)))
+        disable-static #(do ;;fixme doesn't focus
+                          (evt/set-mark-read-only id false)
+                          (jsutils/setCaretPosition id @caret-pos))]
     
     (r/create-class
      {:display-name "autosize-input"
@@ -72,16 +76,14 @@
                               :font-family font-family
                               :color       color}}
               
-              editable {:on-change #(do (reset! state (.. % -target -value))
-                                        (info (jsutils/getCaretPosition id)))
+              editable {:on-change #(reset! state (.. % -target -value))
                         :on-blur   #(do (update-fn @state)
                                         (enable-static))
-                        ;;:on-mouse-leave enable-static
                         :on-key-down (fn [e]
                                        (condp = (.. e -key)
                                          "Enter" (blur e)
                                          "Escape" (blur e)
-                                         "Delete" #(do (reset! state "") ;;delete value
+                                         "Delete" #(do (reset! state "") ;;delete value ;; move to static
                                                        (blur e)) ;; delete
                                          false))
 
