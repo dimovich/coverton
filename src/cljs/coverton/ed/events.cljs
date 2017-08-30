@@ -92,19 +92,12 @@
   (dispatch [::update-cover [:active-mark] id]))
 
 
-(defn handle-add-mark [pos]
-  (let [id (random-uuid)
-        sid (str id)]
-    (dispatch [::add-mark (merge {:pos     pos
-                                  :mark-id id})])
-    (set-active-mark sid)))
+(defn add-mark [m]
+  (dispatch [::add-mark m]))
 
 
-(defn handle-remove-mark [e]
-  (let [text (.. e -target -value)
-        id   (.. e -target -id)]
-    (when (empty? text)
-      (dispatch [::remove-mark id]))))
+(defn remove-mark [id]
+  (dispatch [::remove-mark id]))
 
 
 (defn set-cover-id [id]

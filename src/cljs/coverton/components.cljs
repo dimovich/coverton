@@ -77,8 +77,9 @@
                               :color       color}}
               
               editable {:on-change #(reset! state (.. % -target -value))
-                        :on-blur   #(do (update-fn @state)
-                                        (enable-static))
+                        :on-blur   #(do
+                                      (enable-static)
+                                      (update-fn @state))
                         :on-key-down (fn [e]
                                        (condp = (.. e -key)
                                          "Enter" (blur e)
@@ -197,8 +198,7 @@
                                    :read-only true
                                    :color color
                                    :left x
-                                   :top  y
-                                   :padding "15px"}}
+                                   :top  y}}
                           
                           ;;text
                           ])))))))})))
@@ -273,7 +273,6 @@
                                (evt/set-color @id ((js->clj %) "hex")))]
     
     [react-color {:on-change set-color ;;:on-change-complete
-                  :color @active-color
-                  :class "color-picker"}]))
+                  :color @active-color}]))
 
 

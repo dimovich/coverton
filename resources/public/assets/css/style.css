@@ -67,13 +67,14 @@ body {
     display: inline-block;
     position: relative;
     padding: 5px;
-    border: 2px solid gray;
-    margin-bottom: 10px;
+    border: 2px solid lightgray;
+    margin: 0;
+    margin-bottom: 1em;
 }
 
 .mark {
     position: absolute;
-    /*display: inline-block;*/
+    display: inline-block;
     height: 0;
     width: 0;
 }
@@ -240,7 +241,7 @@ body {
 
 .picker-mark {
     position: absolute;
-    margin: 0;
+    margin: 16px;
     padding: 0;
     border: 0px solid black;
     background-color: transparent;
@@ -266,5 +267,5 @@ body {
 }
 
 
-.color-picker {
+.slider-picker {
 }

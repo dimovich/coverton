@@ -1,6 +1,9 @@
-! mark doesn't get deleted
-! remember caret position, and on focus restore
 ! height of font-picker blocks
+  - move picker-img to separate component and pass it a size atom
+  - win!
+! place mark on top of click coordinates
+! hide cursor on image click
+! delete mark (listen to window key-down)
 ! image size mismatch with parent size (which is used for absolute pos)
 ! position coords rounding (where is it happening?)
   http://cruft.io/posts/percentage-calculations-in-ie/

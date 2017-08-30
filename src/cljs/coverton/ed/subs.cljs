@@ -130,9 +130,8 @@
  :<- [::cover]
  :<- [::active-mark]
  (fn [[cover id] _]
-   (if id
-     (get-in cover [:marks id :color])
-     (get-in cover [:font :color]))))
+   (or (get-in cover [:marks id :color])
+       (get-in cover [:font :color]))))
 
 
 (reg-sub

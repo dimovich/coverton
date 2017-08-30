@@ -8,8 +8,7 @@
             [coverton.ed.events   :as evt]
             [coverton.ed.subs     :as sub]
             [coverton.util        :refer [info]]
-            [coverton.index.events :as evt-index]
-            [jsutils]))
+            [coverton.index.events :as evt-index]))
 
 
 ;; use center of element for position
@@ -57,15 +56,31 @@
 
 
 
+(defn handle-remove-mark [e]
+  (let [text (.. e -target -value)
+        id   (.. e -target -id)]
+    (when (empty? text)
+      (evt/remove-mark id))))
+
+
+
+(defn handle-add-mark [pos]
+  (let [id (random-uuid)
+        sid (str id)]
+    (evt/add-mark (merge {:pos     pos
+                          :mark-id id}))
+    (evt/set-active-mark sid)))
+
+
+
 (defn on-click-add-mark [parent e]
   (let [[w h] @(subscribe [::sub/size])
-        rect (.. parent getBoundingClientRect)
-        rx   (.. rect -left)
-        ry   (.. rect -top)
-        x    (- (.. e -clientX) rx)
-        y    (- (.. e -clientY) ry)]
-    (evt/handle-add-mark [(/ x w) (/ y h)])))
-
+        rect  (.. parent getBoundingClientRect)
+        rx    (.. rect -left)
+        ry    (.. rect -top)
+        x     (- (.. e -clientX) rx)
+        y     (- (.. e -clientY) ry)]
+    (handle-add-mark [(/ x w) (/ y h)])))
 
 
 
@@ -75,12 +90,12 @@
                              (let [el (r/dom-node this)
                                    w  (.. el getBoundingClientRect -width)
                                    h  (.. el getBoundingClientRect -height)]
-                               (println w h )
                                (evt/set-size [w h])))]
     
     [:img.editor-img {:on-click #(on-click-add-mark (r/dom-node this) %)
                       :on-load  update-size ;; image loads later than component mounts
                       :src      url}]))
+
 
 
 (defn editor-img []
@@ -97,7 +112,7 @@
       :reagent-render
       (fn []
         (into
-         [:div.editor-img-wrap {:on-blur evt/handle-remove-mark}
+         [:div.editor-img-wrap {:on-blur handle-remove-mark}
 
           [image {:url @image-url}]
           
