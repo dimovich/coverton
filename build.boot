@@ -1,11 +1,11 @@
 (set-env!
  :source-paths    #{"src/cljs" "src/clj" "src/cljc"}
  :resource-paths  #{"resources" }
- :dependencies '[[org.clojure/clojure "1.9.0-alpha17"]
+ :dependencies '[[org.clojure/clojure "1.9.0-alpha20"]
                  [org.clojure/clojurescript "1.9.908"]
 
-                 [adzerk/boot-cljs-repl     "0.3.3"]
-                 [adzerk/boot-cljs          "2.1.2"  :scope "test"]
+                 [adzerk/boot-cljs-repl     "0.3.3"  :scope "test"]
+                 [adzerk/boot-cljs          "2.1.3"  :scope "test"]
                  [adzerk/boot-reload        "0.5.2"  :scope "test"]
                  [pandeiro/boot-http        "0.8.3"  :scope "test"]
                  [com.cemerick/piggieback   "0.2.1"  :scope "test"]
@@ -21,6 +21,15 @@
                  [com.taoensso/timbre       "4.8.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
 
+                 [ring-middleware-format "0.7.2"]
+
+                 [buddy/buddy-auth "2.1.0"]
+                 [buddy/buddy-hashers "1.3.0"]
+                 [buddy/buddy-sign "2.2.0"]
+                 [buddy/buddy-core "1.4.0"]
+
+                 [clj-time "0.14.0"]
+                 
                  [com.datomic/clj-client "0.8.606"]
                  [org.clojure/core.async "0.3.443"]
                  [org.clojure/data.fressian "0.2.1"]
@@ -31,9 +40,11 @@
                  ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]
+                 ;;update version
                  [reagent  "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 [re-frame "0.9.4"]
-                 [cljs-ajax "0.6.0"]])
+                 [re-frame "0.10.1"]
+                 [day8.re-frame/http-fx "0.1.4"]
+                 [cljs-ajax "0.7.2"]])
 
 
 (require
@@ -41,7 +52,7 @@
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload    :refer [reload]]
  '[pandeiro.boot-http    :refer [serve]]
- '[tolitius.boot-check   :as check])
+ '[tolitius.boot-check   :as    check])
 
 
 
@@ -56,7 +67,7 @@
 (task-options! jar   {:main 'coverton.core :file "coverton.jar"}
                sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets" #"namen\.js"}}
                aot   {:namespace #{'coverton.core}}
-               ;;reload {:on-jsload coverton.core/reload}
+               reload {:on-jsload coverton.core/reload}
                cljs  { ;;:ids #{"public/coverton"}
                       :compiler-options {:output-to  "public/coverton.js"
                                          :output-dir "public/out"
@@ -72,7 +83,7 @@
                ;;cljs-repl  {:ids #{"public/coverton"}}
                serve {:resource-root "target/public"
                       :handler 'coverton.core/app
-                      :reload true
+                      :reload  true
                       :httpkit true})
 
 

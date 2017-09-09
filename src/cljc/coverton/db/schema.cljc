@@ -24,16 +24,33 @@
 
 
 
-(def cover-schema [{:db/ident :cover/id
-                    :db/valueType :db.type/uuid
+(def user-schema [{:db/ident       :user/username
+                   :db/valueType   :db.type/string
+                   :db/cardinality :db.cardinality/one
+                   :db/unique      :db.unique/identity}
+
+                  {:db/ident       :user/password
+                   :db/valueType   :db.type/string
+                   :db/cardinality :db.cardinality/one}
+
+                  {:db/ident       :user/email
+                   :db/valueType   :db.type/string
+                   :db/cardinality :db.cardinality/one}])
+
+
+
+(def cover-schema [{:db/ident       :cover/id
+                    :db/valueType   :db.type/uuid
                     :db/cardinality :db.cardinality/one
-                    :db/unique :db.unique/identity
+                    :db/unique      :db.unique/identity
                     :db/doc "Cover id"}
 
-                   {:db/ident :cover/data
-                    :db/valueType :db.type/bytes
+                   {:db/ident       :cover/data
+                    :db/valueType   :db.type/bytes
                     :db/cardinality :db.cardinality/one
                     :db/doc "Cover fressian data"}
+
+                   ;;TODO: add user ref
 
                    #_(
                       {:db/ident :cover/author

@@ -186,18 +186,3 @@
 
      [cc/color-picker]]))
 
-
-
-
-#_(
-   update-offset-fn (fn []
-                      (let [dom    (r/dom-node this)
-                            parent (.. dom getBoundingClientRect)
-                            child  (.. @child-ref getBoundingClientRect)
-                            x      (- (.. child  -left)
-                                      (.. parent -left))
-                            y      (- (.. child  -top)
-                                      (.. parent -top))]
-                             
-                        (evt/save-mark-offset x y)))
-   )

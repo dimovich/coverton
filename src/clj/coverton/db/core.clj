@@ -9,6 +9,10 @@
 (def db-state (atom {}))
 
 
+(defn random-uuid []
+  (java.util.UUID/randomUUID))
+
+
 (defn connect []
   (-> {:db-name "hello"
        :account-id client/PRO_ACCOUNT
@@ -22,12 +26,14 @@
       <!!))
 
 
+
 (defn get-connection []
   (if-let [conn (:conn @db-state)]
     conn
     (let [conn (connect)]
       (swap! db-state assoc :conn conn)
       conn)))
+
 
 
 (defn init []
@@ -45,12 +51,12 @@
   (client/db (get-connection)))
 
 
+
 (defn add-data [data]
-  (let [data (if (vector? data) data [data])
-        conn (get-connection)]
-    (->> {:tx-data data}
-         (client/transact conn)
-         <!!)))
+  (let [data (if (vector? data) data [data])]
+    (-> (get-connection)
+        (client/transact {:tx-data data})
+        <!!)))
 
 
 
@@ -88,10 +94,30 @@
          ffirst)))
 
 
+
 (defn export-covers-to-file [fname])
 
 
 
+(defn add-user [{:keys [username password email]}]
+  (-> [{:user/username username
+        :user/password password
+        :user/email email}]
+      (add-data)))
+
+
+
+(defn get-user [username]
+  (let [db (current-db)
+        conn (get-connection)]
+    (->> {:query '[:find (pull ?e [*])
+                   :in $ ?name
+                   :where
+                   [?e :user/username ?name]]
+          :args [db name]}
+         (client/q conn)
+         <!!
+         ffirst)))
 
 
 
