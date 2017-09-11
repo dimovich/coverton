@@ -8,7 +8,6 @@ window.deps = {
     'draggable': Draggable,
     'resizable': Resizable,
     'semui': require ('semantic-ui-react'),
-    'resize-detector': require("element-resize-detector"),
     'react-color': SliderPicker
 };
 

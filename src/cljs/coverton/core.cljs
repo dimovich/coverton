@@ -16,3 +16,5 @@
   (reload))
 
 
+(defn ^:export -main [& args]
+  (init))

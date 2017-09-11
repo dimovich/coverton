@@ -1,11 +1,13 @@
 (ns coverton.index.subs
-  (:require [re-frame.core :refer [reg-sub]]))
+  (:require [re-frame.core :refer [reg-sub]]
+            [coverton.ajax.subs :as ajax-sub]))
 
 
 (reg-sub
  ::index
  (fn [db _]
    (:index db)))
+
 
 (reg-sub
  ::panel-stack
@@ -19,3 +21,10 @@
  :<- [::panel-stack]
  (fn [panels _]
    (first panels)))
+
+
+(reg-sub
+ ::authenticated?
+ :<- [::ajax-sub/token]
+ (fn [token _]
+   (not (nil? token))))

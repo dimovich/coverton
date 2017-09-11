@@ -1,7 +1,8 @@
 (ns coverton.ed.events
   (:require [re-frame.core  :as rf :refer [reg-event-db path trim-v dispatch dispatch-sync]]
             [coverton.ed.db :refer [default-db]]
-            [coverton.util  :refer [info]]
+            [taoensso.timbre :refer-macros [info]]
+            [coverton.ajax.events :as ajax-evt]
             [dommy.core     :as d :refer [sel1]]))
 
 
@@ -86,6 +87,20 @@
                   v))
      (assoc-in marks (into [id] ks) v)
      marks)))
+
+
+
+;;editor
+(reg-event-fx
+ ::save-cover
+ (fn [_ [_ cover]]
+   {:dispatch
+    [::ajax-evt/request-auth {:method :post
+                              :uri "/save-cover"
+                              :params cover}]}))
+
+
+
 
 
 (defn set-active-mark [id]

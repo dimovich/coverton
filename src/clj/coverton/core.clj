@@ -2,24 +2,35 @@
   (:require [ring.middleware.resource        :refer [wrap-resource]]
             [ring.middleware.content-type    :refer [wrap-content-type]]
             [ring.middleware.not-modified    :refer [wrap-not-modified]]
-            [coverton.templates.devcards     :refer [devcards]]
-            [ring.middleware.transit         :refer [wrap-transit-response wrap-transit-body]]
-            [ring.util.response              :refer [response not-found]]
-            [coverton.templates.index        :refer [index static-promo]]
-            [compojure.core     :refer [defroutes GET POST PUT]]
+            [ring.middleware.format          :refer [wrap-restful-format] :as ring-format]
+            [ring.util.response              :refer [response file-response redirect not-found content-type]]
+            [ring.middleware.session         :refer [wrap-session]]
+            [ring.middleware.params          :refer [wrap-params]]
+
+            [compojure.core     :refer [defroutes GET POST]]
             [compojure.route    :refer [files resources]]
-            [compojure.handler  :refer [site]]
-            [ring.util.response :refer [file-response]]
+            [compojure.response :refer [render]]
+
             [org.httpkit.server :as server]
             [taoensso.timbre    :as timbre :refer [info]]
-            [cheshire.core      :as json]
-            [namen.core         :as namen]
-            [coverton.db.core   :as db]
-            [coverton.db.schema :refer [mark->db-map cover->db-map magic-id]]
             [clojure.pprint     :refer [pprint]]
             [clojure.set        :refer [rename-keys]]
+            [clojure.data.fressian  :as fress]
+            [clojure.java.io    :as io]
+
+            [buddy.sign.jwt :as jwt]
+            [buddy.auth     :refer [authenticated? throw-unauthorized]]
+            [buddy.auth.middleware :refer [wrap-authentication
+                                           wrap-authorization]]
+
+            [clojure.set :refer [rename-keys]]
             [clojure.data.fressian :as fress]
-            [coverton.util])
+            
+            [coverton.auth :refer [auth-backend login]]
+            [coverton.util :refer [ok bad-request]]
+            [coverton.templates.index        :refer [index static-promo]]
+            [coverton.db.core   :as db]
+            [coverton.db.schema :refer [mark->db-map cover->db-map magic-id]])
   
   (:gen-class))
 
@@ -28,12 +39,12 @@
 
 
 (defn save-cover [req]
-  (let [cover (get-in req [:body :cover])
-        cover-id (or (:cover-id cover) magic-id) ;;fixme
-        cover    (assoc cover :cover-id cover-id)]
-    (info (db/add-data {:cover/id cover-id
-                        :cover/data (.array (fress/write cover))}))
-    (response {:cover-id cover-id})))
+    (let [cover (get-in req [:body :cover])
+          cover-id (or (:cover-id cover) magic-id) ;;fixme
+          cover    (assoc cover :cover-id cover-id)]
+      (info (db/add-data {:cover/id cover-id
+                          :cover/data (.array (fress/write cover))}))
+      (response {:cover-id cover-id})))
 
 
 (defn get-cover [req]
@@ -46,32 +57,63 @@
 
 
 
+
+(def covers-sample {:cover1 {:some :idata}
+                    :cover2 {:some :odata}})
+
+(defn get-covers [{{:keys [type size skip]} :params :as request}]
+  (ok covers-sample))
+
+
+
+
 (defroutes handler
   (GET  "/"           [] (static-promo))
   (GET  "/index"      [] (index))
 
-  (POST "/save-cover" [] save-cover)
-  (POST "/get-cover"  [] get-cover)  ;;fixme, GET is json
+  ;;(POST "/save-cover" [] save-cover)
+  (POST "/get-cover"  [] get-cover)
+
+  (POST "/get-covers" [] get-covers)
+  (POST "/login"  [] login)
   
-  (GET  "/devcards"   [] (devcards))
+  ;;(GET  "/devcards"   [] (devcards))
   
-  (GET  "/wordizer"   [] (namen/frontend))
-  (GET  "/generate"   xs (json/generate-string
-                          (namen/generate (-> xs :params :words vals))))
+  ;;(GET  "/wordizer"   [] (namen/frontend))
+  #_(GET  "/generate"   xs (json/generate-string
+                            (namen/generate (-> xs :params :words vals))))
   
-  (files     "/" {:root "."})   ;; to serve static resources
-  (resources "/" {:root "."})   ;; to serve anything else
+  (files     "/" {:root "."}) ;; to serve static resources
+  (resources "/" {:root "."}) ;; to serve anything else
   (compojure.route/not-found "Page Not Found")) ;; page not found
 
 
+
+(defn wrap-info-request [handler]
+  (fn [request]
+    (info "request: " request)
+    (handler request)))
+
+
+(defn wrap-info-response [handler]
+  (fn [request]
+    (let [response (handler request)]
+      (info "response: " response)
+      response)))
+
+
+
 (def app
-  (-> handler
-      (wrap-transit-body)
-      (wrap-transit-response)
-      (wrap-resource "public")
-      (wrap-content-type)
-      (wrap-not-modified)
-      (site)))
+  (as-> handler $
+    (wrap-info-request   $)
+    (wrap-authorization  $ auth-backend)
+    (wrap-authentication $ auth-backend)
+    (wrap-restful-format $ {:formats [:transit-json]})
+    (wrap-params         $)
+    (wrap-resource       $ "public")
+    (wrap-info-response  $)))
+
+
 
 
 ;; boot runs this from another process... so no state in the end

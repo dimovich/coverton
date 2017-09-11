@@ -1,7 +1,7 @@
 (set-env!
  :source-paths    #{"src/cljs" "src/clj" "src/cljc"}
  :resource-paths  #{"resources" }
- :dependencies '[[org.clojure/clojure "1.9.0-alpha20"]
+ :dependencies '[[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.908"]
 
                  [adzerk/boot-cljs-repl     "0.3.3"  :scope "test"]
@@ -40,7 +40,6 @@
                  ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 
                  [prismatic/dommy "1.1.0"]
-                 ;;update version
                  [reagent  "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.10.1"]
                  [day8.re-frame/http-fx "0.1.4"]
@@ -67,12 +66,12 @@
 (task-options! jar   {:main 'coverton.core :file "coverton.jar"}
                sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets" #"namen\.js"}}
                aot   {:namespace #{'coverton.core}}
-               reload {:on-jsload coverton.core/reload}
+               ;;reload {:on-jsload coverton.core/reload}
                cljs  { ;;:ids #{"public/coverton"}
                       :compiler-options {:output-to  "public/coverton.js"
                                          :output-dir "public/out"
                                          :asset-path "out"
-                                         ;;:preloads   '[coverton.dev]
+                                         :main 'coverton.core
                                          :parallel-build true
                                          :foreign-libs  [{:file        "src/js/jsutils.js"
                                                           :provides    ["jsutils"]
