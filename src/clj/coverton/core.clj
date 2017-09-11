@@ -2,7 +2,7 @@
   (:require [ring.middleware.resource        :refer [wrap-resource]]
             [ring.middleware.content-type    :refer [wrap-content-type]]
             [ring.middleware.not-modified    :refer [wrap-not-modified]]
-            [ring.middleware.format          :refer [wrap-restful-format] :as ring-format]
+            [ring.middleware.format          :refer [wrap-restful-format]]
             [ring.util.response              :refer [response file-response redirect not-found content-type]]
             [ring.middleware.session         :refer [wrap-session]]
             [ring.middleware.params          :refer [wrap-params]]
@@ -11,20 +11,16 @@
             [compojure.route    :refer [files resources]]
             [compojure.response :refer [render]]
 
-            [org.httpkit.server :as server]
-            [taoensso.timbre    :as timbre :refer [info]]
-            [clojure.pprint     :refer [pprint]]
-            [clojure.set        :refer [rename-keys]]
-            [clojure.data.fressian  :as fress]
-            [clojure.java.io    :as io]
-
             [buddy.sign.jwt :as jwt]
             [buddy.auth     :refer [authenticated? throw-unauthorized]]
             [buddy.auth.middleware :refer [wrap-authentication
                                            wrap-authorization]]
 
-            [clojure.set :refer [rename-keys]]
+            [org.httpkit.server    :as server]
+            [taoensso.timbre       :as timbre :refer [info]]
             [clojure.data.fressian :as fress]
+            [clojure.java.io       :as io]
+            [clojure.set :refer [rename-keys]]
             
             [coverton.auth :refer [auth-backend login]]
             [coverton.util :refer [ok bad-request]]
@@ -38,13 +34,17 @@
 (defonce state (atom nil))
 
 
-(defn save-cover [req]
-    (let [cover (get-in req [:body :cover])
-          cover-id (or (:cover-id cover) magic-id) ;;fixme
-          cover    (assoc cover :cover-id cover-id)]
-      (info (db/add-data {:cover/id cover-id
-                          :cover/data (.array (fress/write cover))}))
-      (response {:cover-id cover-id})))
+(defn save-cover [{{:keys [cover]} :params :as request}]
+  (let [{:keys [author cover-id]} cover
+        cover-id (or cover-id magic-id) ;;fixme: generate new
+        cover    (-> cover
+                     assoc :cover-id cover-id)]
+    (info
+     (db/add-data {:cover/id cover-id
+                   :cover/author {:user/username author}
+                   :cover/data (.array (fress/write cover))}))
+    
+    (ok {:cover-id cover-id})))
 
 
 (defn get-cover [req]
@@ -52,7 +52,7 @@
         _        (info "getting" cover-id)
         cover    (db/get-cover cover-id)]
     (if (:cover/data cover)
-      (response (fress/read (:cover/data cover)))
+      (ok (fress/read (:cover/data cover)))
       (not-found (str cover-id)))))
 
 
@@ -75,13 +75,7 @@
   (POST "/get-cover"  [] get-cover)
 
   (POST "/get-covers" [] get-covers)
-  (POST "/login"  [] login)
-  
-  ;;(GET  "/devcards"   [] (devcards))
-  
-  ;;(GET  "/wordizer"   [] (namen/frontend))
-  #_(GET  "/generate"   xs (json/generate-string
-                            (namen/generate (-> xs :params :words vals))))
+  (POST "/login"      [] login)
   
   (files     "/" {:root "."}) ;; to serve static resources
   (resources "/" {:root "."}) ;; to serve anything else
@@ -111,6 +105,7 @@
     (wrap-restful-format $ {:formats [:transit-json]})
     (wrap-params         $)
     (wrap-resource       $ "public")
+    (wrap-content-type   $)
     (wrap-info-response  $)))
 
 

@@ -1,5 +1,5 @@
 import Draggable from 'react-draggable';
-import Resizable from 'react-resizable-box';
+import Resizable from 're-resizable';
 import { SliderPicker } from 'react-color';
 
 window.deps = {

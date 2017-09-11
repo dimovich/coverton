@@ -38,6 +38,7 @@ body {
 }
 
 .index {
+    position: relative;
     text-align: center;
 }
 
@@ -268,4 +269,10 @@ body {
 
 
 .slider-picker {
+}
+
+.auth-box {
+    position: absolute;
+    right: 0;
+    top: 0;
 }

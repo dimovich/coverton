@@ -4,10 +4,14 @@
 
 
 (reg-sub
+ ::db
+ (fn [db _]
+   db))
+
+(reg-sub
  ::index
  (fn [db _]
    (:index db)))
-
 
 (reg-sub
  ::panel-stack

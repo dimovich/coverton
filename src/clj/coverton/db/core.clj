@@ -2,12 +2,16 @@
   (:require [clojure.core.async :refer [<!!]]
             [datomic.client     :as    client]
             [clojure.pprint     :refer [pprint]]
+            [buddy.hashers      :as hashers]
             [taoensso.timbre    :refer [info]]
-            [coverton.db.schema :refer [cover-schema mark-schema sample-data]]))
+            [coverton.db.schema :refer [cover-schema mark-schema user-schema sample-data]]))
 
 
 (def db-state (atom {}))
 
+(def users [{:username "dimovich"
+             :password (hashers/derive "secret")
+             :email   "some@random.com"}])
 
 (defn random-uuid []
   (java.util.UUID/randomUUID))
@@ -33,18 +37,6 @@
     (let [conn (connect)]
       (swap! db-state assoc :conn conn)
       conn)))
-
-
-
-(defn init []
-  (let [schema (concat cover-schema) ;;mark-schema
-        conn (get-connection)]
-    (swap! db-state assoc :conn conn)
-    (<!! (client/transact conn {:tx-data schema}))
-
-    (info "db initialized")
-    
-    conn))
 
 
 (defn current-db []
@@ -119,6 +111,18 @@
          <!!
          ffirst)))
 
+
+
+(defn init []
+  ;;schema
+  (-> (concat cover-schema user-schema)
+      add-data)
+
+  ;;users
+  (doall (map add-user users))
+  
+  (info "db initialized")
+  (get-connection))
 
 
 

@@ -34,8 +34,8 @@
                  [org.clojure/core.async "0.3.443"]
                  [org.clojure/data.fressian "0.2.1"]
 
-                 [namen "0.1.0"]
-                 [cheshire "5.6.3"]
+                 ;;                 [namen "0.1.0"]
+                 ;;                 [cheshire "5.6.3"]
 
                  ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
 

@@ -1,5 +1,5 @@
 (ns coverton.index.events
-  (:require [re-frame.core :as rf :refer [reg-event-db path trim-v reg-event-fx]]
+  (:require [re-frame.core :as rf :refer [reg-event-db path trim-v reg-event-fx dispatch]]
             [coverton.index.db :refer [default-value]]
             [taoensso.timbre :refer-macros [info]]
             [coverton.ajax.events :as ajax-evt]))

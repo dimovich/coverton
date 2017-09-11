@@ -50,25 +50,25 @@
                     :db/cardinality :db.cardinality/one
                     :db/doc "Cover fressian data"}
 
-                   ;;TODO: add user ref
+                   {:db/ident :cover/author
+                    :db/valueType :db.type/ref
+                    :db/cardinality :db.cardinality/one
+                    :db/doc "Cover author"}
+
+                   {:db/ident :cover/image-url
+                    :db/valueType :db.type/string
+                    :db/cardinality :db.cardinality/one
+                    :db/doc "Cover image url"}
+
+                   {:db/ident :cover/tags
+                    :db/valueType :db.type/string
+                    :db/cardinality :db.cardinality/many
+                    :db/fulltext true
+                    :db/doc "Cover tags"}
+
 
                    #_(
-                      {:db/ident :cover/author
-                       :db/valueType :db.type/ref
-                       :db/cardinality :db.cardinality/one
-                       :db/doc "Cover author"}
-
-                      {:db/ident :cover/image-url
-                       :db/valueType :db.type/string
-                       :db/cardinality :db.cardinality/one
-                       :db/doc "Cover image url"}
-
-                      {:db/ident :cover/tags
-                       :db/valueType :db.type/string
-                       :db/cardinality :db.cardinality/many
-                       :db/fulltext true
-                       :db/doc "Cover tags"}
-
+                      
                       {:db/ident :cover/marks
                        :db/valueType :db.type/ref
                        :db/cardinality :db.cardinality/many

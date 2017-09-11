@@ -1,5 +1,5 @@
 (ns coverton.ed.events
-  (:require [re-frame.core  :as rf :refer [reg-event-db path trim-v dispatch dispatch-sync]]
+  (:require [re-frame.core  :as rf :refer [reg-event-db path trim-v dispatch dispatch-sync reg-event-fx]]
             [coverton.ed.db :refer [default-db]]
             [taoensso.timbre :refer-macros [info]]
             [coverton.ajax.events :as ajax-evt]

@@ -4,7 +4,6 @@
             [coverton.index.events :as evt]
             [coverton.index.subs   :as sub]
             [coverton.ed.views     :as ed]
-            [coverton.ed.subs      :as ed-sub]
             [coverton.components   :as cc]
             [coverton.util         :refer [info]]
             [coverton.db.schema    :refer [magic-id]]))
@@ -31,12 +30,13 @@
 
 
 (defn auth-box []
-  (if @(subscribe [::sub/authenticated?])
-    [:input {:type :button
-             :value "Logout"
-             :on-click #(dispatch [::evt/logout])}]
+  [:div.auth-box
+   (if @(subscribe [::sub/authenticated?])
+     [:input {:type :button
+              :value "Logout"
+              :on-click #(dispatch [::evt/logout])}]
        
-    [login-form]))
+     [login-form])])
 
 
 
@@ -65,4 +65,5 @@
          "is coming soon."]]
        
        [:br] [:br]
-       [:div (str @(subscribe [::sub/db]))]])))
+       [:div {:style {:text-align :left}}
+        (str @(subscribe [::sub/db]))]])))
