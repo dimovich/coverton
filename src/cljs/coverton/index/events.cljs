@@ -26,26 +26,14 @@
 
 
 (reg-event-db
- ::push-panel
- panel-interceptors
- (fn [panels [p]]
-   (list* p panels)))
+ ::set-page
+ index-interceptors
+ (fn [db [k]]
+   (assoc db :page k)))
 
 
-(reg-event-db
- ::pop-panel
- panel-interceptors
- (fn [panels _]
-   (rest panels)))
-
-
-(defn push-panel [p]
-  (dispatch [::push-panel p]))
-
-
-(defn pop-panel []
-  (dispatch [::pop-panel]))
-
+(defn set-page [k]
+  (dispatch [::set-page k]))
 
 
 (reg-event-fx

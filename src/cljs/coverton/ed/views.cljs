@@ -7,6 +7,7 @@
             [coverton.components  :as cc]
             [coverton.ed.events   :as evt]
             [coverton.ed.subs     :as sub]
+            [coverton.ajax.events :as ajax-evt]
             [coverton.util        :refer [info]]
             [coverton.index.events :as evt-index]))
 
@@ -124,19 +125,11 @@
 
 
 (defn save-cover [cover]
-  (POST "/save-cover" {:handler (fn [res]
-                                  (evt/set-cover-id (:cover-id res))
-                                  (info res))
-                       :error-handler #(.log js/console (str %))
-                       :params {:cover cover}}))
+  (dispatch [::evt/save-cover cover]))
 
 
 (defn get-cover [id]
-  (POST "/get-cover" {:handler (fn [cover]
-                                 (info cover)
-                                 (evt/initialize cover))
-                      :error-handler #(info %)
-                      :params {:id id}}))
+  (dispatch [::evt/get-cover id]))
 
 
 
@@ -175,7 +168,7 @@
       [cc/Button {:on-click #(evt/initialize cover)}
        "Reset"]
 
-      [cc/Button {:on-click #(evt-index/pop-panel)}
+      [cc/Button {:on-click #(evt-index/set-page :index)}
        "Close"]]
 
 

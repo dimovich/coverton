@@ -90,6 +90,13 @@
 
 
 
+(reg-event-db
+ ::set-cover-id
+ cover-interceptors
+ (fn [db [res]]
+   (assoc db :cover-id (:cover-id res))))
+
+
 ;;editor
 (reg-event-fx
  ::save-cover
@@ -97,7 +104,18 @@
    {:dispatch
     [::ajax-evt/request-auth {:method :post
                               :uri "/save-cover"
-                              :params cover}]}))
+                              :params cover
+                              :on-success [::set-cover-id]}]}))
+
+
+(reg-event-fx
+ ::get-cover
+ (fn [_ [_ id]]
+   {:dispatch
+    [::ajax-evt/request-auth {:method :post
+                              :uri "/get-cover"
+                              :params {:id id}
+                              :on-success [::initialize]}]}))
 
 
 
@@ -113,10 +131,6 @@
 
 (defn remove-mark [id]
   (dispatch [::remove-mark id]))
-
-
-(defn set-cover-id [id]
-  (dispatch [::update-cover [:cover-id] id]))
 
 
 (defn set-size [size]

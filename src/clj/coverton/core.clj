@@ -34,26 +34,29 @@
 (defonce state (atom nil))
 
 
-(defn save-cover [{{:keys [cover]} :params :as request}]
-  (let [{:keys [author cover-id]} cover
-        cover-id (or cover-id magic-id) ;;fixme: generate new
-        cover    (-> cover
-                     assoc :cover-id cover-id)]
-    (info
-     (db/add-data {:cover/id cover-id
-                   :cover/author {:user/username author}
-                   :cover/data (.array (fress/write cover))}))
+(defn save-cover [{{:keys [cover-id] :as cover} :params :as request}]
+  (if (authenticated? request)
+    (let [author (:username (:identity request))
+          cover-id (or cover-id magic-id) ;;fixme: generate new
+          cover    (-> cover
+                       (assoc :cover-id cover-id))]
+
+      (db/add-data {:cover/id cover-id
+                    :cover/author author
+                    :cover/data (.array (fress/write cover))})
     
-    (ok {:cover-id cover-id})))
+      (ok {:cover-id cover-id}))
+    
+    (throw-unauthorized)))
 
 
-(defn get-cover [req]
-  (let [cover-id (get-in req [:body :id])
-        _        (info "getting" cover-id)
-        cover    (db/get-cover cover-id)]
+
+(defn get-cover [{{id :id} :params}]
+  (let [_    (info "getting" id)
+        cover    (db/get-cover id)]
     (if (:cover/data cover)
       (ok (fress/read (:cover/data cover)))
-      (not-found (str cover-id)))))
+      (not-found (str id)))))
 
 
 
@@ -71,7 +74,7 @@
   (GET  "/"           [] (static-promo))
   (GET  "/index"      [] (index))
 
-  ;;(POST "/save-cover" [] save-cover)
+  (POST "/save-cover" [] save-cover)
   (POST "/get-cover"  [] get-cover)
 
   (POST "/get-covers" [] get-covers)

@@ -5,36 +5,34 @@
             [coverton.index.subs   :as sub]
             [coverton.ed.views     :as ed]
             [coverton.components   :as cc]
-            [coverton.util         :refer [info]]
-            [coverton.db.schema    :refer [magic-id]]))
+            [coverton.db.schema    :refer [magic-id]]
+            [taoensso.timbre :refer-macros [info]]))
 
 
 
 (defn login-form []
-  (r/with-let [state (r/atom {:user "" :pass ""})] 
+  (r/with-let [state (r/atom {:username "" :password ""})] 
     [:form
-     [:input {:type :text
-              :placeholder "Username:"
-              :value (:user @state)
-              :on-change #(swap! state assoc :user (.. % -target -value))}]
+     [cc/Input {:placeholder "Username:"
+                :value (:username @state)
+                :on-change #(swap! state assoc :username (.. % -target -value))}]
      
-     [:input {:type :password
-              :placeholder "Password:"
-              :value (:pass @state)
-              :on-change #(swap! state assoc :pass (.. % -target -value))}]
+     [cc/Input {:type :password
+                :placeholder "Password:"
+                :value (:password @state)
+                :on-change #(swap! state assoc :password (.. % -target -value))}]
      
-     [:input {:type "button"
-              :value "Submit"
-              :on-click #(dispatch [::evt/login @state])}]]))
+     [cc/Button {:type :button
+                 :on-click #(dispatch [::evt/login @state])}
+      "Login"]]))
 
 
 
 (defn auth-box []
   [:div.auth-box
    (if @(subscribe [::sub/authenticated?])
-     [:input {:type :button
-              :value "Logout"
-              :on-click #(dispatch [::evt/logout])}]
+     [cc/Button {:on-click #(dispatch [::evt/logout])}
+      "Logout"]
        
      [login-form])])
 
@@ -42,16 +40,16 @@
 
 
 (defn index []
-  (r/with-let [_            (dispatch-sync [::evt/initialize])
-               active-panel (subscribe [::sub/active-panel])]
+  (r/with-let [_     (dispatch-sync [::evt/initialize])
+               page  (subscribe [::sub/page])]
 
-    (condp = @active-panel
+    (condp = @page
       ;; Editor
       :ed [ed/editor {:cover {}}]
 
       ;; Index
       [:div.index
-       [cc/Button {:on-click #(evt/push-panel :ed)}
+       [cc/Button {:on-click #(evt/set-page :ed)}
         "Editor"]
        
        [auth-box]
@@ -64,6 +62,7 @@
          [:br]
          "is coming soon."]]
        
-       [:br] [:br]
-       [:div {:style {:text-align :left}}
-        (str @(subscribe [::sub/db]))]])))
+       #_( [:br] [:br]
+          [:div {:style {:text-align :left
+                         :font-size :18}}
+           (str @(subscribe [::sub/db]))])])))

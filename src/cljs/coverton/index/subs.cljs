@@ -14,18 +14,10 @@
    (:index db)))
 
 (reg-sub
- ::panel-stack
+ ::page
  :<- [::index]
  (fn [db _]
-   (:panel-stack db)))
-
-
-(reg-sub
- ::active-panel
- :<- [::panel-stack]
- (fn [panels _]
-   (first panels)))
-
+   (:page db)))
 
 (reg-sub
  ::authenticated?

@@ -8,7 +8,8 @@
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [clj-time.core      :as time]
             [coverton.util      :refer [ok bad-request]]
-            [taoensso.timbre    :refer [info]]))
+            [taoensso.timbre    :refer [info]]
+            [coverton.db.core   :refer [get-user]]))
 
 
 
@@ -16,19 +17,16 @@
                 (codecs/bytes->hex)))
 
 
-(def authdata
-  {:admin (hashers/derive "secret")})
-
-
-
-(defn login [{{:keys [user pass]} :params :as request}]
+(defn login [{{:keys [username password]} :params :as request}]
   (info "login" request)
 
-  (let [valid? (some-> authdata
-                       (get (keyword user))
-                       #(hashers/check pass %))]
+  (let [user  (get-user username)
+        _ (info "trying: " user)
+        valid? (some-> user
+                       (get :user/password)
+                       #(hashers/check password %))]
     (if valid?
-      (let [claims {:user (keyword user)
+      (let [claims {:username username
                     :exp  (time/plus (time/now) (time/seconds 3600))}
             token (jwt/sign claims secret {:alg :hs512})]
 

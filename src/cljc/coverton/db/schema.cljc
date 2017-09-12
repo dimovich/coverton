@@ -50,8 +50,9 @@
                     :db/cardinality :db.cardinality/one
                     :db/doc "Cover fressian data"}
 
+                   
                    {:db/ident :cover/author
-                    :db/valueType :db.type/ref
+                    :db/valueType :db.type/string
                     :db/cardinality :db.cardinality/one
                     :db/doc "Cover author"}
 
@@ -112,28 +113,28 @@
 
 
 
-(def sample-data
-  [{:cover/image-url "assets/img/coverton.jpg"
-    :cover/tags ["sea" "boat" "depth" "children"]
-    :cover/size [400 400]
-    :cover/marks  [{:mark/type :text
-                    :mark/text "Hello"
-                    :mark/pos [0 0]
-                    :mark/font-size 50
-                    :mark/font-family "GothaPro"}
+#_(def sample-data
+    [{:cover/image-url "assets/img/coverton.jpg"
+      :cover/tags ["sea" "boat" "depth" "children"]
+      :cover/size [400 400]
+      :cover/marks  [{:mark/type :text
+                      :mark/text "Hello"
+                      :mark/pos [0 0]
+                      :mark/font-size 50
+                      :mark/font-family "GothaPro"}
                                     
-                   {:mark/type :text
-                    :mark/text "Friend"
-                    :mark/pos [50 60]
-                    :mark/font-size 50
-                    :mark/font-family "GothaPro"}
+                     {:mark/type :text
+                      :mark/text "Friend"
+                      :mark/pos [50 60]
+                      :mark/font-size 50
+                      :mark/font-family "GothaPro"}
 
-                   {:mark/type :svg
-                    :mark/url "assets/svg/paranoid.svg"
-                    :mark/pos [80 80]}
+                     {:mark/type :svg
+                      :mark/url "assets/svg/paranoid.svg"
+                      :mark/pos [80 80]}
                                     
-                   {:mark/text "What's up?"
-                    :mark/type :text
-                    :mark/pos [30 50]
-                    :mark/font-size 50
-                    :mark/font-family "GothaPro"}]}])
+                     {:mark/text "What's up?"
+                      :mark/type :text
+                      :mark/pos [30 50]
+                      :mark/font-size 50
+                      :mark/font-family "GothaPro"}]}])

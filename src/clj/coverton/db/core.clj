@@ -4,7 +4,7 @@
             [clojure.pprint     :refer [pprint]]
             [buddy.hashers      :as hashers]
             [taoensso.timbre    :refer [info]]
-            [coverton.db.schema :refer [cover-schema mark-schema user-schema sample-data]]))
+            [coverton.db.schema :refer [cover-schema mark-schema user-schema magic-id]]))
 
 
 (def db-state (atom {}))
@@ -45,10 +45,10 @@
 
 
 (defn add-data [data]
-  (let [data (if (vector? data) data [data])]
-    (-> (get-connection)
-        (client/transact {:tx-data data})
-        <!!)))
+  (let [data (if (sequential? data) data [data])]
+    (info (-> (get-connection)
+              (client/transact {:tx-data data})
+              <!!))))
 
 
 
@@ -95,7 +95,7 @@
   (-> [{:user/username username
         :user/password password
         :user/email email}]
-      (add-data)))
+      add-data))
 
 
 
@@ -106,7 +106,7 @@
                    :in $ ?name
                    :where
                    [?e :user/username ?name]]
-          :args [db name]}
+          :args [db username]}
          (client/q conn)
          <!!
          ffirst)))
@@ -149,3 +149,6 @@
 ;; continuous saving
 
 ;; bin/run -m datomic.peer-server -h localhost -p 8998 -a admin,admin -d hello,datomic:mem://hello
+
+
+;;(d/transact conn [{:db/id order-id :order/lineItems [{:lineItem/product chocolate :lineItem/quantity 1} {:lineItem/product whisky :lineItem/quantity 2}]}]
