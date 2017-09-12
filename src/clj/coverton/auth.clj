@@ -9,7 +9,7 @@
             [clj-time.core      :as time]
             [coverton.util      :refer [ok bad-request]]
             [taoensso.timbre    :refer [info]]
-            [coverton.db.core   :refer [get-user]]))
+            [coverton.db.core   :as db]))
 
 
 
@@ -20,11 +20,10 @@
 (defn login [{{:keys [username password]} :params :as request}]
   (info "login" request)
 
-  (let [user  (get-user username)
-        _ (info "trying: " user)
-        valid? (some-> user
-                       (get :user/password)
-                       #(hashers/check password %))]
+  (let [valid? (some->> username
+                        db/get-user
+                        :user/password
+                        (hashers/check password))]
     (if valid?
       (let [claims {:username username
                     :exp  (time/plus (time/now) (time/seconds 3600))}
