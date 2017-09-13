@@ -137,10 +137,11 @@
 
 
 (defn save-cover [cover]
-  (when-let [file (form-data :#image-input)] ;;todo: check if already uploaded
+  (if-let [file (form-data :#image-input)] ;;todo: check if already uploaded
     (dispatch [::evt/upload-file file
-               {:on-success [::evt/set-image-url]}]))
-  (dispatch [::evt/save-cover cover]))
+               {:on-success [::evt/save-cover cover]}])
+    
+    (dispatch [::evt/save-cover cover]))  )
 
 
 

@@ -25,19 +25,27 @@
 
 
 
+(defn merge-props [res new]
+  (if (map? res)
+    (merge-with merge-props res new)
+    new))
+
+
+(defn merge-db [db [m]]
+  (merge-with merge-props db m))
+
+
 (reg-event-db
  ::update
  ed-interceptors
- (fn [db [ks v]]
-   (assoc-in db ks v)))
+ merge-db)
 
 
 
 (reg-event-db
  ::update-cover
  cover-interceptors
- (fn [db [ks v]]
-   (assoc-in db ks v)))
+ merge-db)
 
 
 
@@ -91,6 +99,14 @@
 
 
 (reg-event-db
+ ::update-marks
+ marks-interceptors
+ merge-db)
+
+
+
+
+(reg-event-db
  ::set-cover-id
  cover-interceptors
  (fn [db [res]]
@@ -103,7 +119,7 @@
 
 
 (defn set-active-mark [id]
-  (dispatch [::update-cover [:active-mark] id]))
+  (dispatch [::update-cover {:active-mark id}]))
 
 
 (defn add-mark [m]
@@ -115,11 +131,11 @@
 
 
 (defn set-size [size]
-  (dispatch [::update-cover [:size] size]))
+  (dispatch [::update-cover {:size size}]))
 
 
 (defn set-image-url [url]
-  (dispatch [::update-cover [:image-url] url]))
+  (dispatch [::update-cover {:image-url url}]))
 
 
 (defn set-pos [id pos]
@@ -134,8 +150,8 @@
 
 
 (defn set-font-family [id family]
-  (dispatch [::update-mark id [:font-family] family])
-  (dispatch [::update-cover [:font :font-family] family]))
+  (dispatch [::update-marks {id {:font-family family}}])
+  (dispatch [::update-cover {:font {:font-family family}}]))
 
 
 
@@ -143,32 +159,32 @@
   #_(dispatch [::update-cover {:font {:color color}
                                :marks {id {:color color}}}])
 
-  (dispatch [::update-mark id [:color] color])
-  (dispatch [::update-cover [:font :color] color]))
+  (dispatch [::update-marks {id {:color color}}])
+  (dispatch [::update-cover {:font {:color color}}]))
 
 
 (defn set-ref [id ref]
-  (dispatch [::update-mark id [:ref] ref]))
+  (dispatch [::update-marks {id {:ref ref}}]))
 
 
 (defn set-text [id text]
-  (dispatch [::update-mark id [:text] text]))
+  (dispatch [::update-marks {id {:text text}}]))
 
 
 (defn set-mark-static [id static]
-  (dispatch [::update-mark id [:static] static]))
+  (dispatch [::update-marks {id {:static static}}]))
 
 
 (defn set-dimmer [panel]
-  (dispatch [::update [:dimmer] panel]))
+  (dispatch [::update {:dimmer panel}]))
 
 
 (defn save-mark-offset [x y]
-  (dispatch [::update-cover [:mark-offset]  [x y]]))
+  (dispatch [::update-cover {:mark-offset  [x y]}]))
 
 
 (defn set-mark-read-only [id read-only?]
-  (dispatch [::update-mark id [:read-only?] read-only?]))
+  (dispatch [::update-marks {id {:read-only? read-only?}}]))
 
 
 (defn initialize [cover]
@@ -178,12 +194,13 @@
 ;;editor
 (reg-event-fx
  ::save-cover
- (fn [_ [_ cover]]
-   {:dispatch
-    [::ajax-evt/request-auth {:method :post
-                              :uri "/save-cover"
-                              :params cover
-                              :on-success [::set-cover-id]}]}))
+ (fn [_ [_ cover & props]]
+   (let [cover (merge-db cover props)]
+     {:dispatch
+      [::ajax-evt/request-auth {:method :post
+                                :uri "/save-cover"
+                                :params cover
+                                :on-success [::update-cover]}]})))
 
 
 (reg-event-fx
@@ -212,4 +229,4 @@
 (reg-event-fx
  ::set-image-url
  (fn [_ [_ {url :image-url}]]
-   {:dispatch [::update-cover [:image-url] url]}))
+   {:dispatch [::update-cover {:image-url url}]}))

@@ -43,3 +43,13 @@
 
 
 
+
+
+
+
+
+
+(defn merge-props [res new]
+  (if (map? res)
+    (merge-with merge res new)
+    new))
