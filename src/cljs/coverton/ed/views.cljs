@@ -179,3 +179,7 @@
 
      [cc/color-picker]]))
 
+
+
+
+;;https://github.com/theophilusx/file-upload/blob/master/src/cljs/file_upload/core.cljs

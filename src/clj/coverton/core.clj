@@ -71,8 +71,8 @@
   (ok covers-sample))
 
 
-(defn upload-file [{params :params}]
-  (info (keys params)))
+(defn upload-file [req]
+  (info (keys req)))
 
 
 (defroutes handler
@@ -85,7 +85,7 @@
   (POST "/get-covers" [] get-covers)
   (POST "/login"      [] login)
 
-  (POST "/upload-file" [] upload-file)
+  (POST "/upload-file" [file] (upload-file file))
   
   (files     "/" {:root "."}) ;; to serve static resources
   (resources "/" {:root "."}) ;; to serve anything else

@@ -199,4 +199,5 @@
    {:dispatch
     [::ajax-evt/request-raw-auth {:method :post
                                   :uri "/upload-file"
-                                  :body data}]}))
+                                  :body data
+                                  :headers {"Content-Type" "multipart/form-data"}}]}))

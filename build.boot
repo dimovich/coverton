@@ -83,7 +83,8 @@
                serve {:resource-root "target/public"
                       :handler 'coverton.core/app
                       :reload  true
-                      :httpkit true})
+                      :httpkit true
+                      :init 'coverton.core/init})
 
 
 (deftask production
