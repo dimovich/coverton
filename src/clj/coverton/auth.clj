@@ -13,12 +13,11 @@
 
 
 
-(def secret (-> (nonce/random-bytes 32)
-                (codecs/bytes->hex)))
+(defonce secret (-> (nonce/random-bytes 32)
+                    (codecs/bytes->hex)))
 
 
 (defn login [{{:keys [username password]} :params :as request}]
-  (info "login" request)
 
   (let [valid? (some->> username
                         db/get-user

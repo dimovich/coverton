@@ -6,7 +6,8 @@
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]
             [coverton.ed.subs   :as sub]
-            [jsutils]))
+;;            [jsutils]
+            ))
 
 
 (def react-drag   (arc "deps" "draggable"))
@@ -51,10 +52,12 @@
 
         enable-static  #(do
                           (evt/set-mark-read-only id true)
-                          (reset! caret-pos (jsutils/getCaretPosition id)))
+                          ;;(reset! caret-pos (jsutils/getCaretPosition id))
+                          )
         disable-static #(do ;;fixme doesn't focus
                           (evt/set-mark-read-only id false)
-                          (jsutils/setCaretPosition id @caret-pos))]
+                          ;;(jsutils/setCaretPosition id @caret-pos)
+                          )]
     
     (r/create-class
      {:display-name "autosize-input"

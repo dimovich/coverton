@@ -97,25 +97,6 @@
    (assoc db :cover-id (:cover-id res))))
 
 
-;;editor
-(reg-event-fx
- ::save-cover
- (fn [_ [_ cover]]
-   {:dispatch
-    [::ajax-evt/request-auth {:method :post
-                              :uri "/save-cover"
-                              :params cover
-                              :on-success [::set-cover-id]}]}))
-
-
-(reg-event-fx
- ::get-cover
- (fn [_ [_ id]]
-   {:dispatch
-    [::ajax-evt/request-auth {:method :post
-                              :uri "/get-cover"
-                              :params {:id id}
-                              :on-success [::initialize]}]}))
 
 
 
@@ -188,3 +169,34 @@
 
 (defn initialize [cover]
   (dispatch-sync [::initialize cover]))
+
+
+;;editor
+(reg-event-fx
+ ::save-cover
+ (fn [_ [_ cover]]
+   {:dispatch
+    [::ajax-evt/request-auth {:method :post
+                              :uri "/save-cover"
+                              :params cover
+                              :on-success [::set-cover-id]}]}))
+
+
+(reg-event-fx
+ ::get-cover
+ (fn [_ [_ id]]
+   {:dispatch
+    [::ajax-evt/request-auth {:method :post
+                              :uri "/get-cover"
+                              :params {:id id}
+                              :on-success [::initialize]}]}))
+
+
+
+(reg-event-fx
+ ::upload-file
+ (fn [_ [_ data]]
+   {:dispatch
+    [::ajax-evt/request-raw-auth {:method :post
+                                  :uri "/upload-file"
+                                  :body data}]}))

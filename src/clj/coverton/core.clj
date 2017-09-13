@@ -6,6 +6,7 @@
             [ring.util.response              :refer [response file-response redirect not-found content-type]]
             [ring.middleware.session         :refer [wrap-session]]
             [ring.middleware.params          :refer [wrap-params]]
+            [ring.middleware.multipart-params :refer [wrap-multipart-params]]
 
             [compojure.core     :refer [defroutes GET POST]]
             [compojure.route    :refer [files resources]]
@@ -41,6 +42,8 @@
           cover    (-> cover
                        (assoc :cover-id cover-id))]
 
+      (info "adding data...")
+      
       (db/add-data {:cover/id cover-id
                     :cover/author author
                     :cover/data (.array (fress/write cover))})
@@ -68,6 +71,8 @@
   (ok covers-sample))
 
 
+(defn upload-file [{params :params}]
+  (info (keys params)))
 
 
 (defroutes handler
@@ -79,6 +84,8 @@
 
   (POST "/get-covers" [] get-covers)
   (POST "/login"      [] login)
+
+  (POST "/upload-file" [] upload-file)
   
   (files     "/" {:root "."}) ;; to serve static resources
   (resources "/" {:root "."}) ;; to serve anything else
@@ -107,9 +114,11 @@
     (wrap-authentication $ auth-backend)
     (wrap-restful-format $ {:formats [:transit-json]})
     (wrap-params         $)
+    (wrap-multipart-params $)
     (wrap-resource       $ "public")
     (wrap-content-type   $)
-    (wrap-info-response  $)))
+    ;;(wrap-info-response  $)
+    ))
 
 
 
@@ -137,3 +146,7 @@
 #_(rename-keys cover->db-map)
 #_(update-in [:cover/marks]
              #(map (fn [m] (rename-keys m mark->db-map)) %))
+
+
+
+;; https://zaiste.net/posts/file_uploads_in_a_clojure_web_application_using_compojure/

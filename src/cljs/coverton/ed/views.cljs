@@ -68,8 +68,8 @@
 (defn handle-add-mark [pos]
   (let [id (random-uuid)
         sid (str id)]
-    (evt/add-mark (merge {:pos     pos
-                          :mark-id id}))
+    (evt/add-mark {:pos     pos
+                   :mark-id id})
     (evt/set-active-mark sid)))
 
 

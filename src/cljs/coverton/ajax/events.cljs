@@ -33,7 +33,7 @@
    {:http-xhrio (-> {:method          :get
                      :on-success      [::good-response]
                      :on-failure      [::bad-response]
-                     :format          (ajax/transit-request-format)
+                     ;; :format          (ajax/transit-request-format)
                      :response-format (ajax/transit-response-format)}
                     
                     (merge m))}))
@@ -46,6 +46,15 @@
    {:dispatch
     [::request (-> {:interceptors [token-ajax-interceptor]}
                    (merge m))]}))
+
+
+(reg-event-fx
+ ::request-raw-auth
+ ajax-interceptors
+ (fn [_ [m]]
+   {:dispatch
+    [::request-auth (-> {:response-format (ajax/raw-response-format)}
+                        (merge m))]}))
 
 
 (reg-event-db
