@@ -15,3 +15,8 @@
 
 (defn ok [d]          {:status 200 :body d})
 (defn bad-request [d] {:status 400 :body d})
+
+
+
+(defn random-uuid []
+  (java.util.UUID/randomUUID))

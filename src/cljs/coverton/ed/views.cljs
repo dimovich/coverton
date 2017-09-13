@@ -124,8 +124,24 @@
 
 
 
+(defn form-data [id]
+  (when-let [file (some->
+                   (sel1 id)
+                   .-files
+                   (aget 0))]
+    (doto
+        (js/FormData.)
+        (.append "file" file))))
+
+
+
+
 (defn save-cover [cover]
+  (when-let [file (form-data :#image-input)] ;;todo: check if already uploaded
+    (dispatch [::evt/upload-file file
+               {:on-success [::evt/set-image-url]}]))
   (dispatch [::evt/save-cover cover]))
+
 
 
 (defn get-cover [id]
@@ -140,7 +156,8 @@
    [:input#image-input
     {:type "file"
      :accept "image/*"
-     :style {:display :none}
+     :style {:display :none
+             :position :inline-block}
      :on-change #(evt/set-image-url
                   (.createObjectURL js/URL (-> % .-target .-files (aget 0))))}]])
 
@@ -158,6 +175,11 @@
      [:div.editor-toolbar-top
 
       [image-picker-button]
+
+      [cc/Button {:on-click #(dispatch [::evt/upload-file
+                                        (form-data :#image-input)
+                                        {:on-success [::evt/set-image-url]}])}
+       "Send"]
       
       [cc/Button {:on-click #(save-cover (sub/export-cover))}
        "Save"]

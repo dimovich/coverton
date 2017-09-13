@@ -138,7 +138,11 @@
   (dispatch [::update-cover [:font :font-family] family]))
 
 
+
 (defn set-color [id color]
+  #_(dispatch [::update-cover {:font {:color color}
+                               :marks {id {:color color}}}])
+
   (dispatch [::update-mark id [:color] color])
   (dispatch [::update-cover [:font :color] color]))
 
@@ -195,9 +199,17 @@
 
 (reg-event-fx
  ::upload-file
- (fn [_ [_ data]]
-   {:dispatch
-    [::ajax-evt/request-raw-auth {:method :post
-                                  :uri "/upload-file"
-                                  :body data
-                                  :headers {"Content-Type" "multipart/form-data"}}]}))
+ (fn [_ [_ data & [args]]]
+   (when data
+     {:dispatch
+      [::ajax-evt/request-auth (-> {:method :post
+                                    :uri "/upload-file"
+                                    :body data}
+                                   (merge args))]})))
+
+
+
+(reg-event-fx
+ ::set-image-url
+ (fn [_ [_ {url :image-url}]]
+   {:dispatch [::update-cover [:image-url] url]}))

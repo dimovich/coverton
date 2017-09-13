@@ -4,7 +4,8 @@
             [clojure.pprint     :refer [pprint]]
             [buddy.hashers      :as hashers]
             [taoensso.timbre    :refer [info]]
-            [coverton.db.schema :refer [cover-schema mark-schema user-schema magic-id]]))
+            [coverton.db.schema :refer [cover-schema mark-schema user-schema magic-id]]
+            [coverton.util      :refer [random-uuid]]))
 
 
 (def db-state (atom {}))
@@ -13,8 +14,7 @@
              :password (hashers/derive "secret")
              :email   "some@random.com"}])
 
-(defn random-uuid []
-  (java.util.UUID/randomUUID))
+
 
 
 (defn connect []

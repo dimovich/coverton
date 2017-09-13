@@ -33,7 +33,7 @@
    {:http-xhrio (-> {:method          :get
                      :on-success      [::good-response]
                      :on-failure      [::bad-response]
-                     ;; :format          (ajax/transit-request-format)
+                     :format          (ajax/transit-request-format)
                      :response-format (ajax/transit-response-format)}
                     
                     (merge m))}))

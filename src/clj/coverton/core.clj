@@ -1,5 +1,7 @@
 (ns coverton.core
-  (:require [ring.middleware.resource        :refer [wrap-resource]]
+  (:require [clojure.java.io :as io]
+
+            [ring.middleware.resource        :refer [wrap-resource]]
             [ring.middleware.content-type    :refer [wrap-content-type]]
             [ring.middleware.not-modified    :refer [wrap-not-modified]]
             [ring.middleware.format          :refer [wrap-restful-format]]
@@ -24,7 +26,7 @@
             [clojure.set :refer [rename-keys]]
             
             [coverton.auth :refer [auth-backend login]]
-            [coverton.util :refer [ok bad-request]]
+            [coverton.util :refer [ok bad-request random-uuid]]
             [coverton.templates.index        :refer [index static-promo]]
             [coverton.db.core   :as db]
             [coverton.db.schema :refer [mark->db-map cover->db-map magic-id]])
@@ -71,8 +73,23 @@
   (ok covers-sample))
 
 
-(defn upload-file [req]
-  (info (keys req)))
+
+
+
+(defn handle-upload-file
+  [{{{:keys [filename tempfile]} "file"} :params :as request}]
+  
+  (if (authenticated? request)
+
+    (let [id (random-uuid)
+          path (str "uploads/" id ".jpg")]
+      (io/copy tempfile (io/file path))
+      (ok {:image-url path}))
+    
+    (throw-unauthorized)))
+
+
+
 
 
 (defroutes handler
@@ -85,7 +102,7 @@
   (POST "/get-covers" [] get-covers)
   (POST "/login"      [] login)
 
-  (POST "/upload-file" [file] (upload-file file))
+  (POST "/upload-file" [] handle-upload-file)
   
   (files     "/" {:root "."}) ;; to serve static resources
   (resources "/" {:root "."}) ;; to serve anything else
