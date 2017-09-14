@@ -7,8 +7,6 @@
 
 
 (def index-interceptors        [(path :index)                  trim-v])
-(def panel-interceptors        [(path [:index :panel-stack])   trim-v])
-
 
 
 (reg-event-db

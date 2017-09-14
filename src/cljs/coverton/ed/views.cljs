@@ -8,14 +8,14 @@
             [coverton.ed.events   :as evt]
             [coverton.ed.subs     :as sub]
             [coverton.ajax.events :as ajax-evt]
-            [coverton.util        :refer [info]]
+            [taoensso.timbre :refer-macros [info]]
             [coverton.index.events :as evt-index]))
 
 
 ;; use center of element for position
 ;; how to recover? (in
 
-(defn mark [{:keys [id]}]
+(defn mark [{id :id}]
   (let [text  (subscribe [::sub/mark-text id])
         pos   (subscribe [::sub/mark-pos  id])
         color (subscribe [::sub/color     id])
@@ -85,7 +85,7 @@
 
 
 
-(defn image [{:keys [url]}]
+(defn image [{url :url}]
   (r/with-let [this        (r/current-component)
                update-size (fn [_]
                              (let [el (r/dom-node this)
@@ -141,7 +141,7 @@
     (dispatch [::evt/upload-file file
                {:on-success [::evt/save-cover cover]}])
     
-    (dispatch [::evt/save-cover cover]))  )
+    (dispatch [::evt/save-cover cover])))
 
 
 
@@ -179,7 +179,7 @@
 
       [cc/Button {:on-click #(dispatch [::evt/upload-file
                                         (form-data :#image-input)
-                                        {:on-success [::evt/set-image-url]}])}
+                                        {:on-success [::evt/update-cover]}])}
        "Send"]
       
       [cc/Button {:on-click #(save-cover (sub/export-cover))}
@@ -202,7 +202,3 @@
 
      [cc/color-picker]]))
 
-
-
-
-;;https://github.com/theophilusx/file-upload/blob/master/src/cljs/file_upload/core.cljs

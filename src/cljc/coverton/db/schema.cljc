@@ -4,6 +4,7 @@
 (defonce magic-id #uuid "1d822372-983a-4012-adbc-569f412733fd")
 
 
+
 (defonce cover->db-map
   {:image-url :cover/image-url
    :tags      :cover/tags
@@ -20,7 +21,8 @@
    :font-family :mark/font-family
    :text        :mark/text
    :color       :mark/color
-   :static      :mark/static})
+   :static      :mark/static
+   :read-only?  :mark/read-only?})
 
 
 

@@ -25,10 +25,12 @@
 
 
 
+;;todo: use specter
 (defn merge-props [res new]
   (if (map? res)
     (merge-with merge-props res new)
     new))
+
 
 
 (defn merge-db [db [m]]
@@ -86,17 +88,6 @@
    (dissoc marks id)))
 
 
-(reg-event-db
- ::update-mark
- marks-interceptors
- (fn [marks [id ks v]]
-   (if (and (get marks id)
-            (not= (get-in marks (into [id] ks))
-                  v))
-     (assoc-in marks (into [id] ks) v)
-     marks)))
-
-
 
 (reg-event-db
  ::update-marks
@@ -105,14 +96,11 @@
 
 
 
-
 (reg-event-db
  ::set-cover-id
  cover-interceptors
  (fn [db [res]]
    (assoc db :cover-id (:cover-id res))))
-
-
 
 
 
@@ -143,10 +131,7 @@
 
 
 (defn set-font-size [id fsize]
-  (dispatch [::update-mark-font-size id fsize])
-  ;;use cofx to update default font size
-  ;;(dispatch [::update-cover [:font :font-size] fsize])
-  )
+  (dispatch [::update-mark-font-size id fsize]))
 
 
 (defn set-font-family [id family]
@@ -226,7 +211,18 @@
 
 
 
-(reg-event-fx
- ::set-image-url
- (fn [_ [_ {url :image-url}]]
-   {:dispatch [::update-cover {:image-url url}]}))
+
+
+
+
+
+
+#_(reg-event-db
+   ::update-mark
+   marks-interceptors
+   (fn [marks [id ks v]]
+     (if (and (get marks id)
+              (not= (get-in marks (into [id] ks))
+                    v))
+       (assoc-in marks (into [id] ks) v)
+       marks)))

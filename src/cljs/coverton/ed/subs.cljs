@@ -153,10 +153,15 @@
   (-> @(subscribe [::cover])
       (select-keys (keys cover->db-map))
       (update-in [:marks]
-                 #(reduce (fn [m [k v]]
-                            (assoc m k (select-keys v (keys mark->db-map))))
-                          {}
-                          %))))
+                 #(reduce
+                   (fn [m [k v]]
+                     (assoc m k (select-keys v (keys mark->db-map))))
+                   {}
+                   %))))
+
+
+
+
 
 
 

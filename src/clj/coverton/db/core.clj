@@ -8,12 +8,16 @@
             [coverton.util      :refer [random-uuid]]))
 
 
-(def db-state (atom {}))
+(defonce db-state (atom {}))
 
-(def users [{:username "dimovich"
-             :password (hashers/derive "secret")
-             :email   "some@random.com"}])
 
+(defonce users [{:username "dimovich"
+                 :password (hashers/derive "secret")
+                 :email   "some@random.com"}
+
+                {:username "radyon"
+                 :password (hashers/derive "markforge")
+                 :email   "rad@mail.com"}])
 
 
 

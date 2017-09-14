@@ -1,3 +1,6 @@
+
+
+
 ! height of font-picker blocks
   - move picker-img to separate component and pass it a size atom
   - win!
@@ -19,10 +22,8 @@
 - colorpick
 
 - file upload
-https://groups.google.com/forum/#!topic/clojurescript/xB_ul9HrtiE
-https://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
-https://github.com/reagent-project/reagent-cookbook/tree/master/recipes/file-upload
-https://mrmcc3.github.io/post/csv-with-clojurescript/
+  https://github.com/reagent-project/reagent-cookbook/tree/master/recipes/file-upload
+  https://github.com/theophilusx/file-upload/blob/master/src/cljs/file_upload/core.cljs
 
 
 - fonts
