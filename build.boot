@@ -64,7 +64,8 @@
 
 
 (task-options! jar   {:main 'coverton.core :file "coverton.jar"}
-               sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets" #"namen\.js"}}
+               sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets"
+                                 #"namen\.js" #"uploads/.*jpg" #"db/.*edn"}}
                aot   {:namespace #{'coverton.core}}
                ;;reload {:on-jsload coverton.core/reload}
                cljs  { ;;:ids #{"public/coverton"}
