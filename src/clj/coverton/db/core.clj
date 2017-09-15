@@ -5,20 +5,11 @@
             [buddy.hashers      :as hashers]
             [taoensso.timbre    :refer [info]]
             [coverton.db.schema :refer [cover-schema mark-schema user-schema magic-id]]
+            [clojure.data.fressian :as fress]
             [coverton.util      :refer [random-uuid]]))
 
 
-(defonce db-state (atom {}))
-
-
-(defonce users [{:username "dimovich"
-                 :password (hashers/derive "secret")
-                 :email   "some@random.com"}
-
-                {:username "radyon"
-                 :password (hashers/derive "markforge")
-                 :email   "rad@mail.com"}])
-
+(def db-state (atom {}))
 
 
 (defn connect []
@@ -65,7 +56,10 @@
           :args [db]}
          (client/q conn)
          <!!
-         (map first))))
+         (map #(-> %
+                   first
+                   (update :cover/data fress/read)
+                   (dissoc :db/id))))))
 
 
 
@@ -91,10 +85,6 @@
 
 
 
-(defn export-covers-to-file [fname])
-
-
-
 (defn add-user [{:keys [username password email]}]
   (-> [{:user/username username
         :user/password password
@@ -116,17 +106,66 @@
          ffirst)))
 
 
+(defn get-all-users []
+  (let [db (current-db)
+        conn (get-connection)]
+    
+    (->> {:query '[:find  (pull ?e [*])
+                   :where [?e :user/username]]
+          :args [db]}
+         
+         (client/q conn)
+         <!!
+         (map #(-> %
+                   first
+                   (dissoc :db/id))))))
+
+
+
+
+(defn export-db-file [col fname]
+  (->> (into [] col)
+       clojure.pprint/pprint
+       with-out-str
+       (spit fname)))
+
+
+(defn export-db []
+  (export-db-file (get-all-covers) "db/covers.edn")
+  (export-db-file (get-all-users)  "db/users.edn"))
+
+
+
+(defn import-db-file [fname & [{f :fn :or {f identity}}]]
+  (some->> (slurp fname)
+           read-string
+           (map f)
+           add-data))
+
+(defn import-db []
+  (import-db-file "db/users.edn")
+  (import-db-file "db/covers.edn"
+                  {:fn (fn [m]
+                         (update m :cover/data
+                                 #(.array (fress/write %))))}))
+
+
+
+
+
 
 (defn init []
-  ;;schema
+  ;; add schema
   (-> (concat cover-schema user-schema)
       add-data)
 
-  ;;users
-  (doall (map add-user users))
+  ;; import covers and users
+  (import-db)
   
   (info "db initialized")
   (get-connection))
+
+
 
 
 

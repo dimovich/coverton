@@ -1,0 +1,8 @@
+[{:user/username "dimovich",
+  :user/password
+  "bcrypt+sha512$f82fdf40ec32d25811cbb2f6e1d82aa4$12$8a184d565f68b15304debd11f5396c0bce9adcc1b62323e6",
+  :user/email "some@random.com"}
+ {:user/username "radyon",
+  :user/password
+  "bcrypt+sha512$acaff107de5277902b042cc2c583a1ff$12$9875ea7ba4e726335cb61dd7d94a2efcd49312831677730e",
+  :user/email "rad@mail.com"}]

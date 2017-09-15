@@ -53,3 +53,8 @@
   (if (map? res)
     (merge-with merge res new)
     new))
+
+
+
+;;datomic + jetty lib issues
+[com.datomic/datomic-pro "0.9.5561" :exclusions [org.slf4j/slf4j-nop com.google.guava/guava]]

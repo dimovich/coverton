@@ -8,10 +8,12 @@
  (fn [db _]
    db))
 
+
 (reg-sub
  ::index
  (fn [db _]
    (:index db)))
+
 
 (reg-sub
  ::page
@@ -19,8 +21,23 @@
  (fn [db _]
    (:page db)))
 
+
+(reg-sub
+ ::user
+ :<- [::index]
+ (fn [db _]
+   (:user db)))
+
+
 (reg-sub
  ::authenticated?
  :<- [::ajax-sub/token]
  (fn [token _]
    (not (nil? token))))
+
+
+(reg-sub
+ ::covers
+ :<- [::index]
+ (fn [db _]
+   (:covers db)))

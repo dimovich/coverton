@@ -2,25 +2,26 @@
   (:require [re-frame.core :as rf :refer [reg-event-db path trim-v reg-event-fx dispatch]]
             [coverton.index.db :refer [default-value]]
             [taoensso.timbre :refer-macros [info]]
-            [coverton.ajax.events :as ajax-evt]))
+            [coverton.ajax.events :as ajax-evt]
+            [coverton.util :refer [merge-db]]))
 
 
 
-(def index-interceptors        [(path :index)                  trim-v])
+(def index-interceptors [(path :index) trim-v])
 
 
-(reg-event-db
+(reg-event-fx
  ::initialize
  index-interceptors
  (fn [_ _]
-   default-value))
+   {:db default-value
+    :dispatch [::get-covers]}))
 
 
 (reg-event-db
  ::update
  index-interceptors
- (fn [db [ks v]]
-   (assoc-in db ks v)))
+ merge-db)
 
 
 (reg-event-db
@@ -37,8 +38,9 @@
 (reg-event-fx
  ::login
  index-interceptors
- (fn [_ [creds]]
-   {:dispatch
+ (fn [{db :db} [{:keys [username] :as creds}]]
+   {:db (assoc db :user username )
+    :dispatch
     [::ajax-evt/request {:method     :post
                          :uri        "/login"
                          :params     creds
@@ -63,12 +65,7 @@
     [::ajax-evt/request-auth {:method :post
                               :uri "/get-covers"
                               :params opts
-                              :on-success [::import-covers]}]}))
+                              :on-success [::update]}]}))
 
 
 
-(reg-event-db
- ::import-covers
- index-interceptors
- (fn [db [covers]]
-   (assoc db :covers covers)))

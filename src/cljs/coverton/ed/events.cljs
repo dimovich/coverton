@@ -3,7 +3,8 @@
             [coverton.ed.db :refer [default-db]]
             [taoensso.timbre :refer-macros [info]]
             [coverton.ajax.events :as ajax-evt]
-            [dommy.core     :as d :refer [sel1]]))
+            [dommy.core     :as d :refer [sel1]]
+            [coverton.util  :refer [merge-db]]))
 
 
 
@@ -25,16 +26,6 @@
 
 
 
-;;todo: use specter
-(defn merge-props [res new]
-  (if (map? res)
-    (merge-with merge-props res new)
-    new))
-
-
-
-(defn merge-db [db [m]]
-  (merge-with merge-props db m))
 
 
 (reg-event-db

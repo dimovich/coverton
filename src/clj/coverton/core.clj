@@ -40,7 +40,8 @@
 (defn save-cover [{{:keys [cover-id] :as cover} :params :as request}]
   (if (authenticated? request)
     (let [author (:username (:identity request))
-          cover-id (or cover-id magic-id) ;;fixme: generate new
+          cover-id (or cover-id (random-uuid) ;; magic-id
+                       ) ;;fixme: generate new
           cover    (-> cover
                        (assoc :cover-id cover-id))]
 
@@ -69,8 +70,8 @@
 (def covers-sample {:cover1 {:some :idata}
                     :cover2 {:some :odata}})
 
-(defn get-covers [{{:keys [type size skip]} :params :as request}]
-  (ok covers-sample))
+(defn handle-get-covers [{{:keys [type size skip]} :params :as request}]
+  (ok {:covers (map :cover/data (db/get-all-covers))}))
 
 
 
@@ -90,6 +91,14 @@
 
 
 
+(defn handle-export-db [request]
+  (if (authenticated? request)
+    (when (= "dimovich" (:username (:identity request)))
+      (db/export-db)
+      (ok {:message "all good"}))
+    (throw-unauthorized)))
+
+
 
 
 (defroutes handler
@@ -99,10 +108,12 @@
   (POST "/save-cover" [] save-cover)
   (POST "/get-cover"  [] get-cover)
 
-  (POST "/get-covers" [] get-covers)
+  (POST "/get-covers" [] handle-get-covers)
   (POST "/login"      [] login)
 
   (POST "/upload-file" [] handle-upload-file)
+
+  (GET "/export-db" [] handle-export-db)
   
   (files     "/" {:root "."}) ;; to serve static resources
   (resources "/" {:root "."}) ;; to serve anything else

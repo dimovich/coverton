@@ -177,16 +177,16 @@
 
       [image-picker-button]
 
-      [cc/Button {:on-click #(dispatch [::evt/upload-file
-                                        (form-data :#image-input)
-                                        {:on-success [::evt/update-cover]}])}
-       "Send"]
+      #_[cc/Button {:on-click #(dispatch [::evt/upload-file
+                                          (form-data :#image-input)
+                                          {:on-success [::evt/update-cover]}])}
+         "Send"]
       
       [cc/Button {:on-click #(save-cover (sub/export-cover))}
        "Save"]
      
-      [cc/Button {:on-click #(get-cover magic-id)}
-       "Load"]
+      #_[cc/Button {:on-click #(get-cover magic-id)}
+         "Load"]
 
       [cc/Button {:on-click #(evt/initialize cover)}
        "Reset"]

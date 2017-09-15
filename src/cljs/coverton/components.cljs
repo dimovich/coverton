@@ -202,10 +202,56 @@
                                    :read-only true
                                    :color color
                                    :left x
-                                   :top  y}}
-                          
-                          ;;text
-                          ])))))))})))
+                                   :top  y}}])))))))})))
+
+
+
+
+
+(defn cover-image [{url :url size! :size!}]
+  (r/with-let [this        (r/current-component)
+               update-size (fn [_]
+                             (let [el (r/dom-node this)
+                                   w  (.. el getBoundingClientRect -width)
+                                   h  (.. el getBoundingClientRect -height)]
+                               (reset! size! [w h])))]
+    
+    [:img.cover-image {:on-load  update-size
+                       :src      url}]))
+
+
+
+
+(defn cover-block [cover & [params]]
+  (r/with-let [size (r/atom nil)]
+    (let [marks (:marks cover)]
+      (into
+       [:div.cover-block params
+        [cover-image {:url (:image-url cover)
+                      :size! size}]]
+       
+       (->> marks
+            (map (fn [[_ {:keys [mark-id pos text font-size font-family color static]}]]
+                   (let [id (str mark-id) ;;mark-id collision?
+                         [w h] @size
+                         font-size (* font-size h)
+                         [x y] pos
+                         x (* x w)
+                         y (* y h)]
+
+                     ^{:key id}
+                     [:input.cover-mark
+                      {:value text
+                       :style {:font-family font-family
+                               :font-size font-size
+                               :read-only true
+                               :color color
+                               :left x
+                               :top  y}}]))))))))
+
+
+
+
 
 
 
