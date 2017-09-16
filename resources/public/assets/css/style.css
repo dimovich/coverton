@@ -54,9 +54,10 @@ body {
 
 .menu {
     margin: 1em;
-    margin-bottom: 33px;
+    margin-bottom: 10px;
     font-family : 'GothaPro';
     font-size : 18px;
+    min-height: 1em;
 }
 
 
@@ -297,4 +298,9 @@ a {
     position: absolute;
     right: 0;
     top: 1em;
+}
+
+
+.auth-box input {
+    background-color: transparent;
 }

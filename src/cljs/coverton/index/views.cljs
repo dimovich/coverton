@@ -12,7 +12,8 @@
 
 
 (defn login-form []
-  (r/with-let [state (r/atom {:username "" :password ""})] 
+  (r/with-let [state (r/atom {:username "" :password ""})
+               login #(dispatch [::evt/login @state])] 
     [:form
      [:input {:placeholder "username:"
               :value (:username @state)
@@ -21,9 +22,13 @@
      [:input {:type :password
               :placeholder "password:"
               :value (:password @state)
+              :on-key-up (fn [e]
+                             (condp = (.. e -key)
+                               "Enter" (login)
+                               false))
               :on-change #(swap! state assoc :password (.. % -target -value))}]
      
-     [:a.menu {:on-click #(dispatch [::evt/login @state])}
+     [:a.menu {:on-click login}
       "login"]]))
 
 
@@ -43,7 +48,8 @@
   (r/with-let [_     (dispatch-sync [::evt/initialize])
                page  (subscribe [::sub/page])
                covers (subscribe [::sub/covers])
-               active-cover (r/atom nil)]
+               active-cover (r/atom nil)
+               authenticated? (subscribe [::sub/authenticated?])]
 
     (condp = @page
       ;; Editor
@@ -53,9 +59,10 @@
       ;; Index
       [:div.index
        (cc/menu
-        [:a {:on-click #(do (reset! active-cover {})
-                            (evt/set-page :ed))}
-         "new"])
+        (when @authenticated?
+          [:a {:on-click #(do (reset! active-cover {})
+                              (evt/set-page :ed))}
+           "N E W"]))
        
        [auth-box]
 
@@ -66,13 +73,13 @@
            {:on-click #(do (reset! active-cover cover)
                            (evt/set-page :ed))}])]
        
-       #_[:div {:class "motto vcenter"
-                :style {:text-align :left}}
-          [:img.logo {:src "assets/svg/logo.svg"}]
-          [:p.text
-           "a publishing platform for cover makers"
-           [:br]
-           "is coming soon."]]
+       #_([:div {:class "motto vcenter"
+                 :style {:text-align :left}}
+           [:img.logo {:src "assets/svg/logo.svg"}]
+           [:p.text
+            "a publishing platform for cover makers"
+            [:br]
+            "is coming soon."]])
        
        #_([:br] [:br]
           [:div {:style {:text-align :left

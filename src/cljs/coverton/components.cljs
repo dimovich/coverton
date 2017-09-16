@@ -331,4 +331,6 @@
 (defn menu [& args]
   (into
    [:div.menu]
-   (interpose "  |  " args)))
+   (->> args
+        (filter identity)
+        (interpose "  |  "))))

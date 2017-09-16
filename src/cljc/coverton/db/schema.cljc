@@ -4,6 +4,8 @@
 (defonce magic-id #uuid "1d822372-983a-4012-adbc-569f412733fd")
 
 
+;;todo: need timestamp for covers
+
 
 (defonce cover->db-map
   {:image-url :cover/image-url

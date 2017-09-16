@@ -9,7 +9,8 @@
             [coverton.ed.subs     :as sub]
             [coverton.ajax.events :as ajax-evt]
             [taoensso.timbre :refer-macros [info]]
-            [coverton.index.events :as evt-index]))
+            [coverton.index.events :as evt-index]
+            [coverton.index.subs   :as sub-index]))
 
 
 ;; use center of element for position
@@ -163,19 +164,22 @@
                   (.createObjectURL js/URL (-> % .-target .-files (aget 0))))}]])
 
 
+;; take ESC from dimmer
 (defn editor [{:keys [cover]}]
   (r/with-let [_       (evt/initialize cover)
                dimmer  (subscribe [::sub/dimmer])
-               ed-t    (subscribe [::sub/t])]
+               ed-t    (subscribe [::sub/t])
+               authenticated? (subscribe [::sub-index/authenticated?])]
 
     ^{:key @ed-t} ;;forces re-mount when cover is re-initialized
     [:div.editor
      
      (cc/menu
-      [:a {:on-click #(save-cover (sub/export-cover))}
-       "save"]
-
       [image-picker-button]
+      
+      (when @authenticated?
+          [:a {:on-click #(save-cover (sub/export-cover))}
+           "save"])
       
       [:a {:on-click #(do (evt-index/set-page :index)
                           (evt-index/refresh))}
