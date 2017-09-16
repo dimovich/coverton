@@ -9,7 +9,7 @@
             [coverton.util      :refer [random-uuid]]))
 
 
-(def db-state (atom {}))
+(defonce db-state (atom {}))
 
 
 (defn connect []
@@ -141,6 +141,7 @@
            read-string
            (map f)
            add-data))
+
 
 (defn import-db []
   (import-db-file "db/users.edn")

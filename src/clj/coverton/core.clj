@@ -29,7 +29,9 @@
             [coverton.util :refer [ok bad-request random-uuid]]
             [coverton.templates.index        :refer [index static-promo]]
             [coverton.db.core   :as db]
-            [coverton.db.schema :refer [mark->db-map cover->db-map magic-id]])
+            [coverton.db.schema :refer [mark->db-map cover->db-map magic-id]]
+
+            [coverton.repl :as repl])
   
   (:gen-class))
 
@@ -151,15 +153,33 @@
 
 
 
-;; boot runs this from another process... so no state in the end
+(defn destroy []
+  (info "shutting down...")
+
+  (repl/stop)
+
+  (when-let [server (:server @state)]
+    (server :timeout 100))
+
+  (info "bye!"))
+
+
+
 (defn init []
-  (db/init))
+  (.addShutdownHook (Runtime/getRuntime) (Thread. destroy))
+  
+  (db/init)
+  (repl/start))
+
 
 
 ;; TODO: option to initialize db
 (defn -main [& args]
-  (swap! state assoc :server (server/run-server app {:port 80}))
+  (->> (server/run-server app {:port 80})
+       (swap! state assoc :server))
+  
   (info "started server")
+
   (init))
 
 

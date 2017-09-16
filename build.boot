@@ -9,10 +9,12 @@
                  [adzerk/boot-reload        "0.5.2"  :scope "test"]
                  [pandeiro/boot-http        "0.8.3"  :scope "test"]
                  [com.cemerick/piggieback   "0.2.1"  :scope "test"]
-                 [org.clojure/tools.nrepl   "0.2.13" :scope "test"]
                  [weasel                    "0.7.0"  :scope "test"]
                  [tolitius/boot-check       "0.1.4"  :scope "test"]
 
+                 [org.clojure/tools.nrepl   "0.2.13"]
+                 [cider/cider-nrepl         "0.15.1"]
+                 
                  [compojure      "1.6.0"]
                  [ring/ring-core "1.6.2"]
                  [ring-transit   "0.1.6"]
@@ -56,7 +58,7 @@
 
 
 (swap! boot.repl/*default-dependencies*
-       concat '[[cider/cider-nrepl "0.15.1-SNAPSHOT" :scope "provided"]])
+       concat '[[cider/cider-nrepl "0.15.1-SNAPSHOT" :scope "test"]])
 
 (swap! boot.repl/*default-middleware*
        conj 'cider.nrepl/cider-middleware)

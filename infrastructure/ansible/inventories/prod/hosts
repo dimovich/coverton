@@ -1,7 +1,0 @@
-default ansible_ssh_host=coverton.co ansible_ssh_user=root
-
-[webservers]
-default
-
-[database]
-default
