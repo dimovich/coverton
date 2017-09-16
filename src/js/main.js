@@ -7,7 +7,7 @@ window.deps = {
     'react-dom' : require('react-dom'),
     'draggable': Draggable,
     'resizable': Resizable,
-    'semui': require ('semantic-ui-react'),
+   /* 'semui': require ('semantic-ui-react'),*/
     'react-color': SliderPicker
 };
 

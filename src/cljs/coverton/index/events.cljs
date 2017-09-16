@@ -15,7 +15,14 @@
  index-interceptors
  (fn [_ _]
    {:db default-value
-    :dispatch [::get-covers]}))
+    :dispatch [::refresh]}))
+
+
+(reg-event-fx
+ ::refresh
+ index-interceptors
+ (fn [_ _]
+   {:dispatch [::get-covers]}))
 
 
 (reg-event-db
@@ -30,9 +37,6 @@
  (fn [db [k]]
    (assoc db :page k)))
 
-
-(defn set-page [k]
-  (dispatch [::set-page k]))
 
 
 (reg-event-fx
@@ -69,3 +73,11 @@
 
 
 
+
+
+(defn set-page [k]
+  (dispatch [::set-page k]))
+
+
+(defn refresh []
+  (dispatch [::refresh]))

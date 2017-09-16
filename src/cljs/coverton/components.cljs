@@ -12,8 +12,8 @@
 
 (def react-drag   (arc "deps" "draggable"))
 (def react-resize (arc "deps" "resizable"))
-(def Button       (arc "deps" "semui" "Button"))
-(def Input        (arc "deps" "semui" "Input"))
+;;(def Button       (arc "deps" "semui" "Button"))
+;;(def Input        (arc "deps" "semui" "Input"))
 (def react-color  (arc "deps" "react-color"))
 
 
@@ -326,3 +326,9 @@
                   :color @active-color}]))
 
 
+
+
+(defn menu [& args]
+  (into
+   [:div.menu]
+   (interpose "  |  " args)))

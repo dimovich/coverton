@@ -14,26 +14,25 @@
 (defn login-form []
   (r/with-let [state (r/atom {:username "" :password ""})] 
     [:form
-     [cc/Input {:placeholder "Username:"
-                :value (:username @state)
-                :on-change #(swap! state assoc :username (.. % -target -value))}]
+     [:input {:placeholder "username:"
+              :value (:username @state)
+              :on-change #(swap! state assoc :username (.. % -target -value))}]
      
-     [cc/Input {:type :password
-                :placeholder "Password:"
-                :value (:password @state)
-                :on-change #(swap! state assoc :password (.. % -target -value))}]
+     [:input {:type :password
+              :placeholder "password:"
+              :value (:password @state)
+              :on-change #(swap! state assoc :password (.. % -target -value))}]
      
-     [cc/Button {:type :button
-                 :on-click #(dispatch [::evt/login @state])}
-      "Login"]]))
+     [:a.menu {:on-click #(dispatch [::evt/login @state])}
+      "login"]]))
 
 
 
 (defn auth-box []
   [:div.auth-box
    (if @(subscribe [::sub/authenticated?])
-     [cc/Button {:on-click #(dispatch [::evt/logout])}
-      "Logout"]
+     [:a.menu {:on-click #(dispatch [::evt/logout])}
+      "logout"]
        
      [login-form])])
 
@@ -53,21 +52,10 @@
 
       ;; Index
       [:div.index
-       [cc/Button {:on-click #(do (reset! active-cover {})
-                                  (evt/set-page :ed))}
-        "New"]
-
-       [cc/Button {:on-click #((dispatch-sync [::evt/initialize]))}
-        "Refresh"]
-
-
-       (when (and @(subscribe [::sub/authenticated?])
-                  (= "dimovich" @(subscribe [::sub/user])))
-         [cc/Button {:style {:position :fixed
-                             :bottom 0 :right 0}
-                     :on-click #(dispatch [::evt-ajax/request-auth {:uri "export-db"}])}
-          "Export DB"])
-
+       (cc/menu
+        [:a {:on-click #(do (reset! active-cover {})
+                            (evt/set-page :ed))}
+         "new"])
        
        [auth-box]
 

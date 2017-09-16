@@ -58,3 +58,13 @@
 
 ;;datomic + jetty lib issues
 [com.datomic/datomic-pro "0.9.5561" :exclusions [org.slf4j/slf4j-nop com.google.guava/guava]]
+
+
+
+;; secret client power
+(when (and @(subscribe [::sub/authenticated?])
+           (= "dimovich" @(subscribe [::sub/user])))
+  [cc/Button {:style {:position :fixed
+                      :bottom 0 :right 0}
+              :on-click #(dispatch [::evt-ajax/request-auth {:uri "export-db"}])}
+   "Export DB"])

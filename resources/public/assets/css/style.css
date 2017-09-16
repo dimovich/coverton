@@ -52,8 +52,16 @@ body {
     text-align: center;
 }
 
-.editor-toolbar-top {
+.menu {
+    margin: 1em;
     margin-bottom: 33px;
+    font-family : 'GothaPro';
+    font-size : 18px;
+}
+
+
+a {
+    cursor: pointer;
 }
 
 
@@ -242,6 +250,10 @@ body {
     display: inline-block;
 }
 
+.cover-block {
+    cursor: pointer;
+}
+
 
 .cover-image, .picker-img {
     max-width: 100%;
@@ -284,5 +296,5 @@ body {
 .auth-box {
     position: absolute;
     right: 0;
-    top: 0;
+    top: 1em;
 }

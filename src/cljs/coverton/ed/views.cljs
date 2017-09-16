@@ -152,8 +152,8 @@
 
 (defn image-picker-button []
   [:span
-   [cc/Button {:on-click #(.click (sel1 :#image-input))}
-    "Select Image"]
+   [:a {:on-click #(.click (sel1 :#image-input))}
+    "image"]
    [:input#image-input
     {:type "file"
      :accept "image/*"
@@ -161,8 +161,6 @@
              :position :inline-block}
      :on-change #(evt/set-image-url
                   (.createObjectURL js/URL (-> % .-target .-files (aget 0))))}]])
-
-
 
 
 (defn editor [{:keys [cover]}]
@@ -173,31 +171,19 @@
     ^{:key @ed-t} ;;forces re-mount when cover is re-initialized
     [:div.editor
      
-     [:div.editor-toolbar-top
+     (cc/menu
+      [:a {:on-click #(save-cover (sub/export-cover))}
+       "save"]
 
       [image-picker-button]
-
-      #_[cc/Button {:on-click #(dispatch [::evt/upload-file
-                                          (form-data :#image-input)
-                                          {:on-success [::evt/update-cover]}])}
-         "Send"]
       
-      [cc/Button {:on-click #(save-cover (sub/export-cover))}
-       "Save"]
-     
-      #_[cc/Button {:on-click #(get-cover magic-id)}
-         "Load"]
-
-      [cc/Button {:on-click #(evt/initialize cover)}
-       "Reset"]
-
-      [cc/Button {:on-click #(evt-index/set-page :index)}
-       "Close"]]
-
+      [:a {:on-click #(do (evt-index/set-page :index)
+                          (evt-index/refresh))}
+       "close"])
 
      (condp = @dimmer
        :font-picker [cc/font-picker]
-       
+        
        [editor-img])
 
      [cc/color-picker]]))
