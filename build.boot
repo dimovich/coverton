@@ -1,7 +1,7 @@
 (set-env!
  :source-paths    #{"src/cljs" "src/clj" "src/cljc"}
  :resource-paths  #{"resources" }
- :dependencies '[[org.clojure/clojure "1.9.0-beta1"]
+ :dependencies '[[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.908"]
 
                  [adzerk/boot-cljs-repl     "0.3.3"  :scope "test"]
@@ -69,7 +69,6 @@
                sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets"
                                  #"namen\.js" #"uploads/.*jpg" #"db/.*edn"}}
                aot   {:namespace #{'coverton.core}}
-               ;;reload {:on-jsload coverton.core/reload}
                cljs  { ;;:ids #{"public/coverton"}
                       :compiler-options {:output-to  "public/coverton.js"
                                          :output-dir "public/out"
@@ -82,7 +81,6 @@
 
                                                          {:file     "src/js/bundle.js"
                                                           :provides ["cljsjs.react" "cljsjs.react-dom"]}]}}
-               ;;cljs-repl  {:ids #{"public/coverton"}}
                serve {:resource-root "target/public"
                       :handler 'coverton.core/app
                       :reload  true
