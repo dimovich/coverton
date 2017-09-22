@@ -38,8 +38,9 @@ body {
 }
 
 .index {
-/*    position: relative;*/
+    position: relative;
     text-align: center;
+    font-size: 16px;
 }
 
 
@@ -53,11 +54,6 @@ body {
 }
 
 .menu {
-    margin: 1em;
-    margin-bottom: 10px;
-    font-family : 'GothaPro';
-    font-size : 18px;
-    min-height: 1em;
 }
 
 
@@ -200,9 +196,8 @@ a {
 
 
 .logo {
-    height: 20px;
-    width: 20px;
-    margin-bottom: 0.5em;
+    height: 1em;
+    padding-right: 0.5em;
 }
 
 
@@ -303,4 +298,53 @@ a {
 
 .auth-box input {
     background-color: transparent;
+}
+
+
+.header {
+    position: relative;
+    width: 80%;
+    margin: auto;
+    margin-top: 2em;
+    text-align: left;
+}
+
+.header>span {
+    font-size: 1em;
+}
+
+.menu a {
+    color: #1a1a1a;
+    position: relative;
+    vertical-align: top;
+}
+
+
+.menu a:after {
+    content: '';
+
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+
+    border-width: 0 0 1px;
+    border-style: solid;
+    border-color: #AAA;
+}
+
+.separator {
+    font-size: 1.3em;
+    margin: 0.5em;
+}
+
+
+.search-bar {
+    border: 1px solid #1a1a1a;
+    width: 80%;
+    margin: auto;
+    margin-top: 2em;
+    padding: 0.5em;
+    height: 2.5em;
+    text-align: left;
 }

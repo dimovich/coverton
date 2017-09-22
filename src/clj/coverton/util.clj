@@ -1,5 +1,5 @@
 (ns coverton.util
-  (:require [taoensso.timbre :as timbre]))
+  (:require [taoensso.timbre :as timbre :refer [info]]))
 
 
 (timbre/set-config!
@@ -20,3 +20,13 @@
 
 (defn random-uuid []
   (java.util.UUID/randomUUID))
+
+
+
+(defmacro when-read [[name fname] & body]
+  `(let [file# (io/file ~fname)]
+     (if (.exists file#)
+       (with-open [rdr# (io/reader file#)]
+         (let [~name (slurp rdr#)]
+           ~@body))
+       (info "file " ~fname " doesn't exist."))))

@@ -15,6 +15,7 @@
 ;;(def Button       (arc "deps" "semui" "Button"))
 ;;(def Input        (arc "deps" "semui" "Input"))
 (def react-color  (arc "deps" "react-color"))
+(def react-tags   (arc "deps" "react-tags"))
 
 
 ;;(def resize-detector ((goog.object/getValueByKeys js/window "deps" "resize-detector")))
@@ -330,7 +331,7 @@
 
 (defn menu [& args]
   (into
-   [:div.menu]
+   [:span.menu]
    (->> args
         (filter identity)
-        (interpose "  |  "))))
+        (interpose [:span.separator "|"]))))

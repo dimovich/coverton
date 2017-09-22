@@ -68,3 +68,60 @@
                       :bottom 0 :right 0}
               :on-click #(dispatch [::evt-ajax/request-auth {:uri "export-db"}])}
    "Export DB"])
+
+
+
+
+
+
+
+
+
+
+
+(let [f (io/file "db/users.edn")]
+  (when (.exists f)
+   (with-open [rdr (io/reader f)]
+     (->> rdr
+          slurp
+          println))))
+
+
+
+
+(let [f (io/file "db/users.edn")]
+  (when (.exists f)
+    (->> f
+         slurp
+         println)))
+
+
+
+(def f (io/file "db/users.edn"))
+
+f
+(.exists f)
+
+
+
+
+(defn import-db-file [fname & [{f :fn :or {f identity}}]]
+  (let [file (io/file fname)]
+    (when (.exists file)
+      (with-open [rdr (io/reader file)]
+        (some->> (slurp rdr)
+                 read-string
+                 (map f)
+                 add-data)))))
+
+
+
+(defmacro when-read [[name fname] & body]
+  `(let [file# (io/file ~fname)]
+     (when (.exists file#)
+       (with-open [rdr# (io/reader file#)]
+         (let [~name (slurp rdr#)]
+           ~@body)))))
+
+
+

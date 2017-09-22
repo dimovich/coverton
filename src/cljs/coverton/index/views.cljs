@@ -63,8 +63,25 @@
           [:a {:on-click #(do (reset! active-cover {})
                               (evt/set-page :ed))}
            "N E W"]))
+
+       [:div.header
+        
+        [:span {:style {:left 0}}
+         [:img.logo {:src "assets/svg/logo.svg"}]
+         "a publishing platform for cover makers."]
+
+        [:span {:style {:float :right}}
+         (cc/menu
+          [:a "request invitation"]
+          [:a "log in"])]]
+
+
+       [:div.search-bar
+        [cc/react-tags {:tags [{:id 1 :text "Hello"}]}]]
        
-       [auth-box]
+       
+       
+       #_[auth-box]
 
        [:div.covers-container
         (for [cover @covers]

@@ -6,7 +6,8 @@
             [taoensso.timbre    :refer [info]]
             [coverton.db.schema :refer [cover-schema mark-schema user-schema magic-id]]
             [clojure.data.fressian :as fress]
-            [coverton.util      :refer [random-uuid]]))
+            [coverton.util      :refer [random-uuid when-read]]
+            [clojure.java.io    :as io]))
 
 
 (defonce db-state (atom {}))
@@ -137,10 +138,12 @@
 
 
 (defn import-db-file [fname & [{f :fn :or {f identity}}]]
-  (some->> (slurp fname)
-           read-string
-           (map f)
-           add-data))
+  (when-read [data fname]
+    (some->> data
+             read-string
+             (map f)
+             add-data)))
+
 
 
 (defn import-db []
