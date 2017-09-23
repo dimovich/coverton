@@ -310,13 +310,21 @@ a {
 }
 
 .header>span {
-    font-size: 1em;
+    font-size: 0.8em;
+}
+
+a {
+    color: #1a1a1a;
 }
 
 .menu a {
     color: #1a1a1a;
     position: relative;
     vertical-align: top;
+}
+
+.menu a:hover {
+    color: #050505;
 }
 
 
@@ -333,18 +341,76 @@ a {
     border-color: #AAA;
 }
 
+
 .separator {
     font-size: 1.3em;
     margin: 0.5em;
 }
 
 
-.search-bar {
+div.search-bar {
     border: 1px solid #1a1a1a;
     width: 80%;
     margin: auto;
-    margin-top: 2em;
+    margin-top: 1em;
     padding: 0.5em;
     height: 2.5em;
     text-align: left;
+    overflow: hidden;
+    background-color: #E6E6E6;
 }
+
+
+
+span.search-input {
+    display: block;
+    overflow: hidden;
+    padding-right:0.5em;
+    padding-left: 0.1em;
+    
+}
+
+input.search-input-field {
+    width: 100%;
+    outline: none;
+    border: 0;
+    background-color: transparent;
+    display: inline-block;
+    vertical-align:top;
+    margin-top: -0.1em;
+
+}
+
+
+div.search-tag-box {
+    margin-left: 0;
+    margin-right: 0.5em;
+    padding: 0.2em 0.45em;
+    float: left;
+    margin-top: -0.1em;
+    background-color: white;
+    height: 1.5em;
+}
+
+span.search-tag {
+    font-size: 0.9em;
+    display: inline-block;
+    vertical-align:top;
+    margin-top: -0.1em;
+}
+
+
+img.search-image {
+    float: right;
+    height: 1.5em;
+    margin-top: -0.1em;
+}
+
+
+img.search-tag-close {
+    height: 1em;
+    padding-left: 0.5em;
+    cursor: pointer;
+}
+
+

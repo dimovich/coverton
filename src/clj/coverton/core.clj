@@ -51,6 +51,7 @@
       
       (db/add-data {:cover/id cover-id
                     :cover/author author
+                    :cover/tags [author]
                     :cover/data (.array (fress/write cover))})
     
       (ok {:cover-id cover-id}))
@@ -69,11 +70,14 @@
 
 
 
-(def covers-sample {:cover1 {:some :idata}
-                    :cover2 {:some :odata}})
-
-(defn handle-get-covers [{{:keys [type size skip]} :params :as request}]
-  (ok {:covers (map :cover/data (db/get-all-covers))}))
+(defn handle-get-covers
+  [{{:keys [tags size skip] :as params} :params :as request}]
+  (ok {:covers
+       (map
+        :cover/data
+        (cond
+          (not (empty? tags)) (db/get-covers {:tags tags})
+          :default (db/get-all-covers)))}))
 
 
 

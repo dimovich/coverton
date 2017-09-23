@@ -48,6 +48,25 @@
 
 
 
+
+(defn get-covers [{:keys [tags]}]
+  (let [db (current-db)
+        conn (get-connection)]
+    (->> {:query '[:find (pull ?e [*])
+                   :in $ [?tag ...]
+                   :where
+                   [?e :cover/tags ?tag]]
+          :args [db tags]}
+         (client/q conn)
+         <!!
+         (map #(-> %
+                   first
+                   (update :cover/data fress/read)
+                   (dissoc :db/id))))))
+
+
+
+
 (defn get-all-covers []
   (let [db (current-db)
         conn (get-connection)]

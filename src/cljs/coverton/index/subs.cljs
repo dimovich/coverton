@@ -41,3 +41,10 @@
  :<- [::index]
  (fn [db _]
    (:covers db)))
+
+
+(reg-sub
+ ::search-tags
+ :<- [::index]
+ (fn [db _]
+   (:search-tags db)))

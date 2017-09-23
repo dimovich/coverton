@@ -21,12 +21,19 @@
 (reg-event-fx
  ::refresh
  index-interceptors
- (fn [_ _]
-   {:dispatch [::get-covers]}))
+ (fn [{db :db} _]
+   {:dispatch [::get-covers {:tags (:search-tags db)}]}))
 
 
 (reg-event-db
  ::update
+ index-interceptors
+ (fn [db [k f & args]]
+   (apply update db k f args)))
+
+
+(reg-event-db
+ ::merge
  index-interceptors
  merge-db)
 
@@ -69,7 +76,7 @@
     [::ajax-evt/request-auth {:method :post
                               :uri "/get-covers"
                               :params opts
-                              :on-success [::update]}]}))
+                              :on-success [::merge]}]}))
 
 
 

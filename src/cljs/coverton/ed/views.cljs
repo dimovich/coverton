@@ -174,16 +174,18 @@
     ^{:key @ed-t} ;;forces re-mount when cover is re-initialized
     [:div.editor
      
-     (cc/menu
-      [image-picker-button]
+     [:div.header {:style {:text-align :center
+                           :margin "0.5em auto"}}
+      (cc/menu
+       [image-picker-button]
       
-      (when @authenticated?
-          [:a {:on-click #(save-cover (sub/export-cover))}
-           "save"])
+       (when @authenticated?
+         [:a {:on-click #(save-cover (sub/export-cover))}
+          "save"])
       
-      [:a {:on-click #(do (evt-index/set-page :index)
-                          (evt-index/refresh))}
-       "close"])
+       [:a {:on-click #(do (evt-index/set-page :index)
+                           (evt-index/refresh))}
+        "close"])]
 
      (condp = @dimmer
        :font-picker [cc/font-picker]

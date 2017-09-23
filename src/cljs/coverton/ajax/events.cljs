@@ -57,12 +57,14 @@
                         (merge m))]}))
 
 
+
 (reg-event-db
  ::set-token
  ajax-interceptors
  (fn [db [{:keys [token]}]]
    (info "login success: " token)
    (assoc db :token token)))
+
 
 
 (reg-event-db
@@ -74,21 +76,15 @@
 
 
 
-;;fixme: we don't change the db, can we ignore the return of the fn?
-(reg-event-db
+(reg-fx
  ::good-response
- ajax-interceptors
- (fn
-   [db [response]]
-   (info "ajax success: " response)
-   db))
+ (fn [response]
+   (info "ajax success: " response)))
 
 
-(reg-event-db
+(reg-fx
  ::bad-response
- ajax-interceptors
- (fn [db [response]]
-   (info "ajax error: " response)
-   db))
+ (fn [response]
+   (info "ajax error: " response)))
 
 
