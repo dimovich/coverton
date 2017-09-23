@@ -1,5 +1,6 @@
 (ns coverton.ajax.events
-  (:require [re-frame.core :as rf   :refer [reg-event-db reg-event-fx subscribe path trim-v]]
+  (:require [re-frame.core :as rf   :refer [reg-event-db reg-event-fx reg-fx
+                                            subscribe path trim-v]]
             [ajax.core     :as ajax :refer [to-interceptor]]
             [day8.re-frame.http-fx]
             [coverton.ajax.subs :as sub]
