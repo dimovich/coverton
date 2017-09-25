@@ -224,7 +224,7 @@ a {
 /*    position: relative;*/
     width: 90%;
     margin: auto;
-    margin-top: 50px;
+    margin-top: 2em;
 /*    display: flex;
     flex-wrap: wrap;
     justify-content: space-around;*/
@@ -352,7 +352,7 @@ div.search-bar {
     border: 1px solid #1a1a1a;
     width: 80%;
     margin: auto;
-    margin-top: 1em;
+    margin-top: 2em;
     padding: 0.5em;
     height: 2.5em;
     text-align: left;
@@ -413,4 +413,6 @@ img.search-tag-close {
     cursor: pointer;
 }
 
-
+input {
+    border: 1px dotted #1a1a1a;
+}

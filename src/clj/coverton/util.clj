@@ -1,5 +1,6 @@
 (ns coverton.util
-  (:require [taoensso.timbre :as timbre :refer [info]]))
+  (:require [taoensso.timbre :as timbre :refer [info]]
+            [clojure.java.io :as io]))
 
 
 (timbre/set-config!

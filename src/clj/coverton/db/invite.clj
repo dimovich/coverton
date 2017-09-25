@@ -16,16 +16,16 @@
        repeatedly
        (take n)
        (mapcat #(-> [{:invite/code %
-                      :invite/status :active}]))
+                      :invite/status :new}]))
        db/transact))
 
 
 
 (defn get-invite-code []
-  (let [code (-> '[:find (sample 1 ?code)
+  (let [code (-> '[:find (sample 1 ?code) ;;first??
                    :where
                    [?e :invite/code   ?code]
-                   [?e :invite/status :active]]
+                   [?e :invite/status :new]]
                  db/query-db
                  ffirst
                  first)]
@@ -43,18 +43,18 @@
 
 
 
-(defn get-invite-codes []
-  (->> (db/query-db '[:find (pull ?e [*])
-                      :where
-                      [?e :invite/code ?code]])
+(defn get-all-invites []
+  (->> '[:find (pull ?e [*])
+         :where [?e :invite/code]]
+       db/query-db
        (apply concat)
-       vec))
+       (map #(-> % (dissoc :db/id)))))
 
 
 
 
 (defn retract-expired-invites []
-  (->> (get-invite-codes)
+  (->> (get-all-invites)
        (filter #(= :expired (:invite/status %)))
        (map :db/id)
        (map db/retract-entity)))

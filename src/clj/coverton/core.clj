@@ -28,9 +28,12 @@
             [coverton.auth :refer [auth-backend login]]
             [coverton.util :refer [ok bad-request random-uuid]]
             [coverton.templates.index        :refer [index static-promo]]
-            [coverton.db.core   :as db]
             [coverton.db.schema :refer [mark->db-map cover->db-map magic-id]]
 
+            [coverton.db.core   :as db]
+            [coverton.db.util   :as db-util]
+            [coverton.db.covers :as db-covers]
+            [coverton.db.users  :as db-users]
             [coverton.repl :as repl])
   
   (:gen-class))
@@ -61,7 +64,7 @@
 
 (defn get-cover [{{id :id} :params}]
   (let [_    (info "getting" id)
-        cover    (db/get-cover id)]
+        cover    (db-covers/get-cover id)]
     (if (:cover/data cover)
       (ok (fress/read (:cover/data cover)))
       (not-found (str id)))))
@@ -75,8 +78,8 @@
        (map
         :cover/data
         (cond
-          (not (empty? tags)) (db/get-covers {:tags tags})
-          :default (db/get-all-covers)))}))
+          (not (empty? tags)) (db-covers/get-covers {:tags tags})
+          :default (db-covers/get-all-covers)))}))
 
 
 
@@ -99,7 +102,7 @@
 (defn handle-export-db [request]
   (if (authenticated? request)
     (when (= "dimovich" (:username (:identity request)))
-      (db/export-db)
+      (db-util/export-db)
       (ok {:message "all good"}))
     (throw-unauthorized)))
 
@@ -172,6 +175,7 @@
   (.addShutdownHook (Runtime/getRuntime) (Thread. destroy))
   
   (db/init)
+  (db-util/import-db)
   (repl/start))
 
 

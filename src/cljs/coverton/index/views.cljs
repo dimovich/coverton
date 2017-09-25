@@ -14,8 +14,9 @@
 (defn search-tag [opts tag]
   [:div.search-tag-box
    [:span.search-tag {} tag]
-   [:img.search-tag-close (merge {:src "assets/svg/x.svg"}
-                                 opts)]])
+   [:img.search-tag-close
+    (merge {:src "assets/svg/x.svg"}
+           opts)]])
 
 
 
@@ -64,32 +65,23 @@
 (defn login-form []
   (r/with-let [state (r/atom {:username "" :password ""})
                login #(dispatch [::evt/login @state])] 
-    [:form
-     [:input {:placeholder "username:"
-              :value (:username @state)
-              :on-change #(swap! state assoc :username (.. % -target -value))}]
+    (cc/menu
+     [:span
+      [:input {:placeholder "username:"
+               :auto-focus true
+               :value (:username @state)
+               :on-change #(swap! state assoc :username (.. % -target -value))}]
      
-     [:input {:type :password
-              :placeholder "password:"
-              :value (:password @state)
-              :on-key-up (fn [e]
-                             (condp = (.. e -key)
-                               "Enter" (login)
-                               false))
-              :on-change #(swap! state assoc :password (.. % -target -value))}]
-     
-     [:a.menu {:on-click login}
-      "login"]]))
-
-
-
-(defn auth-box []
-  [:div.auth-box
-   (if @(subscribe [::sub/authenticated?])
-     [:a.menu {:on-click #(dispatch [::evt/logout])}
-      "logout"]
-       
-     [login-form])])
+      [:input {:type :password
+               :placeholder "password:"
+               :value (:password @state)
+               :on-key-up (fn [e]
+                            (condp = (.. e -key)
+                              "Enter" (login)
+                              false))
+               :on-change #(swap! state assoc :password (.. % -target -value))}]]
+     [:a {:on-click login}
+      "log in"])))
 
 
 
@@ -99,6 +91,7 @@
                page  (subscribe [::sub/page])
                covers (subscribe [::sub/covers])
                active-cover (r/atom nil)
+               show-login?  (r/atom false)
                authenticated? (subscribe [::sub/authenticated?])
                search-tags (subscribe [::sub/search-tags])]
     
@@ -109,9 +102,6 @@
       
       ;; Index
       [:div.index
-       (cc/menu
-        (when true ;;@authenticated?
-          ))
 
        [:div.header
         
@@ -119,23 +109,20 @@
          [:img.logo {:src "assets/svg/logo.svg"}]
          "a publishing platform for cover makers."]
         
+
         [:span {:style {:float :right}}
-         (cc/menu
-          [:a "request invitation"]
-          (if @authenticated?
-            [:a {:on-click #(dispatch [::evt/logout])} "log out"]
-            [:a {:on-click #(dispatch [::evt/login {:username "dimovich"
-                                                    :password "secret"}])}
-             "log in"]))]]
+         (apply cc/menu
+                (cond
+                  @authenticated? [[:a {:on-click #(do (reset! active-cover {})
+                                                       (evt/set-page :ed))}
+                                    "N E W"]
+                                   [:a {:on-click #(do (dispatch [::evt/logout])
+                                                       (reset! show-login? false))}
+                                    "log out"]]
+                  @show-login? [[login-form]]
+                  :default [[:a "register"]
+                            [:a {:on-click #(reset! show-login? true)} "log in"]]))]]
 
-
-       (when @authenticated?
-         [:a {:style {:color "#1a1a1a"
-                      :font-size "0.8em"}
-              :on-click #(do (reset! active-cover {})
-                             (evt/set-page :ed))}
-          "N E W"])
-       
 
               
        [search-box {:tags @search-tags}]
@@ -144,8 +131,6 @@
          (dispatch [::evt/refresh]))
        
        
-       #_[auth-box]
-
        [:div.covers-container
         (for [cover @covers]
           ^{:key (:cover-id cover)}
