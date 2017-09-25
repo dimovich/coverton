@@ -125,7 +125,7 @@
           (if @authenticated?
             [:a {:on-click #(dispatch [::evt/logout])} "log out"]
             [:a {:on-click #(dispatch [::evt/login {:username "dimovich"
-                                                    :password ""}])}
+                                                    :password "secret"}])}
              "log in"]))]]
 
 

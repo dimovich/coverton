@@ -12,7 +12,7 @@
     "react-color": "^2.13.4",
     "@cljs-oss/module-deps": "^1.1.1",
     "create-react-class": "^15.6.0",
-      "webpack": "^3.5.6",
-      "react-tag-input": "^4.7.2"
+    "webpack": "^3.5.6",
+    "react-tag-input": "^4.7.2"
   }
 }

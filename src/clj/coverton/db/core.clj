@@ -4,7 +4,7 @@
             [clojure.pprint     :refer [pprint]]
             [buddy.hashers      :as hashers]
             [taoensso.timbre    :refer [info]]
-            [coverton.db.schema :refer [cover-schema mark-schema user-schema magic-id]]
+            [coverton.db.schema :refer [coverton-schema magic-id]]
             [clojure.data.fressian :as fress]
             [coverton.util      :refer [random-uuid when-read]]
             [clojure.java.io    :as io]))
@@ -40,12 +40,20 @@
 
 
 
-(defn add-data [data]
+(defn transact [data]
   (let [data (if (sequential? data) data [data])]
     (info (-> (get-connection)
               (client/transact {:tx-data data})
               <!!))))
 
+
+(defn query-db [q]
+  (let [db (current-db)
+        conn (get-connection)]
+    (->> {:query q
+          :args [db]}
+         (client/q conn)
+         <!!)))
 
 
 
@@ -55,7 +63,8 @@
     (->> {:query '[:find (pull ?e [*])
                    :in $ [?tag ...]
                    :where
-                   [?e :cover/tags ?tag]]
+                   [?e :cover/tags ?tag]
+                   [?e :cover/id _]]
           :args [db tags]}
          (client/q conn)
          <!!
@@ -105,11 +114,20 @@
 
 
 
+(defn retract-entity [id]
+  (transact [[:db.fn/retractEntity id]]))
+
+
+(defn retract-attr [id attr-id attr]
+  (transact [[:db/retract id attr-id attr]]))
+
+
+
 (defn add-user [{:keys [username password email]}]
   (-> [{:user/username username
         :user/password password
         :user/email email}]
-      add-data))
+      transact))
 
 
 
@@ -161,7 +179,7 @@
     (some->> data
              read-string
              (map f)
-             add-data)))
+             transact)))
 
 
 
@@ -179,10 +197,9 @@
 
 (defn init []
   ;; add schema
-  (-> (concat cover-schema user-schema)
-      add-data)
+  (-> coverton-schema
+      transact)
 
-  ;; import covers and users
   (import-db)
   
   (info "db initialized")

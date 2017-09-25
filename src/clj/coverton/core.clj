@@ -42,14 +42,13 @@
 (defn save-cover [{{:keys [cover-id] :as cover} :params :as request}]
   (if (authenticated? request)
     (let [author (:username (:identity request))
-          cover-id (or cover-id (random-uuid) ;; magic-id
-                       ) ;;fixme: generate new
+          cover-id (or cover-id (random-uuid))
           cover    (-> cover
                        (assoc :cover-id cover-id))]
 
       (info "adding data...")
       
-      (db/add-data {:cover/id cover-id
+      (db/transact {:cover/id cover-id
                     :cover/author author
                     :cover/tags [author]
                     :cover/data (.array (fress/write cover))})
@@ -179,7 +178,7 @@
 
 ;; TODO: option to initialize db
 (defn -main [& args]
-  (->> (server/run-server app {:port 80})
+  (->> (server/run-server app {:port 5000})
        (swap! state assoc :server))
   
   (info "started server")

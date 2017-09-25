@@ -125,3 +125,23 @@ f
 
 
 
+
+
+
+(require 'coverton.db.core)
+(in-ns 'coverton.db.core)
+
+
+(let [id (:cover/id (second (get-all-covers)))]
+  ;;(retract-entity [:cover/id id])
+  ;;(retract-attr [:cover/id id] :cover/tags "dimovich")
+  (transact [{:cover/id id
+              :cover/tags ["radyon"]}]))
+
+
+
+(defn retract-entity [id]
+  (add-data [[:db.fn/retractEntity id]]))
+
+(get-all-covers)
+
