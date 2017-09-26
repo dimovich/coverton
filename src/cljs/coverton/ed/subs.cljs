@@ -1,6 +1,5 @@
 (ns coverton.ed.subs
   (:require [re-frame.core      :refer [reg-sub subscribe]]
-            [coverton.db.schema :refer [mark->db-map cover->db-map]]
             [coverton.fonts     :refer [default-font]]))
 
 
@@ -36,14 +35,14 @@
  ::marks
  :<- [::cover]
  (fn [db _]
-   (:marks db)))
+   (:cover/marks db)))
 
 
 (reg-sub
  ::size
  :<- [::cover]
  (fn [db _]
-   (:size db)))
+   (:cover/size db)))
 
 
 (reg-sub
@@ -108,7 +107,7 @@
  ::image-url
  :<- [::cover]
  (fn [db _]
-   (:image-url db)))
+   (:cover/image-url db)))
 
 
 (reg-sub
@@ -129,9 +128,9 @@
  ::active-color
  :<- [::cover]
  :<- [::active-mark]
- (fn [[cover id] _]
-   (or (get-in cover [:marks id :color])
-       (get-in cover [:font :color]))))
+ (fn [[cover active-id] _]
+   (or (get-in cover [:cover/marks active-id :color])
+       (get-in cover [:cover/font :color]))))
 
 
 (reg-sub
@@ -148,20 +147,21 @@
    (:mark-offset db)))
 
 
-(defn export-cover []
-  ;; extract saveable fields
-  (-> @(subscribe [::cover])
-      (select-keys (keys cover->db-map))
-      (update-in [:marks]
-                 #(reduce
-                   (fn [m [k v]]
-                     (assoc m k (select-keys v (keys mark->db-map))))
-                   {}
-                   %))))
 
 
 
 
+
+#_(defn export-cover []
+    ;; extract saveable fields
+    (-> @(subscribe [::cover])
+        (select-keys (keys cover->db-map))
+        (update-in [:marks]
+                   #(reduce
+                     (fn [m [k v]]
+                       (assoc m k (select-keys v (keys mark->db-map))))
+                     {}
+                     %))))
 
 
 

@@ -12,13 +12,7 @@
 
 (def react-drag   (arc "deps" "draggable"))
 (def react-resize (arc "deps" "resizable"))
-;;(def Button       (arc "deps" "semui" "Button"))
-;;(def Input        (arc "deps" "semui" "Input"))
 (def react-color  (arc "deps" "react-color"))
-;;(def react-tags   (arc "deps" "react-tags"))
-
-
-;;(def resize-detector ((goog.object/getValueByKeys js/window "deps" "resize-detector")))
 
 
 ;;
@@ -175,16 +169,16 @@
       
       :reagent-render
       (fn []
-        (let [marks (:marks cover)
+        (let [marks (:cover/marks cover)
               block-family font-family
               [offset-x offset-y] @(subscribe [::sub/mark-offset])]
           (into
            [:div.picker-block
-            [:img.picker-img {:src (:image-url cover)}]]
+            [:img.picker-img {:src (:cover/image-url cover)}]]
        
            (->> marks
-                (map (fn [[_ {:keys [mark-id pos text font-size font-family color static]}]]
-                       (let [id (str mark-id)
+                (map (fn [[_ {:keys [id pos text font-size font-family color static]}]]
+                       (let [id (str id)
                              [w h] @size
                              font-size (* font-size h)
                              [x y] pos
@@ -223,32 +217,37 @@
 
 
 
+(defn cover-mark [{:keys [id pos text font-size font-family color static parent-size]}]
+  (let [id (str id) ;;mark-id collision?
+        [w h] parent-size
+        font-size (* font-size h)
+        [x y] pos
+        x (* x w)
+        y (* y h)]
+
+    ^{:key id}
+    [:input.cover-mark {:value text
+      :style {:font-family font-family
+              :font-size font-size
+              :read-only true
+              :color color
+              :left x
+              :top  y}}]))
+
+
+
+
+
 (defn cover-block [cover & [params]]
   (r/with-let [size (r/atom nil)]
-    (let [marks (:marks cover)]
-      (into
-       [:div.cover-block params
-        [cover-image {:url (:image-url cover)
-                      :size! size}]]
-       
-       (->> marks
-            (map (fn [[_ {:keys [mark-id pos text font-size font-family color static]}]]
-                   (let [id (str mark-id) ;;mark-id collision?
-                         [w h] @size
-                         font-size (* font-size h)
-                         [x y] pos
-                         x (* x w)
-                         y (* y h)]
-
-                     ^{:key id}
-                     [:input.cover-mark
-                      {:value text
-                       :style {:font-family font-family
-                               :font-size font-size
-                               :read-only true
-                               :color color
-                               :left x
-                               :top  y}}]))))))))
+    (let [marks (:cover/marks cover)]
+      [:div.cover-block (merge params
+                               {:style {:text-align :left}})
+       [cover-image {:url (:cover/image-url cover)
+                     :size! size}]
+       (doall (->> (vals marks)
+                   (map #(cover-mark (merge % {:parent-size @size})))))
+       [:span (:cover/author cover)]])))
 
 
 
@@ -284,7 +283,7 @@
 
 
 (defn font-picker []
-  (r/with-let [cover (sub/export-cover)]
+  (r/with-let [cover @(subscribe [::sub/cover])]
     [dimmer
      (into
       [:div.picker-container]

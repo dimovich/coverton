@@ -70,7 +70,7 @@
   (let [id (random-uuid)
         sid (str id)]
     (evt/add-mark {:pos     pos
-                   :mark-id id})
+                   :id id})
     (evt/set-active-mark sid)))
 
 
@@ -180,7 +180,7 @@
        [image-picker-button]
       
        (when @authenticated?
-         [:a {:on-click #(save-cover (sub/export-cover))}
+         [:a {:on-click #(save-cover @(subscribe [::sub/cover]))}
           "save"])
       
        [:a {:on-click #(do (evt-index/set-page :index)

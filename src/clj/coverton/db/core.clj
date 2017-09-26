@@ -94,3 +94,7 @@
 
 
 ;;(d/transact conn [{:db/id order-id :order/lineItems [{:lineItem/product chocolate :lineItem/quantity 1} {:lineItem/product whisky :lineItem/quantity 2}]}]
+
+
+
+;; pull entity map as db -> d/entity-db... vs. d/entity

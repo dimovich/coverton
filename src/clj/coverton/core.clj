@@ -27,8 +27,8 @@
             
             [coverton.auth :refer [auth-backend login]]
             [coverton.util :refer [ok bad-request random-uuid]]
-            [coverton.templates.index        :refer [index static-promo]]
-            [coverton.db.schema :refer [mark->db-map cover->db-map magic-id]]
+            [coverton.templates.index :refer [index static-promo]]
+            [coverton.db.schema :refer [cover->db]]
 
             [coverton.db.core   :as db]
             [coverton.db.util   :as db-util]
@@ -42,46 +42,43 @@
 (defonce state (atom nil))
 
 
-(defn save-cover [{{:keys [cover-id] :as cover} :params :as request}]
+
+(defn handle-save-cover [{{:keys [cover/id] :as cover} :params :as request}]
   (if (authenticated? request)
     (let [author (:username (:identity request))
-          cover-id (or cover-id (random-uuid))
-          cover    (-> cover
-                       (assoc :cover-id cover-id))]
+          id     (or id (random-uuid))
+          cover (merge cover {:cover/id id
+                              :cover/author author})
+          cover (assoc cover :cover/data (.array (fress/write cover)))]
 
-      (info "adding data...")
-      
-      (db/transact {:cover/id cover-id
-                    :cover/author author
-                    :cover/tags [author]
-                    :cover/data (.array (fress/write cover))})
+      (info "adding: " cover)
+
+      (-> cover
+          (select-keys cover->db)
+          db/transact)
     
-      (ok {:cover-id cover-id}))
+      (ok {:cover/id id}))
     
     (throw-unauthorized)))
 
 
 
 (defn get-cover [{{id :id} :params}]
-  (let [_    (info "getting" id)
-        cover    (db-covers/get-cover id)]
+  (let [_     (info "getting" id)
+        cover (db-covers/get-cover id)]
     (if (:cover/data cover)
       (ok (fress/read (:cover/data cover)))
       (not-found (str id)))))
 
 
 
-
 (defn handle-get-covers
   [{{:keys [tags size skip] :as params} :params :as request}]
   (ok {:covers
-       (map
-        :cover/data
-        (cond
-          (not (empty? tags)) (db-covers/get-covers {:tags tags})
-          :default (db-covers/get-all-covers)))}))
-
-
+       (->> (cond
+              (not (empty? tags)) (db-covers/get-covers {:tags tags})
+              :default (db-covers/get-all-covers))
+            (map :cover/data))}))
 
 
 
@@ -113,7 +110,7 @@
   (GET  "/"           [] (static-promo))
   (GET  "/index"      [] (index))
 
-  (POST "/save-cover" [] save-cover)
+  (POST "/save-cover" [] handle-save-cover)
   (POST "/get-cover"  [] get-cover)
 
   (POST "/get-covers" [] handle-get-covers)

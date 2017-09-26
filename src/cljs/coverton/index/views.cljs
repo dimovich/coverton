@@ -98,7 +98,7 @@
     (condp = @page
       ;; Editor
       :ed [ed/editor {:cover (-> @active-cover
-                                 (dissoc :cover-id))}]
+                                 (dissoc :cover/id))}]
       
       ;; Index
       [:div.index
@@ -133,7 +133,7 @@
        
        [:div.covers-container
         (for [cover @covers]
-          ^{:key (:cover-id cover)}
+          ^{:key (:cover/id cover)}
           [cc/cover-block cover
            {:on-click #(do (reset! active-cover cover)
                            (evt/set-page :ed))}])]

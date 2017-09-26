@@ -8,9 +8,11 @@
   (as-> '[:find (pull ?e [*])
           :in $ [?tag ...]
           :where
-          [?e :cover/tags ?tag]
-          [?e :cover/id _]] $
+          (or [?e :cover/tags ?tag]
+              [?e :cover/author ?tag])] $
+    
     (db/query-db $ tags)
+
     (map #(-> %
               first
               (update :cover/data fress/read)

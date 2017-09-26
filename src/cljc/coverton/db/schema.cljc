@@ -1,31 +1,9 @@
 (ns coverton.db.schema)
 
 
-(defonce magic-id #uuid "1d822372-983a-4012-adbc-569f412733fd")
-
-
 ;;todo: need timestamp for covers
 
-
-(defonce cover->db-map
-  {:image-url :cover/image-url
-   :tags      :cover/tags
-   :author    :cover/author
-   :parent    :cover/parent
-   :marks     :cover/marks
-   :cover-id  :cover/id})
-
-
-(defonce mark->db-map
-  {:mark-id     :mark/id
-   :pos         :mark/pos
-   :font-size   :mark/font-size
-   :font-family :mark/font-family
-   :text        :mark/text
-   :color       :mark/color
-   :static      :mark/static
-   :read-only?  :mark/read-only?})
-
+(defonce cover->db [:cover/id :cover/tags :cover/author :cover/data])
 
 
 (defonce coverton-schema
@@ -138,28 +116,7 @@
 
 
 
-#_(def sample-data
-    [{:cover/image-url "assets/img/coverton.jpg"
-      :cover/tags ["sea" "boat" "depth" "children"]
-      :cover/size [400 400]
-      :cover/marks  [{:mark/type :text
-                      :mark/text "Hello"
-                      :mark/pos [0 0]
-                      :mark/font-size 50
-                      :mark/font-family "GothaPro"}
-                                    
-                     {:mark/type :text
-                      :mark/text "Friend"
-                      :mark/pos [50 60]
-                      :mark/font-size 50
-                      :mark/font-family "GothaPro"}
 
-                     {:mark/type :svg
-                      :mark/url "assets/svg/paranoid.svg"
-                      :mark/pos [80 80]}
-                                    
-                     {:mark/text "What's up?"
-                      :mark/type :text
-                      :mark/pos [30 50]
-                      :mark/font-size 50
-                      :mark/font-family "GothaPro"}]}])
+;;(defonce magic-id #uuid "1d822372-983a-4012-adbc-569f412733fd")
+
+
