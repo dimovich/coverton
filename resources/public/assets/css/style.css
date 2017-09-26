@@ -11,7 +11,10 @@ html {}
 
 body {
     margin: 0;
+    padding: 0;
     overflow-x: hidden;
+    overflow-y: scroll;
+    font-family: 'GothaPro';
 }
 
 /*455 x 90*/
@@ -29,18 +32,16 @@ body {
 }
 
 .wrap {
-    margin: 0 auto;
-    padding: 0;
 }
 
 #app {
-    margin: 0 auto;
 }
 
 .index {
     position: relative;
     text-align: center;
-    font-size: 16px;
+    width: 80%;
+    margin: auto;
 }
 
 
@@ -221,28 +222,38 @@ a {
 
 
 .covers-container, .picker-container {
-/*    position: relative;*/
-    width: 90%;
-    margin: auto;
-    margin-top: 2em;
-/*    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;*/
+    padding-top: 1em;
 }
 
+
+.cover-block-box {
+    display: inline-block;
+    padding: 0% 2% 4% 2%;
+    width: 28%;
+    vertical-align: top;
+}
+
+.cover-block-info {
+    width: 100%;
+    text-align: left;
+    margin-top: 0.5em;
+}
+
+.cover-block-tags {
+    width: 50%;
+    float: right;
+}
+
+.cover-block-author {
+    float: left;
+}
 
 .cover-block, .picker-block {
     position: relative;
     border: 1px solid black;
     padding: 0;
-/*    width: 25%;
-    margin: 20px;
-*/
-    width: 23vw;
-    height: 23vw;
-    margin: 2vw 2vw;
 
-  /*    overflow: hidden;*/
+    overflow: hidden;
     display: inline-block;
 }
 
@@ -303,7 +314,6 @@ a {
 
 .header {
     position: relative;
-    width: 80%;
     margin: auto;
     margin-top: 2em;
     text-align: left;
@@ -350,67 +360,59 @@ a {
 
 div.search-bar {
     border: 1px solid #1a1a1a;
-    width: 80%;
     margin: auto;
     margin-top: 2em;
+    margin-bottom: 2em;
     padding: 0.5em;
-    height: 2.5em;
     text-align: left;
     overflow: hidden;
     background-color: #E6E6E6;
 }
 
 
-
-span.search-input {
-    display: block;
-    overflow: hidden;
+.search-input {
     padding-right:0.5em;
     padding-left: 0.1em;
-    
 }
 
 input.search-input-field {
-    width: 100%;
     outline: none;
     border: 0;
     background-color: transparent;
-    display: inline-block;
-    vertical-align:top;
-    margin-top: -0.1em;
-
+    font-size: 1em;
+    height: 1.5em;
+    font-family: 'GothaPro';
 }
 
 
-div.search-tag-box {
+span.search-tag-box {
     margin-left: 0;
     margin-right: 0.5em;
-    padding: 0.2em 0.45em;
-    float: left;
-    margin-top: -0.1em;
+    padding: 0.25em;
     background-color: white;
-    height: 1.5em;
+    display: inline-block;
+    vertical-align: middle;
+    float: left;
 }
 
 span.search-tag {
     font-size: 0.9em;
-    display: inline-block;
-    vertical-align:top;
-    margin-top: -0.1em;
+    vertical-align: bottom;
 }
 
 
 img.search-image {
     float: right;
     height: 1.5em;
-    margin-top: -0.1em;
 }
 
 
 img.search-tag-close {
     height: 1em;
     padding-left: 0.5em;
+    padding-right: 0.2em;
     cursor: pointer;
+    vertical-align: middle;
 }
 
 input {

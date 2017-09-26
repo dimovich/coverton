@@ -217,7 +217,9 @@
 
 
 
-(defn cover-mark [{:keys [id pos text font-size font-family color static parent-size]}]
+(defn cover-mark [{:keys [id pos text
+                          font-size font-family
+                          color static parent-size]}]
   (let [id (str id) ;;mark-id collision?
         [w h] parent-size
         font-size (* font-size h)
@@ -240,14 +242,13 @@
 
 (defn cover-block [cover & [params]]
   (r/with-let [size (r/atom nil)]
-    (let [marks (:cover/marks cover)]
-      [:div.cover-block (merge params
-                               {:style {:text-align :left}})
-       [cover-image {:url (:cover/image-url cover)
-                     :size! size}]
-       (doall (->> (vals marks)
-                   (map #(cover-mark (merge % {:parent-size @size})))))
-       [:span (:cover/author cover)]])))
+    [:div.cover-block (merge params)
+     [cover-image {:url (:cover/image-url cover)
+                   :size! size}]
+     (doall (->> (:cover/marks cover)
+                 vals
+                 (map #(cover-mark
+                        (merge % {:parent-size @size})))))]))
 
 
 

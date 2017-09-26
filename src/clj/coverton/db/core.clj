@@ -2,7 +2,7 @@
   (:require [clojure.core.async :refer [<!!]]
             [datomic.client     :as    client]
             [taoensso.timbre    :refer [info]]
-            [coverton.db.schema :refer [coverton-schema magic-id]]
+            [coverton.db.schema :refer [coverton-schema]]
             [coverton.util      :refer [random-uuid]]))
 
 

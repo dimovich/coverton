@@ -3,7 +3,6 @@
             [dommy.core    :as d  :refer-macros [sel1]]
             [re-frame.core :as rf :refer [subscribe dispatch dispatch-sync]]
             [ajax.core     :as ajax :refer [POST GET]]
-            [coverton.db.schema   :refer [magic-id]]
             [coverton.components  :as cc]
             [coverton.ed.events   :as evt]
             [coverton.ed.subs     :as sub]

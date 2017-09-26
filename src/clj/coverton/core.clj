@@ -90,7 +90,7 @@
     (let [id (random-uuid)
           path (str "uploads/" id ".jpg")]
       (io/copy tempfile (io/file path))
-      (ok {:image-url path}))
+      (ok {:cover/image-url path}))
     
     (throw-unauthorized)))
 

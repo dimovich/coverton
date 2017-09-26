@@ -6,13 +6,12 @@
             [coverton.ed.views     :as ed]
             [coverton.components   :as cc]
             [coverton.ajax.events  :as evt-ajax]
-            [coverton.db.schema    :refer [magic-id]]
             [taoensso.timbre :refer-macros [info]]))
 
 
 
 (defn search-tag [opts tag]
-  [:div.search-tag-box
+  [:span.search-tag-box
    [:span.search-tag {} tag]
    [:img.search-tag-close
     (merge {:src "assets/svg/x.svg"}
@@ -41,6 +40,7 @@
 
     [:div.search-bar
 
+     
      (map-indexed
       (fn [idx tag]
         ^{:key idx}
@@ -48,7 +48,7 @@
       tags)
 
      [:img.search-image {:src "assets/svg/search.svg"}]
-     
+
      [:span.search-input
       [:input.search-input-field {:value @state
                                   :on-change #(reset! state (.. % -target -value))
@@ -134,9 +134,13 @@
        [:div.covers-container
         (for [cover @covers]
           ^{:key (:cover/id cover)}
-          [cc/cover-block cover
-           {:on-click #(do (reset! active-cover cover)
-                           (evt/set-page :ed))}])]
+          [:div.cover-block-box 
+           [cc/cover-block cover {:on-click #(do (reset! active-cover cover)
+                                                 (evt/set-page :ed))}]
+           [:div.cover-block-info
+            [:div.cover-block-author (:cover/author cover)]
+            ;;[:div.cover-block-tags   "tags:"]
+            ]])]
        
        #_([:br] [:br]
           [:div {:style {:text-align :left
