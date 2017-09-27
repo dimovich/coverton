@@ -11,8 +11,9 @@
 
 
 (defn search-tag [opts tag]
-  [:span.search-tag-box
-   [:span.search-tag {} tag]
+  [:div.search-tag
+   [:span.helper-valign]
+   [:span.search-tag-text {} tag]
    [:img.search-tag-close
     (merge {:src "assets/svg/x.svg"}
            opts)]])
@@ -40,24 +41,22 @@
 
     [:div.search-bar
 
-     
      (map-indexed
       (fn [idx tag]
         ^{:key idx}
         [search-tag {:on-click #(remove-tag idx)} tag])
       tags)
+     
+     [:input.search-input-field {:value @state
+                                 :on-change #(reset! state (.. % -target -value))
+                                 :on-key-down (fn [e]
+                                                (condp = (.. e -key)
+                                                  "Enter"     (add-tag)
+                                                  "Backspace" (when (empty? @state)
+                                                                (pop-tag))
+                                                  false))}]
 
-     [:img.search-image {:src "assets/svg/search.svg"}]
-
-     [:span.search-input
-      [:input.search-input-field {:value @state
-                                  :on-change #(reset! state (.. % -target -value))
-                                  :on-key-down (fn [e]
-                                                 (condp = (.. e -key)
-                                                   "Enter"     (add-tag)
-                                                   "Backspace" (when (empty? @state)
-                                                                 (pop-tag))
-                                                   false))}]]]))
+     [:img.search-image {:src "assets/svg/search.svg"}]]))
 
 
 
