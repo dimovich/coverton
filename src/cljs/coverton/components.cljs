@@ -1,12 +1,13 @@
 (ns coverton.components
   (:require [reagent.core   :as r]
             [re-frame.core  :as rf :refer [dispatch subscribe]]
-            [dommy.core     :as d  :refer-macros [sel1 sel]]
-            [coverton.util  :refer [arc info]]
+            [dommy.core     :as d  :refer-macros [sel1]]
+            [taoensso.timbre :refer-macros [info]]
+            [coverton.util  :refer [arc]]
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]
             [coverton.ed.subs   :as sub]
-;;            [jsutils]
+            ;;            [jsutils]
             ))
 
 
@@ -203,13 +204,12 @@
 
 
 
-(defn cover-image [{url :url size! :size!}]
+(defn cover-image [{url :url size :size}]
   (r/with-let [this        (r/current-component)
-               update-size (fn [_]
-                             (let [el (r/dom-node this)
-                                   w  (.. el getBoundingClientRect -width)
-                                   h  (.. el getBoundingClientRect -height)]
-                               (reset! size! [w h])))]
+               update-size (fn [e]
+                             (->> (.. e -target getBoundingClientRect)
+                                  ((juxt #(.. % -width) #(.. % -height)))
+                                  (reset! size)))]
     
     [:img.cover-image {:on-load  update-size
                        :src      url}]))
@@ -239,12 +239,11 @@
 
 
 
-
 (defn cover-block [cover & [params]]
   (r/with-let [size (r/atom nil)]
     [:div.cover-block (merge params)
      [cover-image {:url (:cover/image-url cover)
-                   :size! size}]
+                   :size size}]
      (doall (->> (:cover/marks cover)
                  vals
                  (map #(cover-mark
@@ -290,8 +289,9 @@
       [:div.picker-container]
       (for [font-family coverton.fonts/font-names]
         ^{:key font-family}
-        [picker-block {:cover cover
-                       :font-family font-family}]))]))
+        [:div.cover-block-box
+         [picker-block {:cover cover
+                        :font-family font-family}]]))]))
 
 
 

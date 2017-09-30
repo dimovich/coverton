@@ -88,3 +88,7 @@
 
 (defn refresh []
   (dispatch [::refresh]))
+
+
+(defn set-active-cover [cover]
+  (dispatch [::merge {:active-cover cover}]))

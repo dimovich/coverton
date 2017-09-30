@@ -85,63 +85,73 @@
 
 
 
+(defn header []
+  (r/with-let [show-login?  (r/atom false)
+               authenticated? (subscribe [::sub/authenticated?])]
+
+    [:div.header
+     [:span.clickable {:style {:left 0}
+                       :on-click #(evt/set-page :index)}
+      
+      [:img.logo {:src "assets/svg/logo.svg"}]
+      "a publishing platform for cover makers."]
+        
+
+     [:span {:style {:float :right}}
+      (apply cc/menu
+             (cond
+               @authenticated? [[:a {:on-click #(evt/set-page :ed)} "N E W"]
+                                [:a {:on-click #(do (dispatch [::evt/logout])
+                                                    (reset! show-login? false))}
+                                 "log out"]]
+               @show-login? [[login-form]]
+               :default [[:a {:on-click #(evt/set-page :request-invite)} "request invitation"]
+                         [:a {:on-click #(reset! show-login? true)} "log in"]]))]]))
+
+
+
+(defn request-invite []
+  [:div "request invite"])
+
+
+
 (defn index []
   (r/with-let [_     (dispatch-sync [::evt/initialize])
                page  (subscribe [::sub/page])
                covers (subscribe [::sub/covers])
-               active-cover (r/atom nil)
-               show-login?  (r/atom false)
-               authenticated? (subscribe [::sub/authenticated?])
                search-tags (subscribe [::sub/search-tags])]
     
-    (condp = @page
-      ;; Editor
-      :ed [ed/editor {:cover (-> @active-cover
-                                 (dissoc :cover/id))}]
+    [:div
+     [header]
+     
+     [:div.page
+      (condp = @page
+        :request-invite [request-invite]
+        ;; Editor
+        :ed [ed/editor {:cover (-> @(subscribe [::sub/active-cover])
+                                   (dissoc :cover/id))}]
       
-      ;; Index
-      [:div.index
+        ;; Index
+        [:div.index
+         [search-box {:tags @search-tags}]
 
-       [:div.header
-        
-        [:span {:style {:left 0}}
-         [:img.logo {:src "assets/svg/logo.svg"}]
-         "a publishing platform for cover makers."]
-        
-
-        [:span {:style {:float :right}}
-         (apply cc/menu
-                (cond
-                  @authenticated? [[:a {:on-click #(do (reset! active-cover {})
-                                                       (evt/set-page :ed))}
-                                    "N E W"]
-                                   [:a {:on-click #(do (dispatch [::evt/logout])
-                                                       (reset! show-login? false))}
-                                    "log out"]]
-                  @show-login? [[login-form]]
-                  :default [[:a "register"]
-                            [:a {:on-click #(reset! show-login? true)} "log in"]]))]]
-
-
-              
-       [search-box {:tags @search-tags}]
-
-       (when @search-tags
-         (dispatch [::evt/refresh]))
+         (when @search-tags
+           (dispatch [::evt/refresh]))
        
        
-       [:div.covers-container
-        (for [cover @covers]
-          ^{:key (:cover/id cover)}
-          [:div.cover-block-box 
-           [cc/cover-block cover {:on-click #(do (reset! active-cover cover)
-                                                 (evt/set-page :ed))}]
-           [:div.cover-block-info
-            [:div.cover-block-author (:cover/author cover)]
-            ;;[:div.cover-block-tags   "tags:"]
-            ]])]
-       
-       #_([:br] [:br]
-          [:div {:style {:text-align :left
-                         :font-size :18}}
-           (str @(subscribe [::sub/db]))])])))
+         [:div.covers-container
+          (for [cover @covers]
+            ^{:key (:cover/id cover)}
+            [:div.cover-block-box
+             [cc/cover-block cover {:on-click #(do (evt/set-active-cover cover)
+                                                   (evt/set-page :ed))}]
+             [:div.cover-block-info
+              [:div.cover-block-author (:cover/author cover)]
+              ;;[:div.cover-block-tags   "tags:"]
+              ]])]])
+
+     
+      #_([:br] [:br]
+         [:div {:style {:text-align :left
+                        :font-size :18}}
+          (str @(subscribe [::sub/db]))])]]))
