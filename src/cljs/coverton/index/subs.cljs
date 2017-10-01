@@ -1,6 +1,7 @@
 (ns coverton.index.subs
   (:require [re-frame.core :refer [reg-sub]]
-            [coverton.ajax.subs :as ajax-sub]))
+            [coverton.ajax.subs :as ajax-sub]
+            [taoensso.timbre :refer-macros [info]]))
 
 
 (reg-sub
@@ -14,6 +15,12 @@
  (fn [db _]
    (:index db)))
 
+
+(reg-sub
+ ::key
+ :<- [::index]
+ (fn [db [_ k]]
+   (get db k)))
 
 (reg-sub
  ::page
@@ -55,3 +62,4 @@
  :<- [::index]
  (fn [db _]
    (:active-cover db)))
+

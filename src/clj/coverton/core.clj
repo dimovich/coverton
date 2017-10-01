@@ -105,6 +105,13 @@
 
 
 
+(defn handle-request-invite [{{:keys [email story]} :params}]
+
+  ;; todo: process request
+  
+  (ok {:request-invite-sent true}))
+
+
 
 (defroutes handler
   (GET  "/"           [] (static-promo))
@@ -115,6 +122,8 @@
 
   (POST "/get-covers" [] handle-get-covers)
   (POST "/login"      [] login)
+
+  (POST "/request-invite" [] handle-request-invite)
 
   (POST "/upload-file" [] handle-upload-file)
 

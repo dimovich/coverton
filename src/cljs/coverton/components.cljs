@@ -335,3 +335,12 @@
    (->> args
         (filter identity)
         (interpose [:span.separator "|"]))))
+
+
+
+
+(defn component [tag {:keys [state] :as props}]
+  [tag
+   (merge props
+          {:value @state
+           :on-change #(reset! state (.. % -target -value))})])

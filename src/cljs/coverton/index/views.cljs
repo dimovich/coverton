@@ -5,7 +5,7 @@
             [coverton.index.subs   :as sub]
             [coverton.ed.views     :as ed]
             [coverton.components   :as cc]
-            [coverton.ajax.events  :as evt-ajax]
+            [coverton.ajax.events  :as ajax-evt]
             [taoensso.timbre :refer-macros [info]]))
 
 
@@ -28,7 +28,7 @@
                                       :search-tags
                                       #(-> (or %1 [])
                                            (conj %2))
-                                      @state])
+                                      (:text @state)])
                            (reset! state nil)))
                
                remove-tag (fn [idx]
@@ -41,20 +41,22 @@
 
     [:div.search-bar
 
+     ;; Tags
      (map-indexed
       (fn [idx tag]
         ^{:key idx}
         [search-tag {:on-click #(remove-tag idx)} tag])
       tags)
-     
-     [:input.search-input-field {:value @state
-                                 :on-change #(reset! state (.. % -target -value))
-                                 :on-key-down (fn [e]
-                                                (condp = (.. e -key)
-                                                  "Enter"     (add-tag)
-                                                  "Backspace" (when (empty? @state)
-                                                                (pop-tag))
-                                                  false))}]
+
+     ;; Search input
+     [cc/component :input {:state (r/cursor state [:text])
+                           :class :search-input-field
+                           :on-key-down (fn [e]
+                                          (condp = (.. e -key)
+                                            "Enter"     (add-tag)
+                                            "Backspace" (when (empty? @state)
+                                                          (pop-tag))
+                                            false))}]
 
      [:img.search-image {:src "assets/svg/search.svg"}]]))
 
@@ -66,19 +68,18 @@
                login #(dispatch [::evt/login @state])] 
     (cc/menu
      [:span
-      [:input {:placeholder "username:"
-               :auto-focus true
-               :value (:username @state)
-               :on-change #(swap! state assoc :username (.. % -target -value))}]
+      [cc/component :input {:placeholder "username:"
+                            :auto-focus true
+                            :state (r/cursor state [:username])}]
      
-      [:input {:type :password
-               :placeholder "password:"
-               :value (:password @state)
-               :on-key-up (fn [e]
-                            (condp = (.. e -key)
-                              "Enter" (login)
-                              false))
-               :on-change #(swap! state assoc :password (.. % -target -value))}]]
+
+      [cc/component :input {:type :password
+                            :placeholder "password:"
+                            :state (r/cursor state [:password])
+                            :on-key-up (fn [e]
+                                         (condp = (.. e -key)
+                                           "Enter" (login)
+                                           false))}]]
      [:a {:on-click login}
       "log in"])))
 
@@ -115,14 +116,37 @@
 
 
 (defn request-invite []
-  [:div "request invite"])
+  (r/with-let [state (r/atom nil)
+               sent  (subscribe [::sub/key :request-invite-sent])]
+    (into
+     [:div.request-invite]
+     (if @sent
+       [[:p "Application sent."]]
+       [[:p
+         "To apply for a Coverton account use the form below." [:br]
+         "For support visit " [:a "support.coverton.co"]]
+        [:hr]
+        [:p "Your email address:"]
+        [cc/component :input {:auto-focus true
+                              :state (r/cursor state [:email])}]
+
+        [:p "Tell us about yourself and your work:"]
+        [cc/component :textarea {:state (r/cursor state [:story])}]
+
+        [:button.clickable {:on-click
+                            #(dispatch [::ajax-evt/request
+                                        {:method :post
+                                         :uri "/request-invite"
+                                         :params @state
+                                         :on-success [::evt/merge]}])}
+         [:a "Send Application"]]]))))
 
 
 
 
 (defn index []
-  (r/with-let [_     (dispatch-sync [::evt/initialize])
-               page  (subscribe [::sub/page])
+  (r/with-let [_      (dispatch-sync [::evt/initialize])
+               page   (subscribe [::sub/page])
                covers (subscribe [::sub/covers])
                search-tags (subscribe [::sub/search-tags])]
     

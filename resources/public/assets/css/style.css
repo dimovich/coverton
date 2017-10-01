@@ -17,6 +17,15 @@ body {
     font-family: 'GothaPro';
 }
 
+input, textarea, a {
+    font-family: 'GothaPro';
+}
+
+input, textarea {
+    font-size: 0.9em;
+    background-color: #F0F0F0;
+}
+
 /*455 x 90*/
 .content {
     padding: 80px;
@@ -52,9 +61,6 @@ body {
     width: 100%;
     height: 100%;
     text-align: center;
-}
-
-.menu {
 }
 
 
@@ -333,7 +339,6 @@ a {
 
 .menu a {
     color: #1a1a1a;
-    position: relative;
     vertical-align: top;
 }
 
@@ -341,18 +346,21 @@ a {
     color: #050505;
 }
 
+a {
+    position: relative;
+}
 
-.menu a:after {
+a:after {
     content: '';
 
     width: 100%;
     position: absolute;
     left: 0;
-    bottom: 0;
+    bottom: 0.05em;
 
     border-width: 0 0 1px;
     border-style: solid;
-    border-color: #AAA;
+
 }
 
 
@@ -430,5 +438,51 @@ input {
 .logo-name {
     font-weight: bold;
     font-size: 1.3em;
-    padding-right: 0.3em;
+    padding-right: 1em;
+}
+
+
+.request-invite {
+    width: 80%;
+    text-align: left;
+    margin-top: 0.5em;
+}
+
+.request-invite input {
+    width: 100%;
+    line-height: 1.6em;
+    background-color: #F0F0F0;
+    border: 0;
+    outline: none;
+    padding: 0.4em;
+}
+
+
+.request-invite p {
+    margin: 0;
+    line-height: 1.3em;
+    padding-top: 2em;
+    padding-bottom: 0.5em;
+}
+
+.request-invite textarea {
+    height: 7em;
+    resize: none;
+    width: 100%;
+    border: 0;
+    outline: none;
+    padding: 0.4em;
+}
+
+
+.request-invite button {
+    padding: 0.8em 2em;
+    margin-top: 2em;
+    background-color: #34cc99;
+    border: 0;
+}
+
+button a {
+    color: white;
+    letter-spacing: 0.1em;
 }
