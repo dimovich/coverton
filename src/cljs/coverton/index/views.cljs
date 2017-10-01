@@ -94,13 +94,16 @@
                        :on-click #(evt/set-page :index)}
       
       [:img.logo {:src "assets/svg/logo.svg"}]
+      [:span.logo-name "Coverton"]
       "a publishing platform for cover makers."]
         
 
      [:span {:style {:float :right}}
       (apply cc/menu
              (cond
-               @authenticated? [[:a {:on-click #(evt/set-page :ed)} "N E W"]
+               @authenticated? [[:a {:on-click #(do (evt/set-active-cover {})
+                                                    (evt/set-page :ed))}
+                                 "N E W"]
                                 [:a {:on-click #(do (dispatch [::evt/logout])
                                                     (reset! show-login? false))}
                                  "log out"]]
@@ -110,8 +113,10 @@
 
 
 
+
 (defn request-invite []
   [:div "request invite"])
+
 
 
 

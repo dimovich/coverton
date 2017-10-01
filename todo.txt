@@ -1,23 +1,21 @@
-
-
+- ed
+  draggable https://news.ycombinator.com/item?id=15368104
+  interactjs
+  
 
 ! height of font-picker blocks
   - move picker-img to separate component and pass it a size atom
-  - win!
 ! place mark on top of click coordinates
 ! hide cursor on image click
 ! delete mark (listen to window key-down)
 ! image size mismatch with parent size (which is used for absolute pos)
-! position coords rounding (where is it happening?)
-  http://cruft.io/posts/percentage-calculations-in-ie/
 
 
 - svg blobs
 - spec
 - undo/redo (https://github.com/Day8/re-frame-undo)
 - re-write ref spreading
-- track resize
-- coverton.jar --init-db --export-db --import-db
+- track window resize
 
 - colorpick
 
@@ -36,7 +34,6 @@
 
 + dynamic line-height
 
-interctjs
 
 
 ansible

@@ -19,7 +19,7 @@
  ::initialize
  ed-interceptors
  (fn [db [cover]]
-   (let [cover (or cover (:cover db))
+   (let [;;cover (or cover (:cover db))
          _     (info "initializing with " cover)]
      {:cover (merge default-db cover)
       :t (inc (:t db))})))

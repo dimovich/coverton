@@ -198,7 +198,7 @@ a {
 
 .logo {
     height: 1em;
-    padding-right: 0.5em;
+    padding-right: 0.3em;
 }
 
 
@@ -424,4 +424,11 @@ input {
 
 .clickable {
     cursor: pointer;
+}
+
+
+.logo-name {
+    font-weight: bold;
+    font-size: 1.3em;
+    padding-right: 0.3em;
 }

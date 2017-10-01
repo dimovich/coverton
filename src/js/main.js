@@ -5,6 +5,7 @@ import { SliderPicker } from 'react-color';
 window.deps = {
     'react' : require('react'),
     'react-dom' : require('react-dom'),
+    'fabric' : require('fabric'),
     'draggable': Draggable,
     'resizable': Resizable,
     'react-color': SliderPicker

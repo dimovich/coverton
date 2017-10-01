@@ -33,6 +33,13 @@
 
 
 (reg-event-db
+ ::assoc
+ index-interceptors
+ (fn [db [k v]]
+   (assoc db k v)))
+
+
+(reg-event-db
  ::merge
  index-interceptors
  merge-db)
@@ -91,4 +98,4 @@
 
 
 (defn set-active-cover [cover]
-  (dispatch [::merge {:active-cover cover}]))
+  (dispatch [::assoc :active-cover cover]))
