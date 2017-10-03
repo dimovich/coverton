@@ -31,6 +31,7 @@
                  [buddy/buddy-core "1.4.0"]
 
                  [clj-time "0.14.0"]
+                 [com.draines/postal "2.0.2"]
                  
                  [com.datomic/clj-client "0.8.606"]
                  [org.clojure/core.async "0.3.443"]
