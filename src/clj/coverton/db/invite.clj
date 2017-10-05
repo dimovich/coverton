@@ -5,14 +5,14 @@
 
 
 
-(defn gen-invite-code [length]
+(defn gen-code [length]
   (-> (nonce/random-bytes length)
       (codecs/bytes->hex)))
 
 
 
 (defn gen-invites [n & {length :length :or {length 3}}]
-  (->> #(gen-invite-code length)
+  (->> #(gen-code length)
        repeatedly
        (take n)
        (mapcat #(-> [{:invite/code %
@@ -59,3 +59,9 @@
        (map :db/id)
        (map db/retract-entity)))
 
+
+
+
+(defn request-invite [email story]
+  (let [url "https://coverton.co/approve?email=dimovich@gmail.com&secret=5fgkjfglskgjflgj"
+        secret (gen-code)]))

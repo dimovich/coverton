@@ -8,7 +8,7 @@
 
 (defonce coverton-schema
 
-  [;;
+  [ ;;
    ;; user
    ;;
    {:db/ident       :user/username
@@ -33,9 +33,22 @@
     :db/cardinality :db.cardinality/one
     :db/unique      :db.unique/identity}
 
-   ;; :active / :sent / :expired
+   ;; :new / :approved / :sent / :expired
    {:db/ident       :invite/status
     :db/valueType   :db.type/keyword
+    :db/cardinality :db.cardinality/one}
+
+   {:db/ident :invite/email
+    :db/valueType :db.type/string
+    :db/cardinality :db.cardinality/one
+    :db/unique :db.unique/identity}
+
+   {:db/ident :invite/story
+    :db/valueType :db.type/string
+    :db/cardinality :db.cardinality/one}
+
+   {:db/ident :invite/secret
+    :db/valueType :db.type/string
     :db/cardinality :db.cardinality/one}
 
 
