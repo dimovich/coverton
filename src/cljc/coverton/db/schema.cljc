@@ -26,13 +26,13 @@
 
 
    ;;
-   ;; invites
+   ;; invite
    ;;
-   {:db/ident       :invite/code
-    :db/valueType   :db.type/string
-    :db/cardinality :db.cardinality/one
-    :db/unique      :db.unique/identity}
 
+   {:db/ident :invite/secret
+    :db/valueType :db.type/string
+    :db/cardinality :db.cardinality/one}
+   
    ;; :new / :approved / :sent / :expired
    {:db/ident       :invite/status
     :db/valueType   :db.type/keyword
@@ -44,10 +44,6 @@
     :db/unique :db.unique/identity}
 
    {:db/ident :invite/story
-    :db/valueType :db.type/string
-    :db/cardinality :db.cardinality/one}
-
-   {:db/ident :invite/secret
     :db/valueType :db.type/string
     :db/cardinality :db.cardinality/one}
 
