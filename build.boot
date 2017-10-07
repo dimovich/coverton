@@ -1,13 +1,12 @@
 (set-env!
  :source-paths    #{"src/cljs" "src/clj" "src/cljc"}
  :resource-paths  #{"resources" }
- :dependencies '[[org.clojure/clojure "1.9.0-alpha19"]
-                 [org.clojure/clojurescript "1.9.908"]
+ :dependencies '[[org.clojure/clojure "1.9.0-beta2"]
+                 [org.clojure/clojurescript "1.9.946"]
 
                  [adzerk/boot-cljs-repl     "0.3.3"  :scope "test"]
                  [adzerk/boot-cljs          "2.1.3"  :scope "test"]
                  [adzerk/boot-reload        "0.5.2"  :scope "test"]
-                 [pandeiro/boot-http        "0.8.3"  :scope "test"]
                  [com.cemerick/piggieback   "0.2.1"  :scope "test"]
                  [weasel                    "0.7.0"  :scope "test"]
                  [tolitius/boot-check       "0.1.4"  :scope "test"]
@@ -32,7 +31,7 @@
 
                  [clj-time "0.14.0"]
                  [com.draines/postal "2.0.2"]
-                 
+                 [integrant "0.6.1"]
                  [com.datomic/clj-client "0.8.606"]
                  [org.clojure/core.async "0.3.443"]
                  [org.clojure/data.fressian "0.2.1"]
@@ -46,24 +45,16 @@
                  [reagent  "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.10.1"]
                  [day8.re-frame/http-fx "0.1.4"]
-                 [cljs-ajax "0.7.2"]])
+                 [cljs-ajax "0.7.2"]
+                 [com.taoensso/tengen "1.0.0-RC1"]])
 
 
 (require
  '[adzerk.boot-cljs      :refer [cljs]]
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload    :refer [reload]]
- '[pandeiro.boot-http    :refer [serve]]
- '[tolitius.boot-check   :as    check])
-
-
-
-(swap! boot.repl/*default-dependencies*
-       concat '[[cider/cider-nrepl "0.15.1-SNAPSHOT" :scope "test"]])
-
-(swap! boot.repl/*default-middleware*
-       conj 'cider.nrepl/cider-middleware)
-
+ '[tolitius.boot-check   :as    check]
+ '[coverton.system       :as    system])
 
 
 (task-options! jar   {:main 'coverton.core :file "coverton.jar"}
@@ -81,12 +72,7 @@
                                                           :module-type :commonjs}
 
                                                          {:file     "src/js/bundle.js"
-                                                          :provides ["cljsjs.react" "cljsjs.react-dom"]}]}}
-               serve {:resource-root "target/public"
-                      :handler 'coverton.core/app
-                      :reload  true
-                      :httpkit true
-                      :init 'coverton.core/init})
+                                                          :provides ["cljsjs.react" "cljsjs.react-dom"]}]}})
 
 
 (deftask production
@@ -115,12 +101,14 @@
 
 (deftask run []
   (comp
-   (serve)
    (watch)
    (reload)
    (cljs-repl)
    (cljs)
-   (target)))
+   (target)
+   (call :eval (system/init {:path "resources/config.edn"})
+         :once true
+         :post true)))
 
 
 (deftask dev

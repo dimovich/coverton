@@ -66,8 +66,7 @@
 
 (defn init []
   ;; add schema
-  (-> coverton-schema
-      transact)
+  (transact coverton-schema)
   
   (info "db initialized"))
 

@@ -30,6 +30,6 @@
        (with-open [rdr# (io/reader file#)]
          (let [~name (slurp rdr#)]
            ~@body))
-       (info "file " ~fname " doesn't exist."))))
+       (info ~fname " doesn't exist."))))
 
 

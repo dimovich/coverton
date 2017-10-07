@@ -1,10 +1,11 @@
 (ns coverton.mail
-  (:require [postal.core :refer [send-message]]))
+  (:require [postal.core :as postal]))
 
 
-(send-message {:host "smtp.gmail.com"})
-
-(send-message {:from "coverton@coverton.co"
-               :to "dimovich@gmail.com"
-               :subject "Hi!"
-               :body "Test."})
+(defn send-mail [opts]
+  (postal/send-message {:host "smtp.gmail.com"
+                        :user "coverton.mailer@gmail.com"
+                        :pass "C0ver.Ton"
+                        :ssl   true}
+                       (-> {:from "coverton.mailer@gmail.com"}
+                           (merge opts))))

@@ -146,3 +146,18 @@ f
 (get-all-covers)
 
 
+
+
+
+
+#_(rename-keys cover->db-map)
+#_(update-in [:cover/marks]
+             #(map (fn [m] (rename-keys m mark->db-map)) %))
+
+
+
+#_(serve {:resource-root "target/public"
+          :handler 'coverton.core/app
+          :reload  true
+          :httpkit true
+          :init 'coverton.core/init})
