@@ -17,14 +17,14 @@
                     (codecs/bytes->hex)))
 
 
-(defn login [{{:keys [username password]} :params :as request}]
+(defn login [{{:keys [email password]} :params :as request}]
 
-  (let [valid? (some->> username
-                        db-users/get-user
+  (let [valid? (some->> email
+                        db-users/get-user-by-email
                         :user/password
                         (hashers/check password))]
     (if valid?
-      (let [claims {:username username
+      (let [claims {:email email
                     :exp  (time/plus (time/now) (time/seconds 3600))}
             token (jwt/sign claims secret {:alg :hs512})]
 

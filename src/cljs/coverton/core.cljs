@@ -1,7 +1,8 @@
 (ns coverton.core
   (:require [reagent.core :as r]
             [dommy.core :as d :refer-macros [sel1]]
-            [coverton.index.views  :as index]))
+            [coverton.index.views  :as index]
+            [taoensso.timbre :refer-macros [info]]))
 
 
 (defn app []
@@ -12,9 +13,9 @@
   (r/render [app] (sel1 :#app)))
 
 
-(defn ^:export init []
+(defn ^:export init [& args]
   (reload))
 
 
 (defn ^:export -main [& args]
-  (init))
+  (init args))

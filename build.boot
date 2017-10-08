@@ -36,17 +36,13 @@
                  [org.clojure/core.async "0.3.443"]
                  [org.clojure/data.fressian "0.2.1"]
 
-                 ;;                 [namen "0.1.0"]
-                 ;;                 [cheshire "5.6.3"]
-
-                 ;;[devcards "0.2.3" :exclusions [cljsjs/react cljsjs/react-dom]]
-
                  [prismatic/dommy "1.1.0"]
                  [reagent  "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.10.1"]
                  [day8.re-frame/http-fx "0.1.4"]
                  [cljs-ajax "0.7.2"]
-                 [com.taoensso/tengen "1.0.0-RC1"]])
+                 [com.taoensso/tengen "1.0.0-RC1"]
+                 [jkkramer/verily "0.6.0" :exclusions [org.clojure/clojurescript]]])
 
 
 (require
@@ -58,14 +54,14 @@
 
 
 (task-options! jar   {:main 'coverton.core :file "coverton.jar"}
-               sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets"
+               sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets" #"config.edn"
                                  #"namen\.js" #"uploads/.*jpg" #"db/.*edn"}}
                aot   {:namespace #{'coverton.core}}
                cljs  { ;;:ids #{"public/coverton"}
                       :compiler-options {:output-to  "public/coverton.js"
                                          :output-dir "public/out"
                                          :asset-path "out"
-                                         :main 'coverton.core
+                                         ;;:main 'coverton.core
                                          :parallel-build true
                                          :foreign-libs  [{:file        "src/js/jsutils.js"
                                                           :provides    ["jsutils"]
@@ -101,6 +97,7 @@
 
 (deftask run []
   (comp
+   (cider)
    (watch)
    (reload)
    (cljs-repl)
@@ -114,15 +111,6 @@
 (deftask dev
   []
   (task-options! reload {:on-jsload 'coverton.core/reload})
-  (comp (development)
-        (run)))
-
-
-(deftask devcards
-  []
-  (set-env! :source-paths #(conj % "src/devcards"))
-  (task-options! reload {:on-jsload 'coverton.devcards/reload}
-                 cljs   {:ids #{"public/devcards"}})
   (comp (development)
         (run)))
 

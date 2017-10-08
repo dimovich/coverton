@@ -56,8 +56,8 @@
 (reg-event-fx
  ::login
  index-interceptors
- (fn [{db :db} [{:keys [username] :as creds}]]
-   {:db (assoc db :user username )
+ (fn [{db :db} [{:keys [email] :as creds}]]
+   {:db (assoc db :user email )
     :dispatch
     [::ajax-evt/request {:method     :post
                          :uri        "/login"
@@ -99,3 +99,16 @@
 
 (defn set-active-cover [cover]
   (dispatch [::assoc :active-cover cover]))
+
+
+
+(defn request-invite [data]
+  (dispatch [::ajax-evt/request
+             {:method :post
+              :uri "/request-invite"
+              :params data
+              :on-success [::merge]}]))
+
+
+(defn login [creds]
+  (dispatch [::login creds]))

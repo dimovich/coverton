@@ -7,6 +7,25 @@
   (html5
    {:lang "en"}
    [:head
+    [:title "Coverton"]
+    (include-css "assets/css/style.css")
+    ;;(include-css "https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.css")
+    [:link {:rel "shortcut icon"
+            :href "assets/img/f.ico"
+            :type "image/x-icon"}]]
+   [:body
+    [:div.wrap
+     [:div#app]]
+    [:span#span-measure]
+    (include-js "coverton.js")
+    [:script "coverton.core.init(\"register\");"]]))
+
+
+
+(defn index-register []
+  (html5
+   {:lang "en"}
+   [:head
     [:title "Coverton Editor"]
     (include-css "assets/css/style.css")
     ;;(include-css "https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.10/semantic.min.css")
@@ -18,7 +37,7 @@
      [:div#app]]
     [:span#span-measure]
     (include-js "coverton.js")
-    [:script "coverton.core.init();"]]))
+    [:script "coverton.core.init(\"register\");"]]))
 
 
 

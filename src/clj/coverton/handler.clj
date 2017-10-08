@@ -39,7 +39,7 @@
 (defn handle-save-cover
   [{{:keys [cover/id] :as cover} :params :as request}]
   (if (authenticated? request)
-    (let [author (:username (:identity request))
+    (let [author (:email (:identity request))
           id     (or id (random-uuid))
           cover (merge cover {:cover/id id
                               :cover/author author})
@@ -164,7 +164,7 @@
 
 (def app
   (as-> handler $
-    (wrap-info-request   $)
+    ;;(wrap-info-request $)
     (wrap-authorization  $ auth-backend)
     (wrap-authentication $ auth-backend)
     (wrap-restful-format $ {:formats [:transit-json]})

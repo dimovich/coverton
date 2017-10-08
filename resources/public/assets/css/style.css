@@ -356,7 +356,7 @@ a:after {
     width: 100%;
     position: absolute;
     left: 0;
-    bottom: 0.05em;
+    bottom: 0.03em;
 
     border-width: 0 0 1px;
     border-style: solid;
@@ -485,4 +485,10 @@ input {
 button a {
     color: white;
     letter-spacing: 0.1em;
+}
+
+
+.error {
+    background-color: pink !important;
+   /* border: 1px solid red !important;*/
 }

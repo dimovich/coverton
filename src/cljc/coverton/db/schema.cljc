@@ -11,18 +11,15 @@
   [ ;;
    ;; user
    ;;
-   {:db/ident       :user/username
+   {:db/ident       :user/email
     :db/valueType   :db.type/string
     :db/cardinality :db.cardinality/one
     :db/unique      :db.unique/identity}
-
+   
    {:db/ident       :user/password
     :db/valueType   :db.type/string
     :db/cardinality :db.cardinality/one}
 
-   {:db/ident       :user/email
-    :db/valueType   :db.type/string
-    :db/cardinality :db.cardinality/one}
 
 
    ;;

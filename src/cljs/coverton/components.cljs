@@ -339,8 +339,17 @@
 
 
 
-(defn component [tag {:keys [state] :as props}]
-  [tag
-   (merge props
-          {:value @state
-           :on-change #(reset! state (.. % -target -value))})])
+(defn editable [tag {:keys [state error on-change] :as props}]
+  [tag (-> props
+           (dissoc :state :error)
+           (merge (cond-> {:value @state
+                           :on-change #((reset! state (.. % -target -value))
+                                        (when on-change (on-change)))}
+                    error (merge {:class :error}))))])
+
+
+
+(defn error [msgs]
+  [:span
+   (for [msg msgs]
+     [:p.error msg])])
