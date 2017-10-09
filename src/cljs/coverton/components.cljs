@@ -252,9 +252,6 @@
 
 
 
-
-
-
 (defn dimmer []
   (r/with-let [this  (r/current-component)
                body  (sel1 :body)
@@ -343,8 +340,8 @@
   [tag (-> props
            (dissoc :state :error)
            (merge (cond-> {:value @state
-                           :on-change #((reset! state (.. % -target -value))
-                                        (when on-change (on-change)))}
+                           :on-change #(do (reset! state (.. % -target -value))
+                                           (when on-change (on-change)))}
                     error (merge {:class :error}))))])
 
 

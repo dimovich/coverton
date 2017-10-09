@@ -228,15 +228,23 @@ a {
 
 
 .covers-container, .picker-container {
+/*    clear: both;*/
     padding-top: 1em;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 }
 
 
 .cover-block-box {
-    display: inline-block;
-    padding: 0% 2% 4% 2%;
-    width: 28%;
-    vertical-align: top;
+    padding-bottom: 2em;
+    width: 30%;
+}
+
+.cover-block-box-end {
+    padding-bottom: 2em;
+    margin: auto;
+    width: 30%;
 }
 
 .cover-block-info {

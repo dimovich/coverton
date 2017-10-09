@@ -94,16 +94,17 @@
 
 
 
+(def page->header {:index #{:logo :request-invite :auth}
+                   :ed    #{:logo :request-invite :auth}
+                   :request-invite #{:logo}})
+
 
 (defn header [page]
   (r/with-let [show-login?  (r/atom false)
                authenticated? (subscribe [::sub/authenticated?])
                request-sent?  (subscribe [::sub/key :request-invite-sent])]
 
-    (let [els (-> {:index #{:logo :request-invite :auth}
-                   :ed    #{:logo :request-invite :auth}
-                   :request-invite #{:logo}}
-                  (get page))]
+    (let [els (get page->header page)]
       
       [:div.header
        (when (:logo els)
@@ -135,6 +136,7 @@
 
 
 
+
 (defn request-invite []
   (r/with-let [state    (r/atom {:email "" :story ""})
                errors   (r/atom nil)
@@ -155,18 +157,30 @@
         [:p "Your email address:"]
         [cc/editable :input {:auto-focus true
                              :state (r/cursor state [:email])
-                             ;;:on-blur #(validate :email)
                              :on-change #(validate :email)
                              :error (:email @errors)}]
 
         [:p "Tell us about yourself and your work:"]
         [cc/editable :textarea {:state (r/cursor state [:story])
-                                ;;:on-blur #(validate :story)
                                 :on-change #(validate :story)
                                 :error (:story @errors)}]
 
         [:button.clickable {:on-click send}
          [:a "Send Application"]]]))))
+
+
+
+
+
+(defn gen-cover-box-css [coll n]
+  
+  (let [all    (count coll)
+        cend   (mod all n)
+        cstart (- all cend)]
+    
+    (concat
+     (repeat cstart :div.cover-block-box)
+     (repeat cend   :div.cover-block-box-end))))
 
 
 
@@ -196,15 +210,16 @@
        
        
          [:div.covers-container
-          (for [cover @covers]
-            ^{:key (:cover/id cover)}
-            [:div.cover-block-box
-             [cc/cover-block cover {:on-click #(do (evt/set-active-cover cover)
-                                                   (evt/set-page :ed))}]
-             [:div.cover-block-info
-              [:div.cover-block-author (:cover/author cover)]
-              ;;[:div.cover-block-tags   "tags:"]
-              ]])]])
+          (map
+           (fn [cover css]
+             ^{:key (:cover/id cover)}
+             [css
+              [cc/cover-block cover {:on-click #(do (evt/set-active-cover cover)
+                                                    (evt/set-page :ed))}]
+              [:div.cover-block-info
+               [:div.cover-block-author (:cover/author cover)]]])
+           @covers
+           (gen-cover-box-css @covers 3))]])
 
      
       #_([:br] [:br]
