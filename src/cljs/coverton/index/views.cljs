@@ -127,6 +127,7 @@
                                                       (reset! show-login? false))}
                                    "log out"]]
                  @show-login? [[login-form]]
+                 
                  :default [(when (and (:request-invite els)
                                       (not @request-sent?))
                              [:a {:on-click #(evt/set-page :request-invite)} "request invitation"])

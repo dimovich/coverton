@@ -7,13 +7,17 @@
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]
             [coverton.ed.subs   :as sub]
-            ;;            [jsutils]
+            [cljsjs.react-draggable]
+            [cljsjs.react-color]
+            [cljsjs.fabric]
+            [re-resizable]
+            ;;[jsutils]
             ))
 
 
-(def react-drag   (arc "deps" "draggable"))
-(def react-resize (arc "deps" "resizable"))
-(def react-color  (arc "deps" "react-color"))
+(def react-drag   (r/adapt-react-class js/ReactDraggable))
+(def react-resize (r/adapt-react-class (get (js->clj js/re-resizable) "default")))
+(def react-color  (r/adapt-react-class (.-SliderPicker js/ReactColor)))
 
 
 ;;
@@ -337,12 +341,13 @@
 
 
 (defn editable [tag {:keys [state error on-change] :as props}]
-  [tag (-> props
-           (dissoc :state :error)
-           (merge (cond-> {:value @state
-                           :on-change #(do (reset! state (.. % -target -value))
-                                           (when on-change (on-change)))}
-                    error (merge {:class :error}))))])
+  [tag
+   (-> props
+       (dissoc :state :error)
+       (merge (cond-> {:value @state
+                       :on-change #(do (reset! state (.. % -target -value))
+                                       (when on-change (on-change)))}
+                error (merge {:class :error}))))])
 
 
 
