@@ -46,7 +46,8 @@
 
                  [cljsjs/react-color "2.13.1-0"]
                  [cljsjs/react-draggable "3.0.3-0"]
-                 [cljsjs/fabric "1.5.0-1"]])
+                 ;;[cljsjs/fabric "1.5.0-1"]
+                 ])
 
 
 (require
@@ -70,7 +71,7 @@
                                          :install-deps true
                                          :npm-deps {:re-resizable "4.0.2"}
                                          :foreign-libs  [{:file        "src/js/jsutils.js"
-                                                          :provides    ["jsutils"]
+                                                          :provides    [:jsutils]
                                                           :module-type :commonjs}
 
                                                          #_{:file     "src/js/bundle.js"

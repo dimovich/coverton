@@ -74,6 +74,7 @@
     (cc/menu
      [:span
       [cc/editable :input {:placeholder "email:"
+                           ;;:type :email
                            :auto-focus true
                            :state (r/cursor state [:email])
                            :on-change #(validate :email)

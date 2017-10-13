@@ -9,15 +9,17 @@
             [coverton.ed.subs   :as sub]
             [cljsjs.react-draggable]
             [cljsjs.react-color]
-            [cljsjs.fabric]
+            ;;[cljsjs.fabric]
             [re-resizable]
             ;;[jsutils]
             ))
 
 
-(def react-drag   (r/adapt-react-class js/ReactDraggable))
-(def react-resize (r/adapt-react-class (get (js->clj js/re-resizable) "default")))
-(def react-color  (r/adapt-react-class (.-SliderPicker js/ReactColor)))
+(def react-drag   :div ;;(r/adapt-react-class js/ReactDraggable)
+  )
+(def react-resize (r/adapt-react-class (goog.object/getValueByKeys js/re-resizable "default")))
+(def react-color  :div ;;(r/adapt-react-class (.-SliderPicker js/ReactColor))
+  )
 
 
 ;;
@@ -144,15 +146,16 @@
 (defn draggable [{:keys [update-fn start-pos ref]}]
   (r/with-let [this  (r/current-component)
                [x y] start-pos]
-    [react-drag {:cancel ".cancel-drag"
-                 :on-stop (fn [_ d]
-                            (let [d (js->clj d)]
-                              (update-fn [(+ x (d "x"))
-                                          (+ y (d "y"))])))}
-     
-     (into
-      [:div.react-draggable-child]
-      (r/children this))]))
+    (into [:div.react-drag] (r/children this))
+    #_[react-drag {:cancel ".cancel-drag"
+                   :on-stop (fn [_ d]
+                              (let [d (js->clj d)]
+                                (update-fn [(+ x (d "x"))
+                                            (+ y (d "y"))])))}
+       
+       (into
+        [:div.react-draggable-child]
+        (r/children this))]))
 
 
 
