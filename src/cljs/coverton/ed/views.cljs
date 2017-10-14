@@ -43,11 +43,11 @@
                        :ref child-ref}]
          
           [cc/resizable {:font-size  @font-size
-                         :ref child-ref
+                         :child-ref child-ref
                          :update-fn  #(evt/set-font-size id %)}
           
            [cc/autosize-input {:id          id
-                               :set-ref     #(reset! child-ref %)
+                               :ref     #(println %) ;;(reset! child-ref %)
                                :key         :input
                                :text        @text
                                :color       @color

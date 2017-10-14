@@ -45,7 +45,7 @@
                  [jkkramer/verily "0.6.0" :exclusions [org.clojure/clojurescript]]
 
                  [cljsjs/react-color "2.13.1-0"]
-                 [cljsjs/react-draggable "3.0.3-0"]
+                 ;;[cljsjs/react-draggable "3.0.3-0"]
                  ;;[cljsjs/fabric "1.5.0-1"]
                  ])
 
@@ -68,14 +68,21 @@
                                          :asset-path "out"
                                          ;;:main 'coverton.core
                                          :parallel-build true
+                                         :pseudo-names true
                                          :install-deps true
-                                         :npm-deps {:re-resizable "4.0.2"}
+                                         :npm-deps { ;;:re-resizable "3.0.0"
+                                                    ;;:fabric "1.7.19"
+                                                    ;;:jsdom "11.3.0"
+                                                    :react-fabricjs "1.6.0"}
                                          :foreign-libs  [{:file        "src/js/jsutils.js"
-                                                          :provides    [:jsutils]
+                                                          :provides    ["coverton.jsutil"]
                                                           :module-type :commonjs}
 
-                                                         #_{:file     "src/js/bundle.js"
-                                                            :provides ["cljsjs.react" "cljsjs.react-dom"]}]}})
+                                                         #_({:provides ["cljsjs.fabric"]
+                                                             :global-exports '{cljsjs.fabric Fabric}}
+
+                                                            {:provides ["cljsjs.react-color"]
+                                                             :global-exports '{cljsjs.react-color ReactColor}})]}})
 
 
 (deftask production
@@ -87,7 +94,7 @@
 
 (deftask development
   []
-  (task-options! cljs      {:optimizations :none
+  (task-options! cljs      {:optimizations :advanced
                             :source-map    true}
                  cljs-repl {:nrepl-opts {:port 3311}}
                  target    {:dir #{"target"}})

@@ -7,20 +7,17 @@
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]
             [coverton.ed.subs   :as sub]
-            [cljsjs.react-draggable]
-            [cljsjs.react-color]
-            ;;[cljsjs.fabric]
-            [re-resizable]
-            ;;[jsutils]
-            ))
+            ;;[cljsjs.react-draggable]
+            [cljsjs.react-color :as react-color]
+            ;;[cljsjs.fabric :as fabric]
+            [react-fabricjs]
+            ;;[re-resizable]
+            [coverton.jsutil]))
 
 
-(def react-drag   :div ;;(r/adapt-react-class js/ReactDraggable)
-  )
+(def react-drag   (r/adapt-react-class js/ReactDraggable))
 (def react-resize (r/adapt-react-class (goog.object/getValueByKeys js/re-resizable "default")))
-(def react-color  :div ;;(r/adapt-react-class (.-SliderPicker js/ReactColor))
-  )
-
+(def react-color  (r/adapt-react-class (.-SliderPicker js/ReactColor)))
 
 ;;
 ;; calculate text width in px for font type and size
@@ -67,7 +64,7 @@
       :component-did-mount
       (fn [this]
         ;;for the outer component who modifies size or attributes
-        (set-ref (r/dom-node this))
+        ;;(set-ref (r/dom-node this))
         ;;(evt/set-ref id (r/dom-node this))
         (update-width this))
 
@@ -109,20 +106,21 @@
 
 
 
-(defn resizable [{:keys [font-size update-fn ref]}]
+(defn resizable [{:keys [font-size update-fn child-ref]}]
   (r/with-let [this  (r/current-component)
                start (atom nil)
                size  (atom nil)]
     (into
      [react-resize {:class-name "mark-resize"
-                    :width "1em" :height "1em"
+                    :size {:height "1em" :width "1em"}
+                    ;;:width "1em" :height "1em"
                     :style {:font-size  font-size}
                     :lock-aspect-ratio true
-                    :on-resize-start (fn [_ _ el _]
+                    :on-resize-start (fn [_ _ el]
                                        (reset! start (d/px el :font-size))
                                        (d/add-class! el :cancel-drag))
                     
-                    :on-resize-stop (fn [_ _ el d]
+                    :on-resize-stop (fn [_ _ el _]
                                       (update-fn @size)
                                       (d/remove-class! el :cancel-drag))
                     
@@ -136,8 +134,7 @@
 
                                  (d/set-px! el :font-size @size)
 
-                                 ;; update child
-                                 (set-width @ref))}]
+                                 (set-width @child-ref))}]
      (r/children this))))
 
 
@@ -336,9 +333,9 @@
 (defn menu [& args]
   (into
    [:span.menu]
-   (->> args
-        (filter identity)
-        (interpose [:span.separator "|"]))))
+   (some->> args
+            (filter identity)
+            (interpose [:span.separator "|"]))))
 
 
 
