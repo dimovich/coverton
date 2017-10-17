@@ -44,8 +44,11 @@
                  [com.taoensso/tengen "1.0.0-RC1"]
                  [jkkramer/verily "0.6.0" :exclusions [org.clojure/clojurescript]]
 
+                 [cljsjs/react "15.6.2-0"]
+                 [cljsjs/react-dom "15.6.2-0"]
                  [cljsjs/react-color "2.13.1-0"]
                  ;;[cljsjs/react-draggable "3.0.3-0"]
+                 ;;[cljsjs/interact "1.2.8-0"]
                  ;;[cljsjs/fabric "1.5.0-1"]
                  ])
 
@@ -68,12 +71,11 @@
                                          :asset-path "out"
                                          ;;:main 'coverton.core
                                          :parallel-build true
-                                         :pseudo-names true
+                                         ;;:pseudo-names true
                                          :install-deps true
-                                         :npm-deps { ;;:re-resizable "3.0.0"
-                                                    ;;:fabric "1.7.19"
-                                                    ;;:jsdom "11.3.0"
-                                                    :react-fabricjs "1.6.0"}
+                                         :npm-deps {;;:re-resizable "3.0.0"
+                                                    :react-fabricjs "0.1.6"
+                                                    }
                                          :foreign-libs  [{:file        "src/js/jsutils.js"
                                                           :provides    ["coverton.jsutil"]
                                                           :module-type :commonjs}
@@ -94,7 +96,7 @@
 
 (deftask development
   []
-  (task-options! cljs      {:optimizations :advanced
+  (task-options! cljs      {:optimizations :none
                             :source-map    true}
                  cljs-repl {:nrepl-opts {:port 3311}}
                  target    {:dir #{"target"}})

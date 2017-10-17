@@ -7,16 +7,17 @@
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]
             [coverton.ed.subs   :as sub]
-            ;;[cljsjs.react-draggable]
-            [cljsjs.react-color :as react-color]
-            ;;[cljsjs.fabric :as fabric]
-            [react-fabricjs]
+           ;; [cljsjs.react-draggable]
+            [cljsjs.react-color]
+            ;;[cljsjs.interact]
             ;;[re-resizable]
-            [coverton.jsutil]))
+            ;;[react-fabricjs]
+;;            [coverton.jsutil]
+            ))
 
 
-(def react-drag   (r/adapt-react-class js/ReactDraggable))
-(def react-resize (r/adapt-react-class (goog.object/getValueByKeys js/re-resizable "default")))
+(def react-drag   :div #_(r/adapt-react-class js/ReactDraggable))
+(def react-resize :div #_(r/adapt-react-class (goog.object/getValueByKeys js/re-resizable "default")))
 (def react-color  (r/adapt-react-class (.-SliderPicker js/ReactColor)))
 
 ;;
@@ -64,7 +65,7 @@
       :component-did-mount
       (fn [this]
         ;;for the outer component who modifies size or attributes
-        ;;(set-ref (r/dom-node this))
+        (set-ref (r/dom-node this))
         ;;(evt/set-ref id (r/dom-node this))
         (update-width this))
 
@@ -140,19 +141,19 @@
 
 
 ;; move draggable to resizable? and try to see if the no-item error still appears
-(defn draggable [{:keys [update-fn start-pos ref]}]
+(defn draggable [{:keys [update-fn start-pos]}]
   (r/with-let [this  (r/current-component)
                [x y] start-pos]
-    (into [:div.react-drag] (r/children this))
-    #_[react-drag {:cancel ".cancel-drag"
-                   :on-stop (fn [_ d]
-                              (let [d (js->clj d)]
-                                (update-fn [(+ x (d "x"))
-                                            (+ y (d "y"))])))}
+    
+    [react-drag {:cancel ".cancel-drag"
+                 :on-stop (fn [_ d]
+                            (let [d (js->clj d)]
+                              (update-fn [(+ x (d "x"))
+                                          (+ y (d "y"))])))}
        
-       (into
-        [:div.react-draggable-child]
-        (r/children this))]))
+     (into
+      [:div.react-draggable-child]
+      (r/children this))]))
 
 
 

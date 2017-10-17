@@ -1,11 +1,10 @@
 {
-  "scripts": {
-    "watch": "webpack -d --watch",
-    "build": "webpack -p"
-  },
   "dependencies": {
+    "@cljs-oss/module-deps": "^1.1.1",
     "re-resizable": "^3.0.0",
-    "fabric": "^1.7.19",
-    "webpack": "^3.7.1"
+    "react": "15.6.2",
+    "react-dom": "15.6.2",
+    "react-fabricjs": "^0.1.6",
+    "react-interactjs": "^0.1.2"
   }
 }

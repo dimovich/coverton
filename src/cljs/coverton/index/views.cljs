@@ -4,6 +4,7 @@
             [coverton.index.events :as evt]
             [coverton.index.subs   :as sub]
             [coverton.ed.views     :as ed]
+            [coverton.fabric.views :as fab]
             [coverton.components   :as cc]
             [coverton.ajax.events  :as ajax-evt]
             [taoensso.timbre :refer-macros [info]]
@@ -187,6 +188,8 @@
 
 
 
+
+
 (defn index []
   (r/with-let [_      (dispatch-sync [::evt/initialize])
                page   (subscribe [::sub/page])
@@ -202,7 +205,9 @@
         ;; Editor
         :ed [ed/editor {:cover (-> @(subscribe [::sub/active-cover])
                                    (dissoc :cover/id))}]
-      
+
+        :fabric [fab/fabric]
+        
         ;; Index
         [:div.index
          [search-box {:tags @search-tags}]

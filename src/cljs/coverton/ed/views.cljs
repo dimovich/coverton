@@ -35,8 +35,7 @@
          
          [cc/draggable {:update-fn #(evt/set-pos id %)
                         ;;we get deltas, so we need the initial coords
-                        :start-pos [x y]
-                        :ref child-ref}
+                        :start-pos [x y]}
 
           ;; fixme: move toolbox to inner
           [cc/toolbox {:id id
@@ -47,7 +46,7 @@
                          :update-fn  #(evt/set-font-size id %)}
           
            [cc/autosize-input {:id          id
-                               :ref     #(println %) ;;(reset! child-ref %)
+                               :set-ref     #(reset! child-ref %)
                                :key         :input
                                :text        @text
                                :color       @color
