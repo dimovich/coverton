@@ -1,3 +1,4 @@
+fabric = {};
 fabric.Canvas = {};
 fabric.Text = {};
 fabric.Image = {};
