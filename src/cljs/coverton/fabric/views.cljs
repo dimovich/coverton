@@ -1,5 +1,6 @@
 (ns coverton.fabric.views
-  (:require [react-fabricjs]
+  (:require ;;[react-fabricjs]
+            [cljsjs.fabric]
             [reagent.core       :as r]
             [coverton.ed.subs   :as ed-sub]
             [coverton.ed.events :as ed-evt]

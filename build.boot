@@ -49,7 +49,7 @@
                  [cljsjs/react-color "2.13.1-0"]
                  ;;[cljsjs/react-draggable "3.0.3-0"]
                  ;;[cljsjs/interact "1.2.8-0"]
-                 ;;[cljsjs/fabric "1.5.0-1"]
+                 [cljsjs/fabric "1.5.0-1"]
                  ])
 
 
@@ -72,10 +72,11 @@
                                          ;;:main 'coverton.core
                                          :parallel-build true
                                          ;;:pseudo-names true
-                                         :externs ["src/js/deps.js"]
+                                         ;;:externs ["src/js/fabric.ext.js"]
                                          :install-deps true
                                          :npm-deps {;;:re-resizable "3.0.0"
-                                                    :react-fabricjs "0.1.6"}
+                                                    ;;:react-fabricjs "0.1.6"
+                                                    }
                                          :foreign-libs  [{:file        "src/js/jsutils.js"
                                                           :provides    ["coverton.jsutil"]
                                                           :module-type :commonjs}]}})
