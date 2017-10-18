@@ -44,8 +44,8 @@
                  [com.taoensso/tengen "1.0.0-RC1"]
                  [jkkramer/verily "0.6.0" :exclusions [org.clojure/clojurescript]]
 
-                 [cljsjs/react "15.6.2-0"]
-                 [cljsjs/react-dom "15.6.2-0"]
+                 ;;[cljsjs/react "15.6.2-0"]
+                 ;;[cljsjs/react-dom "15.6.2-0"]
                  [cljsjs/react-color "2.13.1-0"]
                  ;;[cljsjs/react-draggable "3.0.3-0"]
                  ;;[cljsjs/interact "1.2.8-0"]
@@ -72,19 +72,13 @@
                                          ;;:main 'coverton.core
                                          :parallel-build true
                                          ;;:pseudo-names true
+                                         :externs ["src/js/deps.js"]
                                          :install-deps true
                                          :npm-deps {;;:re-resizable "3.0.0"
-                                                    :react-fabricjs "0.1.6"
-                                                    }
+                                                    :react-fabricjs "0.1.6"}
                                          :foreign-libs  [{:file        "src/js/jsutils.js"
                                                           :provides    ["coverton.jsutil"]
-                                                          :module-type :commonjs}
-
-                                                         #_({:provides ["cljsjs.fabric"]
-                                                             :global-exports '{cljsjs.fabric Fabric}}
-
-                                                            {:provides ["cljsjs.react-color"]
-                                                             :global-exports '{cljsjs.react-color ReactColor}})]}})
+                                                          :module-type :commonjs}]}})
 
 
 (deftask production

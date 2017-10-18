@@ -161,3 +161,22 @@ f
           :reload  true
           :httpkit true
           :init 'coverton.core/init})
+
+
+
+;; default value is fabric compatible
+
+
+(swap! items assoc (random-uuid) {:fabric (.fromObject window.fabric.Text (clj->js obj))})
+
+
+(.fromURL window.fabric.Image img-url (fn [img]
+                                        (info img)
+                                        (.add @canvas img)))
+
+
+(.setBackgroundImage c img-url)
+
+
+(window.fabric.Image.fromURL img-url (fn [img]
+                                       (.add @canvas img)))

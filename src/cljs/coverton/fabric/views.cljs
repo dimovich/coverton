@@ -1,42 +1,97 @@
 (ns coverton.fabric.views
-  (:require [reagent.core   :as r]
-            [react-fabricjs]
-            ;;[cljsjs.fabric]
-            [dommy.core     :as d  :refer-macros [sel1]]
-            [taoensso.timbre :refer-macros [info]]))
+  (:require [react-fabricjs]
+            [reagent.core       :as r]
+            [coverton.ed.subs   :as ed-sub]
+            [coverton.ed.events :as ed-evt]
+            [re-frame.core      :refer [subscribe]]
+            [taoensso.timbre    :refer-macros [info]]))
 
 
-(def Canvas window.fabric.Canvas)
-(def Rect window.fabric.Rect)
-(def Text window.fabric.Text)
+
+(def Canvas  (goog.object/getValueByKeys js/window "fabric" "Canvas"))
+(def Rect    (goog.object/getValueByKeys js/window "fabric" "Rect"))
+(def Text    (goog.object/getValueByKeys js/window "fabric" "Text"))
+(def IText   (goog.object/getValueByKeys js/window "fabric" "IText"))
+(def fromURL (goog.object/getValueByKeys js/window "fabric" "Image" "fromURL"))
 
 
-(def img-url "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")
+(def canvas (r/atom nil))
 
-(defn fabric []
-  (let [canvas (r/atom nil)]
+
+(defn click->relative [e]
+  (let [bounds (.. e -target getBoundingClientRect)
+        x (- (.. e -clientX) (.. bounds -left))
+        y (- (.. e -clientY) (.. bounds -top))]
+    [(/ x (.. bounds -width))
+     (/ y (.. bounds -height))]))
+
+
+
+(defn on-click-add-mark [evt]
+  (info evt)
+  (-> (.. evt -e)
+      click->relative
+      ed-evt/add-mark))
+
+
+(defn init-fabric [canvas])
+
+
+(defn marks->fabric [canvas marks]
+  (doall
+   (map (fn [[id mark]]
+          (let [width (.. canvas -width)
+                height (.. canvas -height)
+                [x y] (:pos mark)
+                x (* x width)
+                y (* y height)
+                text (or (:text mark) "hello")]
+            (.add canvas (IText. text (clj->js {:left x :top y})))))
+        marks)))
+
+
+
+(defn cover->fabric [canvas cover]
+  (.clear canvas)
+  (let [url (:cover/image-url cover)
+        marks (:cover/marks cover)]
+    ;; background
+    (fromURL url #(do (.on % "mouse:down" on-click-add-mark)
+                      (.scaleToWidth % (.. canvas -width))
+                      (.setBackgroundImage canvas %)
+                      (.renderAll canvas)))
+    ;; marks
+    (marks->fabric canvas marks)))
+
+
+
+
+(defn fabric [cover]
+  (let [_ (ed-evt/initialize cover)
+        update-size (fn [canvas parent]
+                      (.setWidth canvas (.. parent -clientHeight))
+                      (.setHeight canvas (.. parent -clientHeight)))]
     (r/create-class
      {:component-did-mount
       (fn [this]
-        (let [c (Canvas. "canv")
-              r (Rect. (clj->js {:left 50 :top 50
-                                 :fill "red" :width 50
-                                 :height 50}))]
+        (let [dom (r/dom-node this)
+              c (Canvas. "canv")]
+          
           (reset! canvas c)
-          (.add c r)
-          (.add c (Text. "Hello World" (clj->js {:left 100 :top 100})))
-          #_(.fromURL window.fabric.Image img-url (fn [img]
-                                                    (info img)
-                                                    (.add @canvas img)))
-          ;;         (.setBackgroundImage c img-url)
-          ))
+          (init-fabric   @canvas)
+          (update-size   @canvas (r/dom-node this))
+          (cover->fabric @canvas (r/props this))))
+      
       :component-did-update
       (fn [this]
-        (info (r/props this))
-        (window.fabric.Image.fromURL img-url (fn [img]
-                                               (info img)
-                                               (.add @canvas img))))
+        (cover->fabric @canvas (r/props this)))
+      
       :reagent-render
-      (fn []
-        [:div.editor
+      (fn [cover]
+        [:div.editor-img
          [:canvas#canv]])})))
+
+
+;; TODO:
+;; on-click-add-mark
+;; save state

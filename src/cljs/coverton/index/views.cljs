@@ -4,6 +4,7 @@
             [coverton.index.events :as evt]
             [coverton.index.subs   :as sub]
             [coverton.ed.views     :as ed]
+            [coverton.ed.subs      :as ed-sub]
             [coverton.fabric.views :as fab]
             [coverton.components   :as cc]
             [coverton.ajax.events  :as ajax-evt]
@@ -188,6 +189,8 @@
 
 
 
+(def items (r/atom {}))
+
 
 
 (defn index []
@@ -206,7 +209,7 @@
         :ed [ed/editor {:cover (-> @(subscribe [::sub/active-cover])
                                    (dissoc :cover/id))}]
 
-        :fabric [fab/fabric]
+        :fabric [fab/fabric @(subscribe [::ed-sub/cover])]
         
         ;; Index
         [:div.index

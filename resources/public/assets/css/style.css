@@ -74,6 +74,7 @@ a {
     width: auto;
     border: 0px solid black;
     padding: 0;
+    margin: auto;
 }
 
 .editor-img-wrap {
@@ -499,4 +500,9 @@ button a {
 .error {
     background-color: pink !important;
    /* border: 1px solid red !important;*/
+}
+
+
+.canvas-container {
+    margin: auto;
 }

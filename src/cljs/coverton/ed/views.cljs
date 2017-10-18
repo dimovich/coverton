@@ -64,14 +64,6 @@
 
 
 
-(defn handle-add-mark [pos]
-  (let [id (random-uuid)
-        sid (str id)]
-    (evt/add-mark {:pos     pos
-                   :id id})
-    (evt/set-active-mark sid)))
-
-
 
 (defn on-click-add-mark [parent e]
   (let [[w h] @(subscribe [::sub/size])
@@ -80,7 +72,7 @@
         ry    (.. rect -top)
         x     (- (.. e -clientX) rx)
         y     (- (.. e -clientY) ry)]
-    (handle-add-mark [(/ x w) (/ y h)])))
+    (evt/add-mark [(/ x w) (/ y h)])))
 
 
 

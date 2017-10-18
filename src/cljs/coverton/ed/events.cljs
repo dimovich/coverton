@@ -117,8 +117,11 @@
   (dispatch [::merge-cover {:active-mark id}]))
 
 
-(defn add-mark [m]
-  (dispatch [::add-mark m]))
+(defn add-mark [pos]
+  (let [id (random-uuid)
+        sid (str id)]
+    (dispatch [::add-mark {:pos pos :id id}])
+    (set-active-mark sid)))
 
 
 (defn remove-mark [id]
