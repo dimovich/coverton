@@ -9,11 +9,13 @@
 
 
 
-(def Canvas  (goog.object/getValueByKeys js/window "fabric" "Canvas"))
-(def Rect    (goog.object/getValueByKeys js/window "fabric" "Rect"))
-(def Text    (goog.object/getValueByKeys js/window "fabric" "Text"))
-(def IText   (goog.object/getValueByKeys js/window "fabric" "IText"))
-(def fromURL (goog.object/getValueByKeys js/window "fabric" "Image" "fromURL"))
+(def Canvas  window.fabric.Canvas)
+(def Rect    window.fabric.Rect)
+(def Text    window.fabric.Text)
+(def IText   window.fabric.IText)
+(def fromURL window.fabric.Image.fromURL)
+
+;;(def fromURL (goog.object/getValueByKeys js/window "fabric" "Image" "fromURL"))
 
 
 (def canvas (r/atom nil))
@@ -29,14 +31,12 @@
 
 
 (defn on-click-add-mark [evt]
-  (info evt)
   (-> (.. evt -e)
       click->relative
       ed-evt/add-mark))
 
 
-(defn init-fabric [canvas])
-
+()
 
 (defn marks->fabric [canvas marks]
   (doall
@@ -46,9 +46,13 @@
                 [x y] (:pos mark)
                 x (* x width)
                 y (* y height)
-                text (or (:text mark) "hello")]
-            (.add canvas (IText. text (clj->js {:left x :top y})))))
+                text (or (:text mark) "hello")
+                text (IText. text (clj->js {:left x :top y}))
+                text (.on text "mousedown" #(do (info (.. % -e -target -width))
+                                                (.. % -e preventDefault)))]
+            (.add canvas text)))
         marks)))
+
 
 
 
@@ -57,13 +61,21 @@
   (let [url (:cover/image-url cover)
         marks (:cover/marks cover)]
     ;; background
-    (fromURL url #(do (.on % "mouse:down" on-click-add-mark)
-                      (.scaleToWidth % (.. canvas -width))
-                      (.setBackgroundImage canvas %)
-                      (.renderAll canvas)))
+    (fromURL url (fn [img]
+                   ;;(.on img "changed" #(info "selected"))
+                   (.scaleToWidth img (.. canvas -width))
+                   (.setBackgroundImage canvas img)
+                   (.renderAll canvas)))
     ;; marks
     (marks->fabric canvas marks)))
 
+
+
+
+(defn init-fabric [canvas]
+  (.on canvas "mouse:down" (fn [evt]
+                             (info (js->clj (.. evt -e -target -className)))
+                             (on-click-add-mark evt))))
 
 
 
@@ -91,6 +103,9 @@
       (fn [cover]
         [:div.editor-img
          [:canvas#canv]])})))
+
+
+
 
 
 ;; TODO:

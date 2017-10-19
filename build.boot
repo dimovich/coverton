@@ -46,11 +46,10 @@
 
                  ;;[cljsjs/react "15.6.2-0"]
                  ;;[cljsjs/react-dom "15.6.2-0"]
-                 [cljsjs/react-color "2.13.1-0"]
                  ;;[cljsjs/react-draggable "3.0.3-0"]
                  ;;[cljsjs/interact "1.2.8-0"]
                  [cljsjs/fabric "1.5.0-1"]
-                 ])
+                 [cljsjs/react-color "2.13.1-0"]])
 
 
 (require
