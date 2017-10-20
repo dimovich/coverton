@@ -7,13 +7,7 @@
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]
             [coverton.ed.subs   :as sub]
-           ;; [cljsjs.react-draggable]
-            [cljsjs.react-color]
-            ;;[cljsjs.interact]
-            ;;[re-resizable]
-            ;;[react-fabricjs]
-;;            [coverton.jsutil]
-            ))
+            [cljsjs.react-color]))
 
 
 (def react-drag   :div #_(r/adapt-react-class js/ReactDraggable))
@@ -327,6 +321,15 @@
     
     [react-color {:on-change set-color ;;:on-change-complete
                   :color @active-color}]))
+
+
+
+(defn color-picker2 [canvas]
+  (r/with-let [set-color  #(when-let [obj (.getActiveObject @canvas)]
+                             (.setColor obj (get (js->clj %) "hex"))
+                             (.renderAll @canvas))]
+    
+    [react-color {:on-change set-color}]))
 
 
 

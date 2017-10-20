@@ -5,6 +5,7 @@
             [re-frame.core      :refer [subscribe dispatch]]
             [taoensso.timbre    :refer-macros [info]]
             [coverton.fonts     :refer [default-font]]
+            [coverton.components :as cc]
             [cljsjs.fabric]))
 
 
@@ -50,10 +51,9 @@
 
 
 (defn cover->fabric [canvas cover]
+  (.clear canvas)
   (if-let [fabric-json (:cover/fabric-json cover)]
-    (do ;;init from object
-      (info fabric-json)
-      (.loadFromJSON canvas fabric-json (fn [objs] (info "loaded" objs))))
+    (.loadFromJSON canvas fabric-json)
     ;;create new
     (let [url (:cover/image-url cover)]
       ;;background
@@ -79,10 +79,12 @@
 (defn fabric [cover]
   (let [_     (ed-evt/initialize cover)
         cover (subscribe [::ed-sub/cover])
-        fabric->json (fn [] (.toJSON @canvas))
+        fabric->json (fn [c] (.toJSON c))
         update-size (fn [canvas parent]
-                      (.setWidth canvas (.. parent -clientHeight))
-                      (.setHeight canvas (.. parent -clientHeight)))]
+                      (let [h (.. parent -clientHeight)
+                            h (- h 70)]
+                       (.setWidth canvas h)
+                       (.setHeight canvas h)))]
     (r/create-class
      {:component-did-mount
       (fn [this]
@@ -95,21 +97,21 @@
           (cover->fabric @canvas @cover)))
       
       :component-did-update
-      (fn [this]
-        (info "updated" (.toJSON @canvas))
-        (cover->fabric @canvas @cover))
+      (fn [this])
 
       :component-will-unmount
       (fn [this]
-        (info "unmounting")
-        ;;(info {:cover/fabric-json (fabric->json)})
-        )
+        (dispatch [::ed-evt/update-cover
+                   :cover/fabric-json #(fabric->json @canvas)]))
       
       :reagent-render
       (fn []
-        [:div.editor-img
-         [:canvas#canv]
-         #_[:div (str @cover)]])})))
+        [:div.editor
+         [:div.fabric-wrap
+          [:div.editor-img
+           [:canvas#canv]]]
+         
+         [cc/color-picker2 canvas]])})))
 
 
 

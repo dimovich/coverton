@@ -32,6 +32,13 @@
 
 
 (reg-sub
+ ::keys
+ :<- [::ed]
+ (fn [db [_ ks]]
+   (get-in db ks)))
+
+
+(reg-sub
  ::marks
  :<- [::cover]
  (fn [db _]

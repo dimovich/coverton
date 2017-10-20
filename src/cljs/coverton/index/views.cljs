@@ -99,7 +99,8 @@
 
 (def page->header {:index #{:logo :request-invite :auth}
                    :ed    #{:logo :request-invite :auth}
-                   :request-invite #{:logo}})
+                   :request-invite #{:logo}
+                   :fabric #{:logo}})
 
 
 (defn header [page]
@@ -122,6 +123,8 @@
 
        [:span {:style {:float :right}}
         (apply cc/menu
+               [:a {:on-click #(do (evt/set-page :fabric))}
+                "fabric"]
                (cond
                  @authenticated? [[:a {:on-click #(do (evt/set-active-cover {})
                                                       (evt/set-page :ed))}
