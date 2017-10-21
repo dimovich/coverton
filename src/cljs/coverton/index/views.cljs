@@ -3,8 +3,6 @@
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [coverton.index.events :as evt]
             [coverton.index.subs   :as sub]
-            [coverton.ed.views     :as ed]
-            [coverton.ed.subs      :as ed-sub]
             [coverton.fabric.views :as fab]
             [coverton.components   :as cc]
             [coverton.ajax.events  :as ajax-evt]
@@ -97,10 +95,9 @@
 
 
 
-(def page->header {:index #{:logo :request-invite :auth}
-                   :ed    #{:logo :request-invite :auth}
+(def page->header {:index #{:logo :fabric :request-invite :auth}
                    :request-invite #{:logo}
-                   :fabric #{:logo}})
+                   :fabric #{:logo :auth}})
 
 
 (defn header [page]
@@ -114,7 +111,8 @@
        (when (:logo els)
          [:span.clickable {:style {:left 0}
                            :on-click #(do (evt/set-page :index)
-                                          (reset! show-login? false))}
+                                          (reset! show-login? false)
+                                          (dispatch [::evt/refresh]))}
       
           [:img.logo {:src "assets/svg/logo.svg"}]
           [:span.logo-name "Coverton"]
@@ -123,11 +121,9 @@
 
        [:span {:style {:float :right}}
         (apply cc/menu
-               [:a {:on-click #(do (evt/set-page :fabric))}
-                "fabric"]
                (cond
                  @authenticated? [[:a {:on-click #(do (evt/set-active-cover {})
-                                                      (evt/set-page :ed))}
+                                                      (evt/set-page :fabric))}
                                    "N E W"]
                                   [:a {:on-click #(do (dispatch [::evt/logout])
                                                       (reset! show-login? false))}
@@ -209,10 +205,8 @@
       (condp = @page
         :request-invite [request-invite]
         ;; Editor
-        :ed [ed/editor {:cover (-> @(subscribe [::sub/active-cover])
-                                   (dissoc :cover/id))}]
-
-        :fabric [fab/fabric @(subscribe [::ed-sub/cover])]
+        :fabric [fab/editor {:cover (-> @(subscribe [::sub/active-cover])
+                                        (dissoc :cover/id))}]
         
         ;; Index
         [:div.index
@@ -228,7 +222,7 @@
              ^{:key (:cover/id cover)}
              [css
               [cc/cover-block cover {:on-click #(do (evt/set-active-cover cover)
-                                                    (evt/set-page :ed))}]
+                                                    (evt/set-page :fabric))}]
               [:div.cover-block-info
                [:div.cover-block-author (:cover/author cover)]]])
            @covers

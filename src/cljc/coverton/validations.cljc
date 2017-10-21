@@ -35,6 +35,7 @@
 (defn validator [state errors]
   (fn [& ks]
     (let [msgs (apply validate @state ks)
+          ;; ks that have been clears
           good (apply disj (set ks) (keys msgs))]
       (swap! errors #(-> (apply dissoc % good)
                          (merge msgs))))))

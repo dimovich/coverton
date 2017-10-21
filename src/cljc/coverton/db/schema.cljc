@@ -1,7 +1,7 @@
 (ns coverton.db.schema)
 
 
-;;todo: need timestamp for covers
+;;todo: need timestamp for covers (datomic has builtin
 
 (defonce cover->db [:cover/id :cover/tags :cover/author :cover/data])
 
@@ -74,52 +74,6 @@
     :db/cardinality :db.cardinality/many
     :db/fulltext true
     :db/doc "Cover tags"}])
-
-
-
-(defonce cover-schema [
-                       #_(
-                          {:db/ident :cover/marks
-                           :db/valueType :db.type/ref
-                           :db/cardinality :db.cardinality/many
-                           :db/isComponent true
-                           :db/doc "Cover marks (labels, svgs, etc)"})])
-
-
-
-(defonce mark-schema [{:db/ident :mark/id
-                       :db/valueType :db.type/uuid
-                       :db/cardinality :db.cardinality/one
-                       :db/unique :db.unique/identity}
-                  
-                      {:db/ident :mark/font-family
-                       :db/valueType :db.type/string
-                       :db/cardinality :db.cardinality/one}
-                  
-                      {:db/ident :mark/font-size
-                       :db/valueType :db.type/long
-                       :db/cardinality :db.cardinality/one}
-
-                      {:db/ident :mark/color
-                       :db/valueType :db.type/string
-                       :db/cardinality :db.cardinality/one}
-
-                      {:db/ident :mark/url
-                       :db/valueType :db.type/string
-                       :db/cardinality :db.cardinality/one}
-
-                      {:db/ident :mark/type
-                       :db/valueType :db.type/keyword
-                       :db/cardinality :db.cardinality/one}
-
-                      {:db/ident :mark/text
-                       :db/valueType :db.type/string
-                       :db/cardinality :db.cardinality/one}
-                  
-                      {:db/ident :mark/pos
-                       :db/valueType :db.type/long
-                       :db/cardinality :db.cardinality/many}])
-
 
 
 

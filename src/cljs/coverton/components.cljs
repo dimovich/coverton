@@ -6,13 +6,8 @@
             [coverton.util  :refer [arc]]
             [coverton.fonts :refer [default-font]]
             [coverton.ed.events :as evt]
-            [coverton.ed.subs   :as sub]
-            [cljsjs.react-color]))
+            [coverton.ed.subs   :as sub]))
 
-
-(def react-drag   :div #_(r/adapt-react-class js/ReactDraggable))
-(def react-resize :div #_(r/adapt-react-class (goog.object/getValueByKeys js/re-resizable "default")))
-(def react-color  (r/adapt-react-class (.-SliderPicker js/ReactColor)))
 
 ;;
 ;; calculate text width in px for font type and size
@@ -33,121 +28,6 @@
     ;; so possibly extend to scroll width
     (d/set-px! el :width (+ 2 (.. span -scrollWidth)))
     (d/set-px! el :width (.. el -scrollWidth))))
-
-
-
-(defn autosize-input
-  [{:keys [id update-fn text font-family color set-ref read-only?]}]
-  
-  (let [state          (r/atom (or text ""))
-        caret-pos      (atom 0)
-        update-width   #(set-width (r/dom-node %))
-        blur           #(.. % -target blur)
-
-        enable-static  #(do
-                          (evt/set-mark-read-only id true)
-                          ;;(reset! caret-pos (jsutils/getCaretPosition id))
-                          )
-        disable-static #(do ;;fixme doesn't focus
-                          (evt/set-mark-read-only id false)
-                          ;;(jsutils/setCaretPosition id @caret-pos)
-                          )]
-    
-    (r/create-class
-     {:display-name "autosize-input"
-      
-      :component-did-mount
-      (fn [this]
-        ;;for the outer component who modifies size or attributes
-        (set-ref (r/dom-node this))
-        ;;(evt/set-ref id (r/dom-node this))
-        (update-width this))
-
-      :component-did-update update-width
-      
-      :reagent-render
-      (fn [{:keys [font-family color read-only?]}]
-        (let [common {:id id
-                      :value @state
-                      :on-click #(evt/set-active-mark id)
-                      :style {:font-size   "1em"
-                              :font-family font-family
-                              :color       color}}
-              
-              editable {:on-change #(reset! state (.. % -target -value))
-                        :on-blur   #(do
-                                      (enable-static)
-                                      (update-fn @state))
-                        :on-key-down (fn [e]
-                                       (condp = (.. e -key)
-                                         "Enter" (blur e)
-                                         "Escape" (blur e)
-                                         "Delete" #(do (reset! state "") ;;delete value ;; move to static
-                                                       (blur e)) ;; delete
-                                         false))
-
-                        :class "mark-input cancel-drag"
-                        :auto-focus true}
-              
-              static {:on-double-click disable-static
-                      :read-only true
-                      :on-focus blur
-                      :class "mark-input"
-                      :style {:cursor :move}}]
-          
-          [:input
-           (merge-with merge common (if read-only? static editable))]))})))
-
-
-
-
-(defn resizable [{:keys [font-size update-fn child-ref]}]
-  (r/with-let [this  (r/current-component)
-               start (atom nil)
-               size  (atom nil)]
-    (into
-     [react-resize {:class-name "mark-resize"
-                    :size {:height "1em" :width "1em"}
-                    ;;:width "1em" :height "1em"
-                    :style {:font-size  font-size}
-                    :lock-aspect-ratio true
-                    :on-resize-start (fn [_ _ el]
-                                       (reset! start (d/px el :font-size))
-                                       (d/add-class! el :cancel-drag))
-                    
-                    :on-resize-stop (fn [_ _ el _]
-                                      (update-fn @size)
-                                      (d/remove-class! el :cancel-drag))
-                    
-                    :on-resize (fn [_ _ el d]
-                                 ;; element is inline, so child will set size
-                                 (d/remove-style! el :height)
-                                 (d/remove-style! el :width)
-
-                                 (reset! size (+ @start
-                                                 (get-in (vec (js->clj d)) [1 1])))
-
-                                 (d/set-px! el :font-size @size)
-
-                                 (set-width @child-ref))}]
-     (r/children this))))
-
-
-
-;; move draggable to resizable? and try to see if the no-item error still appears
-(defn draggable [{:keys [update-fn start-pos]}]
-  (r/with-let [this  (r/current-component)
-               [x y] start-pos]
-    
-    [react-drag {:cancel ".cancel-drag"
-                 :on-stop (fn [_ d]
-                            (let [d (js->clj d)]
-                              (update-fn [(+ x (d "x"))
-                                          (+ y (d "y"))])))}
-       
-     (into
-      [:div.react-draggable-child]
-      (r/children this))]))
 
 
 
@@ -313,26 +193,6 @@
 
 
 
-(defn color-picker []
-  (r/with-let [id           (subscribe [::sub/active-mark])
-               active-color (subscribe [::sub/active-color])
-               set-color    #(when @id
-                               (evt/set-color @id ((js->clj %) "hex")))]
-    
-    [react-color {:on-change set-color ;;:on-change-complete
-                  :color @active-color}]))
-
-
-
-(defn color-picker2 [canvas]
-  (r/with-let [set-color  #(when-let [obj (.getActiveObject @canvas)]
-                             (.setColor obj (get (js->clj %) "hex"))
-                             (.renderAll @canvas))]
-    
-    [react-color {:on-change set-color}]))
-
-
-
 
 (defn menu [& args]
   (into
@@ -359,3 +219,39 @@
   [:span
    (for [msg msgs]
      [:p.error msg])])
+
+
+
+
+(defn image-picker-button [set-fn]
+  [:span
+   [:a {:on-click #(.click (sel1 :#image-input))}
+    "image"]
+   [:input#image-input
+    {:type "file"
+     :accept "image/*"
+     :style {:display :none
+             :position :inline-block}
+     :on-change #(set-fn (.createObjectURL js/URL (-> % .-target .-files (aget 0))))}]])
+
+
+
+
+(defn form-data [id]
+  (when-let [file (some-> (sel1 id)
+                          .-files
+                          (aget 0))]
+    (doto
+        (js/FormData.)
+        (.append "file" file))))
+
+
+
+
+(defn save-cover [cover]
+  (if-let [file (form-data :#image-input)] ;;todo: check if already uploaded
+    (dispatch [::evt/upload-file file
+               {:on-success [::evt/save-cover cover]}])
+    
+    (dispatch [::evt/save-cover cover])))
+

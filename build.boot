@@ -37,17 +37,13 @@
                  [org.clojure/data.fressian "0.2.1"]
                  
                  [prismatic/dommy "1.1.0"]
-                 [reagent  "0.8.0-alpha1"]
+                 [reagent  "0.8.0-alpha2"]
                  [re-frame "0.10.2"]
                  [cljs-ajax "0.7.2"]
                  [day8.re-frame/http-fx "0.1.4"]
                  [com.taoensso/tengen "1.0.0-RC1"]
                  [jkkramer/verily "0.6.0" :exclusions [org.clojure/clojurescript]]
 
-                 ;;[cljsjs/react "15.6.2-0"]
-                 ;;[cljsjs/react-dom "15.6.2-0"]
-                 ;;[cljsjs/react-draggable "3.0.3-0"]
-                 ;;[cljsjs/interact "1.2.8-0"]
                  [cljsjs/fabric "1.5.0-1"]
                  [cljsjs/react-color "2.13.1-0"]])
 
@@ -70,12 +66,12 @@
                                          :asset-path "out"
                                          ;;:main 'coverton.core
                                          :parallel-build true
-                                         ;;:pseudo-names true
+                                         :pseudo-names true
                                          ;;:externs ["src/js/fabric.ext.js"]
-                                         :install-deps true
-                                         :npm-deps {;;:re-resizable "3.0.0"
-                                                    ;;:react-fabricjs "0.1.6"
-                                                    }
+                                         #_(:install-deps true
+                                                          :npm-deps { ;;:re-resizable "3.0.0"
+                                                                     ;;:react-fabricjs "0.1.6"
+                                                                     })
                                          :foreign-libs  [{:file        "src/js/jsutils.js"
                                                           :provides    ["coverton.jsutil"]
                                                           :module-type :commonjs}]}})

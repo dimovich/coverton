@@ -15,45 +15,6 @@
 ;; use center of element for position
 ;; how to recover? (in
 
-(defn mark [{id :id}]
-  (let [text  (subscribe [::sub/mark-text id])
-        pos   (subscribe [::sub/mark-pos  id])
-        color (subscribe [::sub/color     id])
-        font-family  (subscribe [::sub/mark-font-family id])
-        font-size    (subscribe [::sub/mark-font-size   id])
-        read-only?   (subscribe [::sub/mark-read-only?  id])
-        child-ref    (atom nil)
-        this         (r/current-component)
-        ;;initial click coords
-        [x y]        @pos]
-
-    (r/create-class
-     {:display-name "mark"
-      :reagent-render
-      (fn []
-        [:div.mark {:style {:left x :top y}}
-         
-         [cc/draggable {:update-fn #(evt/set-pos id %)
-                        ;;we get deltas, so we need the initial coords
-                        :start-pos [x y]}
-
-          ;; fixme: move toolbox to inner
-          [cc/toolbox {:id id
-                       :ref child-ref}]
-         
-          [cc/resizable {:font-size  @font-size
-                         :child-ref child-ref
-                         :update-fn  #(evt/set-font-size id %)}
-          
-           [cc/autosize-input {:id          id
-                               :set-ref     #(reset! child-ref %)
-                               :key         :input
-                               :text        @text
-                               :color       @color
-                               :font-family @font-family
-                               :read-only?  @read-only?
-                               :update-fn   #(evt/set-text id %)}]]]])})))
-
 
 
 (defn handle-remove-mark [e]
@@ -108,50 +69,11 @@
 
           [image {:url @image-url}]
           
-          (when @size
-            (for [id @ids]
-              ^{:key id} [mark {:id id}]))]))})))
+          #_(when @size
+              (for [id @ids]
+                ^{:key id} [mark {:id id}]))]))})))
 
 
-
-
-(defn form-data [id]
-  (when-let [file (some->
-                   (sel1 id)
-                   .-files
-                   (aget 0))]
-    (doto
-        (js/FormData.)
-        (.append "file" file))))
-
-
-
-
-(defn save-cover [cover]
-  (if-let [file (form-data :#image-input)] ;;todo: check if already uploaded
-    (dispatch [::evt/upload-file file
-               {:on-success [::evt/save-cover cover]}])
-    
-    (dispatch [::evt/save-cover cover])))
-
-
-
-(defn get-cover [id]
-  (dispatch [::evt/get-cover id]))
-
-
-
-(defn image-picker-button []
-  [:span
-   [:a {:on-click #(.click (sel1 :#image-input))}
-    "image"]
-   [:input#image-input
-    {:type "file"
-     :accept "image/*"
-     :style {:display :none
-             :position :inline-block}
-     :on-change #(evt/set-image-url
-                  (.createObjectURL js/URL (-> % .-target .-files (aget 0))))}]])
 
 
 ;; take ESC from dimmer
@@ -167,10 +89,10 @@
      [:div.header {:style {:text-align :center
                            :margin "0.5em auto"}}
       (cc/menu
-       [image-picker-button]
+       [cc/image-picker-button #(evt/set-image-url %)]
       
        (when @authenticated?
-         [:a {:on-click #(save-cover @(subscribe [::sub/cover]))}
+         [:a {:on-click #(cc/save-cover @(subscribe [::sub/cover]))}
           "save"])
       
        [:a {:on-click #(do (evt-index/set-page :index)
@@ -180,7 +102,5 @@
      (condp = @dimmer
        :font-picker [cc/font-picker]
         
-       [editor-img])
-
-     [cc/color-picker]]))
+       [editor-img])]))
 

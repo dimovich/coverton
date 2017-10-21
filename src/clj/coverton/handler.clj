@@ -129,7 +129,7 @@
   (GET  "/index"      [] (index))
 
   (POST "/save-cover" [] handle-save-cover)
-  (POST "/get-cover"  [] get-cover)
+  ;;(POST "/get-cover"  [] get-cover)
 
   (POST "/get-covers" [] handle-get-covers)
 
