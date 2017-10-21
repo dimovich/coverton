@@ -1,5 +1,5 @@
 (set-env!
- :source-paths    #{"src/cljs" "src/clj" "src/cljc" "src/js"}
+ :source-paths    #{"src/cljs" "src/clj" "src/cljc"}
  :resource-paths  #{"resources" }
  :dependencies '[[org.clojure/clojure "1.9.0-beta2"]
                  [org.clojure/clojurescript "1.9.946"]
@@ -44,8 +44,7 @@
                  [com.taoensso/tengen "1.0.0-RC1"]
                  [jkkramer/verily "0.6.0" :exclusions [org.clojure/clojurescript]]
 
-                 [cljsjs/fabric "1.5.0-1"]
-                 [cljsjs/react-color "2.13.1-0"]])
+                 [cljsjs/fabric "1.7.19-1"]])
 
 
 (require
@@ -66,7 +65,7 @@
                                          :asset-path "out"
                                          ;;:main 'coverton.core
                                          :parallel-build true
-                                         :pseudo-names true
+                                         ;;:pseudo-names true
                                          ;;:externs ["src/js/fabric.ext.js"]
                                          #_(:install-deps true
                                                           :npm-deps { ;;:re-resizable "3.0.0"

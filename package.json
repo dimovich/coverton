@@ -4,7 +4,7 @@
     "re-resizable": "^3.0.0",
     "react": "15.6.2",
     "react-dom": "15.6.2",
-    "react-fabricjs": "^0.1.6",
-    "react-interactjs": "^0.1.2"
+    "fabric": "1.7.19",
+    "jsdom": "11.3.0"
   }
 }

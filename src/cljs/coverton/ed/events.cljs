@@ -183,15 +183,22 @@
   (dispatch-sync [::initialize cover]))
 
 
-;;editor
+
 (reg-event-fx
  ::save-cover
- (fn [_ [_ cover & props]]
-   {:dispatch
-    [::ajax-evt/request-auth {:method :post
-                              :uri "/save-cover"
-                              :params (merge-db cover props)
-                              :on-success [::merge-cover]}]}))
+ cover-interceptors
+ (fn [{db :db} [cover & props]]
+   (let [cover (merge-db cover props)
+         url (:cover/image-url cover)
+         cover (if (:cover/fabric-json cover)
+                 (assoc-in cover [:cover/fabric-json "backgroundImage" "src"] url)
+                 cover)]
+     {:db cover
+      :dispatch
+      [::ajax-evt/request-auth {:method :post
+                                :uri "/save-cover"
+                                :params cover
+                                :on-success [::merge-cover]}]})))
 
 
 (reg-event-fx

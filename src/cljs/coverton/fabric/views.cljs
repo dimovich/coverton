@@ -28,9 +28,11 @@
   (let [bounds (.. e -target getBoundingClientRect)
         x (- (.. e -clientX) (.. bounds -left))
         y (- (.. e -clientY) (.. bounds -top))]
-    [x y]
-    #_[(/ x (.. bounds -width))
-       (/ y (.. bounds -height))]))
+    [x y]))
+
+#_[(/ x (.. bounds -width))
+   (/ y (.. bounds -height))]
+
 
 
 
@@ -63,18 +65,18 @@
            (fn [img]
              (.scaleToWidth img (.. canvas -width))
              (.setBackgroundImage canvas img
-                                  (.bind canvas.renderAll canvas)))))
-
+                                  #(do (fabric->cover canvas)
+                                       (.renderAll canvas))))))
 
 
 (defn cover->fabric [canvas cover]
   ;;(.clear canvas)
   (let [url (:cover/image-url cover)]
-    (when-let [fabric-json (clj->js (:cover/fabric-json cover))]
-      (info "loading from json..." fabric-json)
-      (.loadFromJSON canvas fabric-json))
-    ;;background
-    (set-background canvas url)))
+    (if-let [fabric-json (clj->js (:cover/fabric-json cover))]
+      (do
+        (info "loading from json..." fabric-json)
+        (.loadFromJSON canvas fabric-json))
+      (set-background canvas url))))
 
 
 
@@ -96,7 +98,7 @@
 
 
 
-(defn update-size [canvas parent]
+(defn set-canvas-size [canvas parent]
   (let [h (.. parent -clientHeight)]
     (.setWidth canvas h)
     (.setHeight canvas h)))
@@ -111,10 +113,10 @@
             c (Canvas. "canv")]
         
         (reset! canvas c)
-        (init-fabric   @canvas)
-        (update-size   @canvas (r/dom-node this))
-        (cover->fabric @canvas cover)
-        (fabric->cover @canvas)))
+        (init-fabric     @canvas)
+        (set-canvas-size @canvas (r/dom-node this))
+        (cover->fabric   @canvas cover)
+        (fabric->cover   @canvas)))
     
     :component-did-update
     (fn [this]
@@ -156,3 +158,12 @@
 
      [:br]
      [:div (str @cover)]]))
+
+
+
+;; TODO:
+;;
+;; scale
+;; picker-block
+;; controls
+;; background
