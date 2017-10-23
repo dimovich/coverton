@@ -189,13 +189,13 @@
  cover-interceptors
  (fn [{db :db} [& props]]
    (let [cover (apply merge db props)
-         url (:cover/image-url cover)
-         fabric (:cover/fabric cover)
-         cover (if (:json fabric)
-                 (assoc-in cover [:cover/fabric :json "backgroundImage" "src"] url)
-                 cover)]
-     {:db cover
-      :dispatch
+         #_(url (:cover/image-url cover)
+                fabric (:cover/fabric cover)
+                cover (if (:json fabric)
+                        (assoc-in cover [:cover/fabric :json "backgroundImage" "src"] url)
+                        cover))]
+     (info "saving cover...")
+     {:dispatch
       [::ajax-evt/request-auth {:method :post
                                 :uri "/save-cover"
                                 :params cover
@@ -207,9 +207,9 @@
     ;; the callback will merge the uploaded file name
     ;; with cover data
     (do
-      (info "uploading and saving file...")
+      (info "uploading file...")
       (dispatch [::upload-file file
-                 {:on-success [::save-cover]}]))
+                 {:on-success [::merge-cover]}]))
     
     (dispatch [::save-cover])))
 
@@ -231,6 +231,7 @@
  ::upload-file
  (fn [_ [_ data & [args]]]
    (when data
+     (info "uploading file...")
      {:dispatch
       [::ajax-evt/request-auth (-> {:method :post
                                     :uri "/upload-file"

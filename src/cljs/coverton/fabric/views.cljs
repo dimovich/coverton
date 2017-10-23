@@ -1,6 +1,6 @@
 (ns coverton.fabric.views
   (:require [reagent.core       :as r]
-            [re-frame.core      :as rf :refer [reg-event-fx]]
+            [re-frame.core      :as rf :refer [reg-event-fx dispatch]]
             [coverton.ed.subs   :as ed-sub]
             [coverton.ed.events :as ed-evt :refer [cover-interceptors]]
             [coverton.index.subs :as index-sub]
@@ -23,7 +23,7 @@
 (def enlivenObjects window.fabric.util.enlivenObjects)
 
 
-(def canvas (atom nil))
+(def state (atom nil))
 
 
 (defn click->relative [e]
@@ -66,26 +66,31 @@
 
 
 
-(defn set-background [canvas url]
+(defn set-background [canvas url & [cb]]
   (info "setting background: " url)
   (fromURL url
            (fn [img]
              (.scaleToWidth img (.. canvas -width))
              (.setBackgroundImage canvas img
                                   #(do (.renderAll canvas)
-                                       (fabric->cover canvas))))))
+                                       (fabric->cover canvas)
+                                       (when cb (cb)))))))
 
 
 
-(defn upload-artifacts []
-  (when-let [file (util/form-data :#image-input)]
-    (info "uploading image...")
-    (dispatch [::upload-file file
-               {:on-success [::ed-evt/merge-cover]}])))
+(reg-event-fx
+ ::save-cover
+ cover-interceptors
+ (fn [{db :db} _]
+   (if-let [file (util/form-data :#image-input)]
+     (do
+       (swap! state assoc :save-on-update? true)
+       {:dispatch [::ed-evt/upload-file file
+                   {:on-success [::ed-evt/merge-cover]}]})
+     
+     {:dispatch [::ed-evt/save-cover]})))
 
 
-#_(defn save-cover []
-    (upload-artifacts))
 
 
 (defn attach-events [canvas]
@@ -136,7 +141,9 @@
 
 
 
-(defn init-fabric [canvas])
+(defn init-fabric [canvas parent-dom]
+  (set-canvas-size canvas parent-dom))
+
 
 
 (defn fabric [{url :cover/image-url}]
@@ -145,23 +152,29 @@
     (r/create-class
      {:component-did-mount
       (fn [_]
-        (reset! canvas   (Canvas. "canv"))
+        (let [canvas (Canvas. "canv")]
+          (swap! state assoc :canvas canvas)
         
-        (init-fabric     @canvas)
-        (set-canvas-size @canvas @parent-dom)
-        (cover->fabric   @canvas @cover)
-        (fabric->cover   @canvas))
+          (init-fabric     canvas @parent-dom)
+          (cover->fabric   canvas @cover)
+          (fabric->cover   canvas)))
     
       :component-did-update
       (fn [this]
         (info "updating fabric...")
-        (set-background @canvas
-                        (:cover/image-url (r/props this))))
+        (set-background
+         (:canvas @state)
+         (:cover/image-url (r/props this))
+                        
+         (when (:save-on-update? @state)
+           (swap! state dissoc :save-on-update?)
+           #(dispatch [::ed-evt/save-cover]))))
 
+      
       :component-will-unmount
       (fn [this]
         (info "unmounting fabric...")
-        (some-> @canvas .clear))
+        (some-> @state :canvas .clear))
 
       :reagent-render
       (fn []
@@ -188,7 +201,7 @@
        [cc/image-picker]
        
        (when @auth?
-         [:a {:on-click #(ed-evt/save-cover)}
+         [:a {:on-click #(dispatch [::save-cover])}
           "save"]))]
 
      [fabric {:cover/image-url @url}]
@@ -200,7 +213,8 @@
 
 ;; TODO:
 ;;
+;; background selection on advanced
+;; cover-block scale bug
 ;; scale
 ;; picker-block
 ;; controls
-;; background

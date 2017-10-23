@@ -12,11 +12,11 @@
 
 
 (defn cover-block [cover & [params]]
-  (r/with-let [size (r/atom nil)]
-    [:div.cover-block params
-     [:object (->> {:width "100%"
-                    :data (str "data:image/svg+xml;charset=utf-8,"
-                               (get-in cover [:cover/fabric :svg]))})]]))
+  [:div.cover-block
+   [:div.cover-block-clickable  params]
+   [:object (->> {:width "100%"
+                  :data (str "data:image/svg+xml;charset=utf-8,"
+                             (get-in cover [:cover/fabric :svg]))})]])
 
 
 
@@ -95,6 +95,5 @@
                    (.createObjectURL js/URL (-> % .-target .-files (aget 0))))
       :style {:display :none
               :position :inline-block}}]]])
-
 
 
