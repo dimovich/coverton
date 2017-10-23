@@ -4,7 +4,7 @@
             [taoensso.timbre :refer-macros [info]]
             [coverton.ajax.events :as ajax-evt]
             [dommy.core     :as d :refer [sel1]]
-            [coverton.util  :refer [merge-db]]))
+            [coverton.util  :as util :refer [merge-db form-data]]))
 
 
 
@@ -187,11 +187,12 @@
 (reg-event-fx
  ::save-cover
  cover-interceptors
- (fn [{db :db} [cover & props]]
-   (let [cover (merge-db cover props)
+ (fn [{db :db} [& props]]
+   (let [cover (apply merge db props)
          url (:cover/image-url cover)
-         cover (if (:cover/fabric-json cover)
-                 (assoc-in cover [:cover/fabric-json "backgroundImage" "src"] url)
+         fabric (:cover/fabric cover)
+         cover (if (:json fabric)
+                 (assoc-in cover [:cover/fabric :json "backgroundImage" "src"] url)
                  cover)]
      {:db cover
       :dispatch
@@ -199,6 +200,20 @@
                                 :uri "/save-cover"
                                 :params cover
                                 :on-success [::merge-cover]}]})))
+
+
+(defn save-cover []
+  (if-let [file (util/form-data :#image-input)]
+    ;; the callback will merge the uploaded file name
+    ;; with cover data
+    (do
+      (info "uploading and saving file...")
+      (dispatch [::upload-file file
+                 {:on-success [::save-cover]}]))
+    
+    (dispatch [::save-cover])))
+
+
 
 
 (reg-event-fx

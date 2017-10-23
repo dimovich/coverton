@@ -1,9 +1,8 @@
 (ns coverton.util
-  (:require [reagent.core :as r]))
+  (:require [reagent.core :as r]
+            [dommy.core :refer [sel1]]
+            [taoensso.timbre :refer-macros [info]]))
 
-
-(defn info [& args]
-  (apply println args))
 
 
 (defn arc [& args]
@@ -21,3 +20,15 @@
 
 (defn merge-db [db [m]]
   (merge-with merge-props db m))
+
+
+
+
+(defn form-data [id]
+  (info "getting form data")
+  (when-let [file (some-> (sel1 id)
+                          .-files
+                          (aget 0))]
+    (info "got" file)
+    (doto (js/FormData.)
+      (.append "file" file))))

@@ -89,10 +89,10 @@
      [:div.header {:style {:text-align :center
                            :margin "0.5em auto"}}
       (cc/menu
-       [cc/image-picker-button #(evt/set-image-url %)]
+       [cc/image-picker]
       
        (when @authenticated?
-         [:a {:on-click #(cc/save-cover @(subscribe [::sub/cover]))}
+         [:a {:on-click #(evt/save-cover)}
           "save"])
       
        [:a {:on-click #(do (evt-index/set-page :index)

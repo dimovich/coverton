@@ -1,12 +1,14 @@
 (ns coverton.fabric.views
   (:require [reagent.core       :as r]
+            [re-frame.core      :as rf :refer [reg-event-fx]]
             [coverton.ed.subs   :as ed-sub]
-            [coverton.ed.events :as ed-evt]
+            [coverton.ed.events :as ed-evt :refer [cover-interceptors]]
             [coverton.index.subs :as index-sub]
             [re-frame.core      :refer [subscribe dispatch]]
             [taoensso.timbre    :refer-macros [info]]
             [coverton.fonts     :refer [default-font]]
             [coverton.components :as cc]
+            [coverton.util      :as util]
             [cljsjs.fabric]))
 
 
@@ -30,10 +32,6 @@
         y (- (.. e -clientY) (.. bounds -top))]
     [x y]))
 
-#_[(/ x (.. bounds -width))
-   (/ y (.. bounds -height))]
-
-
 
 
 (defn add-mark [canvas [x y]]
@@ -53,9 +51,18 @@
 
 
 
+(reg-event-fx
+ ::fabric->cover
+ cover-interceptors
+ (fn [{db :db} [canvas]]
+   {:db (merge db {:cover/fabric
+                   {:json (js->clj (.toJSON canvas))
+                    :svg  (.toSVG canvas)}})}))
+
+
 (defn fabric->cover [canvas]
-  (dispatch [::ed-evt/update-cover
-             :cover/fabric-json #(js->clj (.toJSON canvas))]))
+  (dispatch [::fabric->cover canvas]))
+
 
 
 
@@ -65,96 +72,126 @@
            (fn [img]
              (.scaleToWidth img (.. canvas -width))
              (.setBackgroundImage canvas img
-                                  #(do (fabric->cover canvas)
-                                       (.renderAll canvas))))))
+                                  #(do (.renderAll canvas)
+                                       (fabric->cover canvas))))))
+
+
+
+(defn upload-artifacts []
+  (when-let [file (util/form-data :#image-input)]
+    (info "uploading image...")
+    (dispatch [::upload-file file
+               {:on-success [::ed-evt/merge-cover]}])))
+
+
+#_(defn save-cover []
+    (upload-artifacts))
+
+
+(defn attach-events [canvas]
+  (let [save #(do (info "saving...")
+                  (fabric->cover canvas))
+        selecting? (atom false)]
+    (doto canvas
+      (.on (clj->js
+            {"object:modified" save
+             "object:added"    save
+             "object:removed"  save
+             "selection:created" #(reset! selecting? true)
+             "mouse:down" #(reset! selecting? false)
+             "mouse:up"
+             (fn [evt]
+               ;; when clicking some empty space
+               (when-not (or @selecting? (.. evt -target))
+                 (on-click-add-mark canvas evt)))})))))
+
+
 
 
 (defn cover->fabric [canvas cover]
   ;;(.clear canvas)
-  (let [url (:cover/image-url cover)]
-    (if-let [fabric-json (clj->js (:cover/fabric-json cover))]
+  (let [url (:cover/image-url cover)
+        fabric (:cover/fabric cover)]
+    (if-let [json (clj->js (:json fabric))]
       (do
-        (info "loading from json..." fabric-json)
-        (.loadFromJSON canvas fabric-json))
-      (set-background canvas url))))
-
-
-
-
-(defn init-fabric [canvas]
-  (let [save #(do (info "saving...")
-                  (fabric->cover canvas))]
-    (doto canvas
-      (.on (clj->js
-            {"object:modified" save
-             "object:added" save
-             "object:removed" save
-             "mouse:down"
-             (fn [evt]
-               ;; when clicking some empty space
-               (when-not (.. evt -target)
-                 (on-click-add-mark canvas evt)))})))))
+        (info "loading from json..." json)
+        (.loadFromJSON canvas json
+                       (fn []
+                         (.renderAll canvas)
+                         (attach-events canvas))))
+      ;; new
+      (do
+        (set-background canvas url)
+        (attach-events canvas)))))
 
 
 
 
 (defn set-canvas-size [canvas parent]
   (let [h (.. parent -clientHeight)]
-    (.setWidth canvas h)
-    (.setHeight canvas h)))
+    (info "setting size" h h)
+    (doto canvas
+      (.setWidth h)
+      (.setHeight h))))
 
 
 
-(defn fabric [cover]
-  (r/create-class
-   {:component-did-mount
-    (fn [this]
-      (let [dom (r/dom-node this)
-            c (Canvas. "canv")]
+(defn init-fabric [canvas])
+
+
+(defn fabric [{url :cover/image-url}]
+  (let [parent-dom (atom nil)
+        cover (subscribe [::ed-sub/cover])]
+    (r/create-class
+     {:component-did-mount
+      (fn [_]
+        (reset! canvas   (Canvas. "canv"))
         
-        (reset! canvas c)
         (init-fabric     @canvas)
-        (set-canvas-size @canvas (r/dom-node this))
-        (cover->fabric   @canvas cover)
-        (fabric->cover   @canvas)))
+        (set-canvas-size @canvas @parent-dom)
+        (cover->fabric   @canvas @cover)
+        (fabric->cover   @canvas))
     
-    :component-did-update
-    (fn [this]
-      (info "updating fabric..."))
+      :component-did-update
+      (fn [this]
+        (info "updating fabric...")
+        (set-background @canvas
+                        (:cover/image-url (r/props this))))
 
-    :component-will-unmount
-    (fn [this]
-      (info "unmounting fabric...")
-      (fabric->cover @canvas))
-    
-    :reagent-render
-    (fn []
-      [:div.fabric-wrap
-       [:div.editor-img
-        [:canvas#canv]]])}))
+      :component-will-unmount
+      (fn [this]
+        (info "unmounting fabric...")
+        (some-> @canvas .clear))
+
+      :reagent-render
+      (fn []
+        [:div.fabric-wrap
+         [:div.editor-img {:ref #(reset! parent-dom %)}
+          [:canvas#canv]]])})))
 
 
 
 
-(defn editor [{c :cover}]
-  (r/with-let [_     (ed-evt/initialize c)
+(defn editor [{initial-cover :cover}]
+  (r/with-let [_     (ed-evt/initialize initial-cover)
                cover (subscribe [::ed-sub/cover])
-               authenticated? (subscribe [::index-sub/authenticated?])]
+               auth? (subscribe [::index-sub/authenticated?])
+               ed-t  (subscribe [::ed-sub/t])
+               url   (subscribe [::ed-sub/image-url])]
+
+    ^{:key @ed-t}
     
     [:div.editor
      [:div.header {:style {:text-align :center
                            :margin "0.5em auto"}}
       (cc/menu
-       [cc/image-picker-button
-        #(do (info "img-picker" %)
-             (ed-evt/set-image-url %)
-             (set-background @canvas %))]
+       [cc/image-picker]
        
-       (when @authenticated?
-         [:a {:on-click #(do (cc/save-cover @cover))}
+       (when @auth?
+         [:a {:on-click #(ed-evt/save-cover)}
           "save"]))]
-     
-     [fabric @cover]
+
+     [fabric {:cover/image-url @url}]
 
      [:br]
      [:div (str @cover)]]))

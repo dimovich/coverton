@@ -269,3 +269,61 @@ f
  (fn [objs opts]
    (doseq [o objs]
      (.add @canvas o))))
+
+
+
+
+(defn click->relative [e]
+  (let [bounds (.. e -target getBoundingClientRect)
+        x (- (.. e -clientX) (.. bounds -left))
+        y (- (.. e -clientY) (.. bounds -top))]
+    [x y]))
+
+
+#_[(/ x (.. bounds -width))
+   (/ y (.. bounds -height))]
+
+
+
+
+
+(defn cover-image [{url :url size :size}]
+  (r/with-let [this        (r/current-component)
+               update-size (fn [e]
+                             (->> (.. e -target getBoundingClientRect)
+                                  ((juxt #(.. % -width) #(.. % -height)))
+                                  (reset! size)))]
+    
+    [:img.cover-image {:on-load  update-size
+                       :src      url}]))
+
+
+
+#_{:dangerouslySetInnerHTML
+        {:__html (str  "</img>")}}
+
+
+
+
+
+;;
+;; calculate text width in px for font type and size
+;; and change element width.
+;; Uses a static span element #span-measure
+;;
+(defn set-width [el]
+  (let [font (d/style el :font-family)
+        size (d/style el :font-size)
+        span (sel1 :#span-measure)]
+
+    ;; copy styles to span
+    (d/set-style! span :font-size size)
+    (d/set-style! span :font-family font)
+    (d/set-html!  span "")
+    (d/append!    span (d/create-text-node (d/value el))) ;;fixme: memleak?
+
+    ;; get normal width (has issues with whitespace),
+    ;; so possibly extend to scroll width
+    (d/set-px! el :width (+ 2 (.. span -scrollWidth)))
+    (d/set-px! el :width (.. el -scrollWidth))))
+

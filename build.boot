@@ -57,7 +57,7 @@
 
 (task-options! jar   {:main 'coverton.core :file "coverton.jar"}
                sift  {:include #{#"coverton\.jar" #"coverton\.js" #"assets" #"^config.edn$"
-                                 #"namen\.js" #"uploads/.*jpg" #"db/.*edn"}}
+                                 #"namen\.js" #"uploads/.*" #"db/.*edn"}}
                aot   {:namespace #{'coverton.core}}
                cljs  { ;;:ids #{"public/coverton"}
                       :compiler-options {:output-to  "public/coverton.js"
