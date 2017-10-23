@@ -46,12 +46,12 @@
 
 
 (defn add-mark [canvas [x y]]
-  (let [mark (->> {:left x :top y
-                   :fill (:color default-font) :cursorColor (:color default-font)
-                   :fontFamily (:font-family default-font) :fontSize 40}
-                  clj->js
-                  (IText. "hello"))]
-    (.add canvas mark)))
+  (->> {:left x :top y
+        :fill (:color default-font) :cursorColor (:color default-font)
+        :fontFamily (:font-family default-font) :fontSize 40}
+       clj->js
+       (IText. "hello")
+       (.add canvas)))
 
 
 
@@ -126,7 +126,7 @@
 
 
 (defn cover->fabric [canvas cover]
-  ;;(.clear canvas)
+  (.clear canvas)
   (let [url (:cover/image-url cover)
         fabric (:cover/fabric cover)]
     (if-let [json (clj->js (:json fabric))]
@@ -138,6 +138,7 @@
                          (attach-events canvas))))
       ;; new
       (do
+        (info "creating new canvas...")
         (set-background canvas url)
         (attach-events canvas)))))
 
@@ -158,8 +159,9 @@
         (let [canvas (Canvas. "canv")]
           (swap! state assoc :canvas canvas)
         
-          (init-fabric     canvas @parent-dom)
-          (cover->fabric   canvas @cover)))
+          (doto canvas
+            (init-fabric   @parent-dom)
+            (cover->fabric @cover))))
     
       :component-did-update
       (fn [this]
@@ -167,7 +169,7 @@
         (set-background
          (:canvas @state)
          (:cover/image-url (r/props this))
-                        
+
          (when (:save-on-update? @state)
            (swap! state dissoc :save-on-update?)
            #(dispatch [::ed-evt/save-cover]))))
@@ -212,10 +214,7 @@
 
 ;; TODO:
 ;;
-;; Snap
-;;
 ;; background selection on advanced
-;; cover-block scale bug
 ;; scale
 ;; picker-block
 ;; controls

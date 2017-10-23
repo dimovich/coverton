@@ -44,6 +44,8 @@
                  [com.taoensso/tengen "1.0.0-RC1"]
                  [jkkramer/verily "0.6.0" :exclusions [org.clojure/clojurescript]]
 
+                 [cljsjs/react "15.6.2-0"]
+                 [cljsjs/react-dom "15.6.2-0"]
                  [cljsjs/fabric "1.7.19-1"]])
 
 
