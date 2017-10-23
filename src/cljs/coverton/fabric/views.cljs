@@ -37,32 +37,6 @@
 
 
 
-#_(defn cover-block [cover & [params]]
-    (let [dom (atom nil)
-          ;;fab (atom nil)
-          ]
-      (r/create-class
-       {:component-did-mount
-        (fn [_]
-          (let [fab (StaticCanvas. @dom)]
-            (set-canvas-size fab @dom)
-            (.loadFromJSON fab
-                           (clj->js (get-in cover [:cover/fabric :json]))
-                           (.bind fab.renderAll fab))))
-      
-        :reagent-render
-        (fn []
-          [:div.cover-block
-           [:div.cover-block-clickable  params]
-           [:canvas.cover-block-svg
-            {:ref #(reset! dom %)}]
-           #_[:object (->> {:width "100%"
-                            :data (str "data:image/svg+xml;charset=utf-8,"
-                                       (get-in cover [:cover/fabric :svg]))})]])})))
-
-
-
-
 (defn click->relative [e]
   (let [bounds (.. e -target getBoundingClientRect)
         x (- (.. e -clientX) (.. bounds -left))
@@ -213,14 +187,11 @@
 
 
 
-(defn editor [{initial-cover :cover}]
-  (r/with-let [_     (ed-evt/initialize initial-cover)
-               cover (subscribe [::ed-sub/cover])
+(defn editor []
+  (r/with-let [cover (subscribe [::ed-sub/cover])
                auth? (subscribe [::index-sub/authenticated?])
-               ed-t  (subscribe [::ed-sub/t])
                url   (subscribe [::ed-sub/image-url])]
 
-    ^{:key @ed-t}
     
     [:div.editor
      [:div.header {:style {:text-align :center
@@ -234,8 +205,8 @@
 
      [fabric {:cover/image-url @url}]
 
-     [:br]
-     [:div (str @cover)]]))
+     #_([:br]
+        [:div (str @cover)])]))
 
 
 

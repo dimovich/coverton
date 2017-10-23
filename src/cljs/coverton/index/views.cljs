@@ -4,6 +4,8 @@
             [coverton.index.events :as evt]
             [coverton.index.subs   :as sub]
             [coverton.fabric.views :as fab]
+            [coverton.ed.subs      :as ed-sub]
+            [coverton.ed.events    :as ed-evt]
             [coverton.components   :as cc]
             [coverton.ajax.events  :as ajax-evt]
             [taoensso.timbre :refer-macros [info]]
@@ -95,9 +97,11 @@
 
 
 
+
 (def page->header {:index #{:logo :fabric :request-invite :auth}
                    :request-invite #{:logo}
                    :fabric #{:logo :auth}})
+
 
 
 (defn header [page]
@@ -122,7 +126,8 @@
        [:span {:style {:float :right}}
         (apply cc/menu
                (cond
-                 @authenticated? [[:a {:on-click #(do (evt/set-active-cover {})
+                 @authenticated? [[:a {:on-click #(do (ed-evt/initialize {})
+                                                      ;;(evt/set-active-cover nil)
                                                       (evt/set-page :fabric))}
                                    "N E W"]
                                   [:a {:on-click #(do (dispatch [::evt/logout])
@@ -135,6 +140,7 @@
                              [:a {:on-click #(evt/set-page :request-invite)} "request invitation"])
                            (when (:auth els)
                              [:a {:on-click #(reset! show-login? true)} "log in"])]))]])))
+
 
 
 
@@ -178,37 +184,29 @@
 (defn gen-cover-box-css [coll n]
   
   (let [all    (count coll)
-        cend   (mod all n)
-        cstart (- all cend)]
+        nend   (mod all n)
+        nstart (- all nend)]
     
     (concat
-     (repeat cstart :div.cover-block-box)
-     (repeat cend   :div.cover-block-box-end))))
+     (repeat nstart :div.cover-block-box)
+     (repeat nend   :div.cover-block-box-end))))
 
 
 
 
-(def items (r/atom {}))
-
-
-
-(defn index []
-  (r/with-let [_      (dispatch-sync [::evt/initialize])
-               page   (subscribe [::sub/page])
-               covers (subscribe [::sub/covers])
-               search-tags (subscribe [::sub/search-tags])]
+(defn index-page []
+  (let [page-scroll (subscribe [::sub/key :page-scroll])
+        covers (subscribe [::sub/covers])
+        search-tags (subscribe [::sub/search-tags])]
     
-    [:div
-     [header @page]
-     
-     [:div.page
-      (condp = @page
-        :request-invite [request-invite]
-        ;; Editor
-        :fabric [fab/editor {:cover (-> @(subscribe [::sub/active-cover])
-                                        (dissoc :cover/id))}]
-        
-        ;; Index
+    (r/create-class
+     {:component-did-mount
+      (fn [this]
+        (window.scroll 0 @page-scroll)
+        (dispatch [::evt/assoc :page-scroll 0]))
+      
+      :reagent-render
+      (fn []
         [:div.index
          [search-box {:tags @search-tags}]
 
@@ -219,14 +217,38 @@
          [:div.covers-container
           (map
            (fn [cover css]
+
              ^{:key (:cover/id cover)}
              [css
-              [cc/cover-block cover {:on-click #(do (evt/set-active-cover cover)
-                                                     (evt/set-page :fabric))}]
+              [cc/cover-block cover
+               {:on-click #(do (dispatch [::evt/assoc :page-scroll window.scrollY])
+                               (ed-evt/initialize (dissoc cover :cover/id))
+                               (evt/set-page :fabric))}]
+              
               [:div.cover-block-info
                [:div.cover-block-author (:cover/author cover)]]])
+           
            @covers
-           (gen-cover-box-css @covers 3))]])
+           (gen-cover-box-css @covers 3))]])})))
+
+
+
+
+(defn index []
+  (r/with-let [_    (dispatch-sync [::evt/initialize])
+               page (subscribe [::sub/page])]
+    
+    [:div
+     [header @page]
+     
+     [:div.page
+      (condp = @page
+        :request-invite [request-invite]
+        ;; Editor
+        :fabric [fab/editor]
+        
+        ;; Index
+        [index-page])
 
      
       #_([:br] [:br]
