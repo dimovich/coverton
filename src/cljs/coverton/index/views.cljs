@@ -222,7 +222,7 @@
              ^{:key (:cover/id cover)}
              [css
               [cc/cover-block cover {:on-click #(do (evt/set-active-cover cover)
-                                                    (evt/set-page :fabric))}]
+                                                     (evt/set-page :fabric))}]
               [:div.cover-block-info
                [:div.cover-block-author (:cover/author cover)]]])
            @covers

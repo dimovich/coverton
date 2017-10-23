@@ -18,12 +18,49 @@
 (def Text    window.fabric.Text)
 (def IText   window.fabric.IText)
 (def fromURL  window.fabric.Image.fromURL)
+(def StaticCanvas  window.fabric.StaticCanvas)
 (def loadSVGFromString window.fabric.loadSVGFromString)
 (def groupSVGElements window.fabric.util.groupSVGElements)
 (def enlivenObjects window.fabric.util.enlivenObjects)
 
 
 (def state (atom nil))
+
+
+
+(defn set-canvas-size [canvas parent]
+  (let [h (.. parent -clientHeight)]
+    (info "setting size" h h)
+    (doto canvas
+      (.setWidth h)
+      (.setHeight h))))
+
+
+
+#_(defn cover-block [cover & [params]]
+    (let [dom (atom nil)
+          ;;fab (atom nil)
+          ]
+      (r/create-class
+       {:component-did-mount
+        (fn [_]
+          (let [fab (StaticCanvas. @dom)]
+            (set-canvas-size fab @dom)
+            (.loadFromJSON fab
+                           (clj->js (get-in cover [:cover/fabric :json]))
+                           (.bind fab.renderAll fab))))
+      
+        :reagent-render
+        (fn []
+          [:div.cover-block
+           [:div.cover-block-clickable  params]
+           [:canvas.cover-block-svg
+            {:ref #(reset! dom %)}]
+           #_[:object (->> {:width "100%"
+                            :data (str "data:image/svg+xml;charset=utf-8,"
+                                       (get-in cover [:cover/fabric :svg]))})]])})))
+
+
 
 
 (defn click->relative [e]
@@ -57,7 +94,8 @@
  (fn [{db :db} [canvas]]
    {:db (merge db {:cover/fabric
                    {:json (js->clj (.toJSON canvas))
-                    :svg  (.toSVG canvas)}})}))
+                    :svg  (.toSVG canvas (clj->js {:width "100%"
+                                                   :height "100%"}))}})}))
 
 
 (defn fabric->cover [canvas]
@@ -132,15 +170,6 @@
 
 
 
-(defn set-canvas-size [canvas parent]
-  (let [h (.. parent -clientHeight)]
-    (info "setting size" h h)
-    (doto canvas
-      (.setWidth h)
-      (.setHeight h))))
-
-
-
 (defn init-fabric [canvas parent-dom]
   (set-canvas-size canvas parent-dom))
 
@@ -156,8 +185,7 @@
           (swap! state assoc :canvas canvas)
         
           (init-fabric     canvas @parent-dom)
-          (cover->fabric   canvas @cover)
-          (fabric->cover   canvas)))
+          (cover->fabric   canvas @cover)))
     
       :component-did-update
       (fn [this]
@@ -212,6 +240,8 @@
 
 
 ;; TODO:
+;;
+;; Snap
 ;;
 ;; background selection on advanced
 ;; cover-block scale bug

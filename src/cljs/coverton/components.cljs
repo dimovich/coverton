@@ -12,11 +12,12 @@
 
 
 (defn cover-block [cover & [params]]
-  [:div.cover-block
-   [:div.cover-block-clickable  params]
-   [:object (->> {:width "100%"
-                  :data (str "data:image/svg+xml;charset=utf-8,"
-                             (get-in cover [:cover/fabric :svg]))})]])
+  (let [resize (fn [d] )]
+    [:div.cover-block {:ref #(when % (d/set-px! % :height (d/px % :width)))}
+     [:div.cover-block-clickable params]
+     [:div.cover-block-svg
+      {:dangerouslySetInnerHTML
+       {:__html (get-in cover [:cover/fabric :svg])}}]]))
 
 
 

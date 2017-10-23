@@ -327,3 +327,11 @@ f
     (d/set-px! el :width (+ 2 (.. span -scrollWidth)))
     (d/set-px! el :width (.. el -scrollWidth))))
 
+
+
+
+
+
+[:object (->> {:width "100%"
+               :data (str "data:image/svg+xml;charset=utf-8,"
+                          (get-in cover [:cover/fabric :svg]))})]
