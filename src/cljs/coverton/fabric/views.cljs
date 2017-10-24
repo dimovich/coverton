@@ -1,5 +1,6 @@
 (ns coverton.fabric.views
   (:require [reagent.core       :as r]
+            [dommy.core         :as d]
             [re-frame.core      :as rf :refer [reg-event-fx dispatch]]
             [coverton.ed.subs   :as ed-sub]
             [coverton.ed.events :as ed-evt :refer [cover-interceptors]]
@@ -45,13 +46,23 @@
 
 
 
+(defn attach-text-events [text]
+  (doto text
+    (.on (clj->js
+          {"editing:exited" identity}))))
+
+
 (defn add-mark [canvas [x y]]
   (->> {:left x :top y
         :fill (:color default-font) :cursorColor (:color default-font)
-        :fontFamily (:font-family default-font) :fontSize 40}
+        :fontFamily (:font-family default-font) :fontSize 50}
        clj->js
-       (IText. "hello")
-       (.add canvas)))
+       (IText. "")
+       (#(do
+           (doto canvas
+             (.add %)
+             (.setActiveObject %))
+           (.enterEditing %)))))
 
 
 
@@ -73,8 +84,8 @@
 
 
 (defn fabric->cover [canvas]
+  (info "saving...")
   (dispatch [::fabric->cover canvas]))
-
 
 
 
@@ -90,8 +101,25 @@
 
 
 
+(defn cover->fabric [canvas cover]
+  (.clear canvas)
+  (let [url (:cover/image-url cover)
+        fabric (:cover/fabric cover)]
+    (if-let [json (clj->js (:json fabric))]
+      (do
+        (info "loading from json..." json)
+        (.loadFromJSON canvas json
+                       (fn []
+                         (.renderAll canvas))))
+      (do
+        (info "creating new canvas...")
+        (set-background canvas url)))))
+
+
+
+
 (reg-event-fx
- ::save-cover
+ ::upload-cover
  cover-interceptors
  (fn [{db :db} _]
    (if-let [file (util/form-data :#image-input)]
@@ -100,20 +128,30 @@
        {:dispatch [::ed-evt/upload-file file
                    {:on-success [::ed-evt/merge-cover]}]})
      
-     {:dispatch [::ed-evt/save-cover]})))
+     {:dispatch [::ed-evt/upload-cover]})))
 
+
+
+
+
+(defn handle-text-edit-exit
+  [canvas e]
+  (let [target (.. e -target)
+        text (.. target -text)]
+
+    (when (empty? text)
+      (.remove canvas target))))
 
 
 
 (defn attach-events [canvas]
-  (let [save #(do (info "saving...")
-                  (fabric->cover canvas))
-        selecting? (atom false)]
+  (let [selecting? (atom false)]
     (doto canvas
       (.on (clj->js
-            {"object:modified" save
-             "object:added"    save
-             "object:removed"  save
+            {"object:modified" #(fabric->cover canvas)
+             ;;"object:added"    save
+             ;;"object:removed"  #(fabric->cover canvas)
+             "text:editing:exited" #(handle-text-edit-exit canvas %)
              "selection:created" #(reset! selecting? true)
              "mouse:down" #(reset! selecting? false)
              "mouse:up"
@@ -125,27 +163,30 @@
 
 
 
-(defn cover->fabric [canvas cover]
-  (.clear canvas)
-  (let [url (:cover/image-url cover)
-        fabric (:cover/fabric cover)]
-    (if-let [json (clj->js (:json fabric))]
-      (do
-        (info "loading from json..." json)
-        (.loadFromJSON canvas json
-                       (fn []
-                         (.renderAll canvas)
-                         (attach-events canvas))))
-      (do
-        (info "creating new canvas...")
-        (set-background canvas url)
-        (attach-events canvas)))))
+
+(defn handle-keys [e]
+  (condp = (.. e -keyCode)
+    ;;Delete
+    46  (let [canvas (:canvas @state)]
+          (some->> canvas
+                   .getActiveObject
+                   (.remove canvas)
+                   ;;fabric->cover
+                   ))
+    false))
+
+
+(defn init-fabric
+  [canvas parent-dom]
+  (attach-events canvas)
+  (set-canvas-size canvas parent-dom)
+  (d/listen! (d/sel1 :body) :keydown handle-keys))
 
 
 
-
-(defn init-fabric [canvas parent-dom]
-  (set-canvas-size canvas parent-dom))
+(defn unmount-fabric [canvas]
+  (some-> canvas .dispose)
+  (d/unlisten! (d/sel1 :body) :keydown handle-keys))
 
 
 
@@ -171,12 +212,12 @@
 
          (when (:save-on-update? @state)
            (swap! state dissoc :save-on-update?)
-           #(dispatch [::ed-evt/save-cover]))))
+           #(dispatch [::ed-evt/upload-cover]))))
       
       :component-will-unmount
       (fn [this]
         (info "unmounting fabric...")
-        (some-> @state :canvas .clear))
+        (unmount-fabric (:canvas @state)))
 
       :reagent-render
       (fn []
@@ -200,7 +241,7 @@
        [cc/image-picker]
        
        (when @auth?
-         [:a {:on-click #(dispatch [::save-cover])}
+         [:a {:on-click #(dispatch [::upload-cover])}
           "save"]))]
 
      [fabric {:cover/image-url @url}]

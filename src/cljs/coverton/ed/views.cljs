@@ -92,7 +92,8 @@
        [cc/image-picker]
       
        (when @authenticated?
-         [:a {:on-click #(evt/save-cover)}
+         [:a {:on-click identity;;#(evt/save-cover)
+              }
           "save"])
       
        [:a {:on-click #(do (evt-index/set-page :index)

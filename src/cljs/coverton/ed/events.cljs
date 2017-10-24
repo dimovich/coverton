@@ -185,7 +185,7 @@
 
 
 (reg-event-fx
- ::save-cover
+ ::upload-cover
  cover-interceptors
  (fn [{db :db} [& props]]
    (let [cover (apply merge db props)
@@ -194,7 +194,7 @@
                 cover (if (:json fabric)
                         (assoc-in cover [:cover/fabric :json "backgroundImage" "src"] url)
                         cover))]
-     (info "saving cover...")
+     (info "uploading cover...")
      {:dispatch
       [::ajax-evt/request-auth {:method :post
                                 :uri "/save-cover"
@@ -202,16 +202,17 @@
                                 :on-success [::merge-cover]}]})))
 
 
-(defn save-cover []
-  (if-let [file (util/form-data :#image-input)]
-    ;; the callback will merge the uploaded file name
-    ;; with cover data
-    (do
-      (info "uploading file...")
-      (dispatch [::upload-file file
-                 {:on-success [::merge-cover]}]))
+
+#_(defn upload-cover []
+    (if-let [file (util/form-data :#image-input)]
+      ;; the callback will merge the uploaded file name
+      ;; with cover data
+      (do
+        (info "uploading file...")
+        (dispatch [::upload-file file
+                   {:on-success [::merge-cover]}]))
     
-    (dispatch [::save-cover])))
+      (dispatch [::upload-cover])))
 
 
 

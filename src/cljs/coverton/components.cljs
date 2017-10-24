@@ -11,13 +11,14 @@
 
 
 
-(defn cover-block [cover & [params]]
-  (let [resize (fn [d] )]
-    [:div.cover-block {:ref #(when % (d/set-px! % :height (d/px % :width)))}
-     [:div.cover-block-clickable params]
-     [:div.cover-block-svg
-      {:dangerouslySetInnerHTML
-       {:__html (get-in cover [:cover/fabric :svg])}}]]))
+(defn cover-block
+  [cover & [params]]
+  
+  [:div.cover-block {:ref #(when % (d/set-px! % :height (d/px % :width)))}
+   [:div.cover-block-clickable params]
+   [:div.cover-block-svg
+    {:dangerouslySetInnerHTML
+     {:__html (get-in cover [:cover/fabric :svg])}}]])
 
 
 
