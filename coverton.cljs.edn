@@ -1,5 +1,0 @@
-{:require [coverton.core]
- :init-fns [coverton.core/init]
- :compiler-options {:parallel-build true
-                    :foreign-libs  [{:file "src/js/bundle.js"
-                                     :provides ["cljsjs.react" "cljsjs.react-dom"]}]}}
