@@ -2,8 +2,7 @@
   (:require [reagent.core :as r]
             [dommy.core :as d :refer-macros [sel1]]
             [coverton.index.views  :as index]
-            [taoensso.timbre :refer-macros [info]]
-            [coverton.util :refer [arc]]))
+            [taoensso.timbre :as timbre :refer [info]]))
 
 
 (defn app []
@@ -15,8 +14,9 @@
 
 
 (defn ^:export init [& args]
+  (timbre/set-level! :error)
   (reload))
 
 
 (defn ^:export -main [& args]
-  (init args))
+  (init))

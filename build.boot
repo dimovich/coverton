@@ -42,10 +42,8 @@
                  [cljs-ajax "0.7.2"]
                  [day8.re-frame/http-fx "0.1.4"]
                  [com.taoensso/tengen "1.0.0-RC1"]
-                 [jkkramer/verily "0.6.0" :exclusions [org.clojure/clojurescript]]
+                 [jkkramer/verily "0.6.0"]
 
-                 [cljsjs/react "15.6.2-0"]
-                 [cljsjs/react-dom "15.6.2-0"]
                  [cljsjs/fabric "1.7.19-1"]])
 
 
@@ -68,11 +66,8 @@
                                          ;;:main 'coverton.core
                                          :parallel-build true
                                          ;;:pseudo-names true
-                                         ;;:externs ["src/js/fabric.ext.js"]
                                          #_(:install-deps true
-                                                          :npm-deps { ;;:re-resizable "3.0.0"
-                                                                     ;;:react-fabricjs "0.1.6"
-                                                                     })
+                                                          :npm-deps {})
                                          :foreign-libs  [{:file        "src/js/jsutils.js"
                                                           :provides    ["coverton.jsutil"]
                                                           :module-type :commonjs}]}})
@@ -96,15 +91,15 @@
 
 (deftask build-jar
   []
-  (comp (aot)
-        (uber)
-        (jar)
-        (sift)))
+  (comp
+   (aot)
+   (uber)
+   (jar)
+   (sift)))
 
 
 (deftask run []
   (comp
-   (cider)
    (watch)
    (reload)
    (cljs-repl)
@@ -118,16 +113,19 @@
 (deftask dev
   []
   (task-options! reload {:on-jsload 'coverton.core/reload})
-  (comp (development)
-        (run)))
+  (comp
+   (development)
+   (cider)
+   (run)))
 
 
 (deftask prod
   []
-  (comp (production)
-        (cljs)
-        (build-jar)
-        (target)))
+  (comp
+   (production)
+   (cljs)
+   (build-jar)
+   (target)))
 
 
 (deftask check-sources

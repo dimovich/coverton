@@ -136,7 +136,6 @@
                        (fn []
                          (.renderAll canvas)
                          (attach-events canvas))))
-      ;; new
       (do
         (info "creating new canvas...")
         (set-background canvas url)
@@ -162,7 +161,7 @@
           (doto canvas
             (init-fabric   @parent-dom)
             (cover->fabric @cover))))
-    
+
       :component-did-update
       (fn [this]
         (info "updating fabric...")
@@ -173,7 +172,6 @@
          (when (:save-on-update? @state)
            (swap! state dissoc :save-on-update?)
            #(dispatch [::ed-evt/save-cover]))))
-
       
       :component-will-unmount
       (fn [this]
@@ -214,7 +212,6 @@
 
 ;; TODO:
 ;;
-;; background selection on advanced
 ;; scale
 ;; picker-block
 ;; controls
