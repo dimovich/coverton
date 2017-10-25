@@ -96,8 +96,8 @@
              (.scaleToWidth img (.. canvas -width))
              (.setBackgroundImage canvas img
                                   #(do (.renderAll canvas)
-                                       (fabric->cover canvas)
-                                       (when cb (cb)))))))
+                                       (when cb (cb))
+                                       (fabric->cover canvas))))))
 
 
 
@@ -170,17 +170,20 @@
     46  (let [canvas (:canvas @state)]
           (some->> canvas
                    .getActiveObject
-                   (.remove canvas)
-                   ;;fabric->cover
-                   ))
+                   (.remove canvas)))
     false))
+
+
 
 
 (defn init-fabric
   [canvas parent-dom]
-  (attach-events canvas)
+    
   (set-canvas-size canvas parent-dom)
+  
+  (attach-events canvas)
   (d/listen! (d/sel1 :body) :keydown handle-keys))
+
 
 
 
