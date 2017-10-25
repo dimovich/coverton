@@ -38,9 +38,10 @@
 
 (defn transact [data]
   (let [data (if (sequential? data) data [data])]
-    (info (-> (get-connection)
-              (client/transact {:tx-data data})
-              <!!))))
+    (-> (get-connection)
+        (client/transact {:tx-data data})
+        <!!
+        info)))
 
 
 

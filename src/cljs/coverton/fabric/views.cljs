@@ -96,8 +96,8 @@
              (.scaleToWidth img (.. canvas -width))
              (.setBackgroundImage canvas img
                                   #(do (.renderAll canvas)
-                                       (when cb (cb))
-                                       (fabric->cover canvas))))))
+                                       (fabric->cover canvas)
+                                       (when cb (cb)))))))
 
 
 
@@ -124,7 +124,7 @@
  (fn [{db :db} _]
    (if-let [file (util/form-data :#image-input)]
      (do
-       (swap! state assoc :save-on-update? true)
+       (swap! state assoc :upload-on-update? true)
        {:dispatch [::ed-evt/upload-file file
                    {:on-success [::ed-evt/merge-cover]}]})
      
@@ -213,8 +213,8 @@
          (:canvas @state)
          (:cover/image-url (r/props this))
 
-         (when (:save-on-update? @state)
-           (swap! state dissoc :save-on-update?)
+         (when (:upload-on-update? @state)
+           (swap! state dissoc :upload-on-update?)
            #(dispatch [::ed-evt/upload-cover]))))
       
       :component-will-unmount

@@ -188,31 +188,13 @@
  ::upload-cover
  cover-interceptors
  (fn [{db :db} [& props]]
-   (let [cover (apply merge db props)
-         #_(url (:cover/image-url cover)
-                fabric (:cover/fabric cover)
-                cover (if (:json fabric)
-                        (assoc-in cover [:cover/fabric :json "backgroundImage" "src"] url)
-                        cover))]
+   (let [cover (apply merge db props)]
      (info "uploading cover...")
      {:dispatch
       [::ajax-evt/request-auth {:method :post
                                 :uri "/save-cover"
                                 :params cover
                                 :on-success [::merge-cover]}]})))
-
-
-
-#_(defn upload-cover []
-    (if-let [file (util/form-data :#image-input)]
-      ;; the callback will merge the uploaded file name
-      ;; with cover data
-      (do
-        (info "uploading file...")
-        (dispatch [::upload-file file
-                   {:on-success [::merge-cover]}]))
-    
-      (dispatch [::upload-cover])))
 
 
 
