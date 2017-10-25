@@ -54,7 +54,7 @@
 (defn editor-img []
   (let [ids       (subscribe [::sub/mark-ids])
         size      (subscribe [::sub/size])
-        image-url (subscribe [::sub/image-url])]
+        image-url (subscribe [::sub/background])]
 
     (r/create-class
      {:display-name "editor-img"

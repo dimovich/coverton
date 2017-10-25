@@ -43,10 +43,10 @@
           id     (or id (random-uuid))
           cover (merge cover {:cover/id id
                               :cover/author author})
-          cover (assoc cover :cover/data (.array (fress/write cover)))]
+          cover (assoc cover :cover/data
+                       (.array (fress/write cover)))]
 
-      (info "adding: " cover)
-
+      (info "adding cover:" cover)
       (-> cover
           (select-keys cover->db)
           db/transact)
@@ -85,7 +85,7 @@
     (let [id (random-uuid)
           path (str "uploads/" id ".jpg")]
       (io/copy tempfile (io/file path))
-      (ok {:cover/image-url path}))
+      (ok {:cover/background path}))
     
     (throw-unauthorized)))
 

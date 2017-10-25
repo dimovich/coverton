@@ -85,17 +85,19 @@
 
 
 
-(defn image-picker []
-  [:span
-   [:a {:on-click #(.click (sel1 :#image-input))}
-    "image"]
-   [:form {:style {:display :none}}
-    [:input#image-input
-     {:type "file"
-      :accept "image/*"
-      :on-change #(evt/set-image-url
-                   (.createObjectURL js/URL (-> % .-target .-files (aget 0))))
-      :style {:display :none
-              :position :inline-block}}]]])
-
+(defn image-picker [callback]
+  (r/with-let [input-dom (atom nil)]
+    [:span
+     [:a {:on-click #(some-> @input-dom .click)}
+      "image"]
+     [:form {:style {:display :none}}
+      [:input#image-input
+       {:type "file"
+        :accept "image/*"
+        :ref #(some->> % (reset! input-dom))
+        :on-change #(->> (-> % .-target .-files (aget 0))
+                         (.createObjectURL js/URL)
+                         (callback))
+        :style {:display :none
+                :position :inline-block}}]]]))
 

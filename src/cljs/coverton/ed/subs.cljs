@@ -111,10 +111,10 @@
 
 
 (reg-sub
- ::image-url
+ ::background
  :<- [::cover]
  (fn [db _]
-   (:cover/image-url db)))
+   (:cover/background db)))
 
 
 (reg-sub

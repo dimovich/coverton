@@ -78,7 +78,8 @@
  cover-interceptors
  (fn [{db :db} [canvas]]
    {:db (merge db {:cover/fabric
-                   {:json (js->clj (.toJSON canvas))
+                   {:size [(.getWidth canvas) (.getHeight canvas)]
+                    :json (js->clj (.toJSON canvas))
                     :svg  (.toSVG canvas (clj->js {:width "100%"
                                                    :height "100%"}))}})}))
 
@@ -103,14 +104,12 @@
 
 (defn cover->fabric [canvas cover]
   (.clear canvas)
-  (let [url (:cover/image-url cover)
+  (let [url (:cover/background cover)
         fabric (:cover/fabric cover)]
     (if-let [json (clj->js (:json fabric))]
       (do
-        (info "loading from json..." json)
-        (.loadFromJSON canvas json
-                       (fn []
-                         (.renderAll canvas))))
+        (info "loading from json..." (:size fabric) json)
+        (.loadFromJSON canvas json #(.renderAll canvas)))
       (do
         (info "creating new canvas...")
         (set-background canvas url)))))
@@ -164,13 +163,18 @@
 
 
 
-(defn handle-keys [e]
+(defn handle-keys [canvas e]
   (condp = (.. e -keyCode)
     ;;Delete
-    46  (let [canvas (:canvas @state)]
-          (some->> canvas
-                   .getActiveObject
-                   (.remove canvas)))
+    46  (some->> canvas
+                 .getActiveObject
+                 (.remove canvas)
+                 fabric->cover)
+
+    ;;Esc
+    27  (some->> canvas
+                 .deactivateAll
+                 .renderAll)
     false))
 
 
@@ -182,7 +186,7 @@
   (set-canvas-size canvas parent-dom)
   
   (attach-events canvas)
-  (d/listen! (d/sel1 :body) :keydown handle-keys))
+  (d/listen! (d/sel1 :body) :keydown #(handle-keys canvas %)))
 
 
 
@@ -193,26 +197,29 @@
 
 
 
-(defn fabric [{url :cover/image-url}]
-  (let [parent-dom (atom nil)
-        cover (subscribe [::ed-sub/cover])]
+
+(defn fabric [{url :cover/background}]
+  (let [canvas     (atom nil)
+        canvas-dom (atom nil)
+        parent-dom (atom nil)
+        cover      (subscribe [::ed-sub/cover])]
+    
     (r/create-class
      {:component-did-mount
       (fn [_]
-        (let [canvas (Canvas. "canv")]
-          (swap! state assoc :canvas canvas)
+        (reset! canvas (Canvas. @canvas-dom))
         
-          (doto canvas
-            (init-fabric   @parent-dom)
-            (cover->fabric @cover))))
+        (doto @canvas
+          (init-fabric   @parent-dom)
+          (cover->fabric @cover)))
 
       :component-did-update
       (fn [this]
         (info "updating fabric...")
+        
         (set-background
-         (:canvas @state)
-         (:cover/image-url (r/props this))
-
+         @canvas  (:cover/background (r/props this))
+         
          (when (:upload-on-update? @state)
            (swap! state dissoc :upload-on-update?)
            #(dispatch [::ed-evt/upload-cover]))))
@@ -220,13 +227,13 @@
       :component-will-unmount
       (fn [this]
         (info "unmounting fabric...")
-        (unmount-fabric (:canvas @state)))
+        (unmount-fabric @canvas))
 
       :reagent-render
       (fn []
         [:div.fabric-wrap
          [:div.editor-img {:ref #(reset! parent-dom %)}
-          [:canvas#canv]]])})))
+          [:canvas#canv {:ref #(reset! canvas-dom %)}]]])})))
 
 
 
@@ -234,20 +241,20 @@
 (defn editor []
   (r/with-let [cover (subscribe [::ed-sub/cover])
                auth? (subscribe [::index-sub/authenticated?])
-               url   (subscribe [::ed-sub/image-url])]
+               url   (subscribe [::ed-sub/background])]
 
     
     [:div.editor
      [:div.header {:style {:text-align :center
                            :margin "0.5em auto"}}
       (cc/menu
-       [cc/image-picker]
+       [cc/image-picker ed-evt/set-background]
        
        (when @auth?
          [:a {:on-click #(dispatch [::upload-cover])}
           "save"]))]
 
-     [fabric {:cover/image-url @url}]
+     [fabric {:cover/background @url}]
 
      #_([:br]
         [:div (str @cover)])]))

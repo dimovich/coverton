@@ -335,3 +335,29 @@ f
 [:object (->> {:width "100%"
                :data (str "data:image/svg+xml;charset=utf-8,"
                           (get-in cover [:cover/fabric :svg]))})]
+
+
+
+
+#_(do
+    (loadSVGFromString
+     svg
+     (fn [objs opts]
+       (info "loading from svg..." objs)
+       (doseq [o objs]
+         (info o)
+         (.add canvas o)
+         )
+       #_(enlivenObjects objs
+                         (fn [objs]
+                           (info (js->clj objs)) #_(.add canvas))))))
+
+
+
+
+
+#_(:install-deps true
+                 :npm-deps {})
+#_(:foreign-libs  [{:file        "src/js/jsutils.js"
+                    :provides    ["coverton.jsutil"]
+                    :module-type :commonjs}])

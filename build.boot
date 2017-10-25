@@ -64,13 +64,8 @@
                                          :output-dir "public/out"
                                          :asset-path "out"
                                          ;;:main 'coverton.core
-                                         :parallel-build true
                                          ;;:pseudo-names true
-                                         #_(:install-deps true
-                                                          :npm-deps {})
-                                         :foreign-libs  [{:file        "src/js/jsutils.js"
-                                                          :provides    ["coverton.jsutil"]
-                                                          :module-type :commonjs}]}})
+                                         :parallel-build true}})
 
 
 (deftask production

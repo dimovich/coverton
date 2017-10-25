@@ -132,8 +132,8 @@
   (dispatch [::merge-cover {:cover/size size}]))
 
 
-(defn set-image-url [url]
-  (dispatch [::merge-cover {:cover/image-url url}]))
+(defn set-background [url]
+  (dispatch [::merge-cover {:cover/background url}]))
 
 
 (defn set-pos [id pos]
