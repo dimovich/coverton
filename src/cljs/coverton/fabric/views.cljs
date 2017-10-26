@@ -157,7 +157,7 @@
              ;;"object:removed"  #(fabric->cover canvas)
              "mouse:up"
              (fn [evt]
-               ;; when clicking some empty space
+               ;; clicking some empty space
                (when-not (or @selecting? (.. evt -target))
                  (on-click-add-mark canvas evt)))})))))
 
