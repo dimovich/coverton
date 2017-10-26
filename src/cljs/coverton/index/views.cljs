@@ -195,7 +195,7 @@
 
 (defn index-page []
   (let [page-scroll (subscribe [::sub/key :page-scroll])
-        covers (subscribe [::sub/covers])
+        covers      (subscribe [::sub/covers])
         search-tags (subscribe [::sub/search-tags])]
     
     (r/create-class
@@ -234,9 +234,8 @@
 
 
 (defn index []
-  (r/with-let [_    (dispatch-sync [::evt/initialize])
+  (r/with-let [_ (dispatch-sync [::evt/initialize])
                page (subscribe [::sub/page])]
-    
     [:div
      [header @page]
      

@@ -1,15 +1,14 @@
 (ns coverton.fabric.views
   (:require [reagent.core       :as r]
             [dommy.core         :as d]
-            [re-frame.core      :as rf :refer [reg-event-fx dispatch]]
+            [re-frame.core      :as rf :refer [reg-event-fx dispatch subscribe dispatch]]
+            [taoensso.timbre    :refer [info]]
             [coverton.ed.subs   :as ed-sub]
             [coverton.ed.events :as ed-evt :refer [cover-interceptors]]
             [coverton.index.subs :as index-sub]
-            [re-frame.core      :refer [subscribe dispatch]]
-            [taoensso.timbre    :refer-macros [info]]
-            [coverton.fonts     :refer [default-font]]
+            [coverton.fonts      :refer [default-font]]
             [coverton.components :as cc]
-            [coverton.util      :as util]
+            [coverton.util       :as util]
             [cljsjs.fabric]))
 
 
@@ -35,7 +34,7 @@
 
 
 
-(defn resize [canvas newsize oldsize]
+(defn handle-resize [canvas newsize oldsize]
   (let [[nx ny] newsize
         [ox oy] oldsize
         scale   (/ ny oy)]
@@ -94,12 +93,14 @@
   (info "setting background: " url)
   (fromURL url
            (fn [img]
-             (.scaleToWidth img (/  (.. canvas getWidth) (.. canvas getZoom)))
-             (info "scaled img width" (.getWidth img))
-             (.setBackgroundImage canvas img
-                                  #(do (.renderAll canvas)
-                                       (fabric->cover canvas)
-                                       (when cb (cb)))))))
+             (.scaleToWidth
+              img (/  (.. canvas getWidth)
+                      (.. canvas getZoom)))
+             (.setBackgroundImage
+              canvas img
+              #(do (.renderAll canvas)
+                   (fabric->cover canvas)
+                   (when cb (cb)))))))
 
 
 
@@ -187,23 +188,27 @@
   (let [newsize  (dom-size dom)
         origsize (:size (:cover/fabric cover))
         origsize (or origsize newsize)
-        resizer  #(doto canvas
-                    (resize (dom-size dom) origsize)
-                    .renderAll)]
+        
+        keydown #(handle-keys canvas %)
+        resize  #(doto canvas
+                   (handle-resize (dom-size dom) origsize)
+                   .renderAll)
+        
+        evts [[(d/sel1 :body) :keydown keydown]
+              [js/window      :resize  resize]]]
 
+
+    (set! window.fabric.Object.NUM_FRACTION_DIGITS 10)
+    
     (doto canvas
-      (resize newsize origsize)
+      (handle-resize newsize origsize)
       (cover->fabric cover)
       attach-events)
 
-    (set! window.fabric.Object.NUM_FRACTION_DIGITS 10)
-  
-    (d/listen! (d/sel1 :body) :keydown #(handle-keys canvas %))
-    (d/listen! js/window :resize resizer)
-    
-    (swap! state update :run-unmount conj
-           #(d/unlisten! js/window :resize resizer)
-           #(d/unlisten! (d/sel1 :body) :keydown handle-keys))))
+    ;; Events
+    (doseq [e evts] (apply d/listen! e))
+    (swap! state update :run-unmount concat
+           (for [e evts] #(apply d/unlisten! e)))))
 
 
 
@@ -225,7 +230,6 @@
     (r/create-class
      {:component-did-mount
       (fn [_]
-        
         (reset! canvas (Canvas. @dom))
         (init-fabric @canvas @parent-dom @cover))
 
@@ -257,9 +261,7 @@
 (defn editor []
   (r/with-let [cover (subscribe [::ed-sub/cover])
                auth? (subscribe [::index-sub/authenticated?])
-               url   (subscribe [::ed-sub/background])
-               ed-t  (subscribe [::ed-sub/t])]
-
+               url   (subscribe [::ed-sub/background])]
    
     [:div.editor
      [:div.header {:style {:text-align :center
@@ -271,7 +273,6 @@
          [:a {:on-click #(dispatch [::upload-cover])}
           "save"]))]
 
-     ;;^{:key @ed-t}
      [fabric {:cover/background @url}]
 
      #_([:br]
@@ -283,6 +284,7 @@
 ;;
 ;; picker-block
 ;; controls
+;;
 
 
 

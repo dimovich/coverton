@@ -1,7 +1,11 @@
+
+
 ! fix absolute urls in svg to relative
 
-+ form validation
+
+
 + server-side rendering
+http://tonsky.me/blog/datascript-chat/
 
 
 - ed
