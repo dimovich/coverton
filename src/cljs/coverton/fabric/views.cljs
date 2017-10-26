@@ -29,12 +29,16 @@
 
 
 
-(defn set-canvas-size [canvas parent]
-  (let [h (.. parent -clientHeight)]
-    (info "setting size" h h)
+(defn resize [canvas parent [ox oy]]
+  (let [h (.. parent -clientHeight)
+        w (.. parent -clientWidth)
+        oy (or oy h)
+        sy (/ h oy)]
+    (info "resize" w h sy)
     (doto canvas
       (.setWidth h)
-      (.setHeight h))))
+      (.setHeight h)
+      (.setZoom sy))))
 
 
 
@@ -181,19 +185,33 @@
 
 
 (defn init-fabric
-  [canvas parent-dom]
-    
-  (set-canvas-size canvas parent-dom)
+  [canvas parent-dom cover]
+
+  (let [origsize (:size (:cover/fabric cover))
+        resize-handler
+        #(do (resize canvas parent-dom origsize)
+             (.renderAll canvas)
+             (.calcOffset canvas))]
+
+    (doto canvas
+      (resize parent-dom origsize)
+      (cover->fabric cover)
+      attach-events)
   
-  (attach-events canvas)
-  (d/listen! (d/sel1 :body) :keydown #(handle-keys canvas %)))
+    (d/listen! (d/sel1 :body) :keydown #(handle-keys canvas %))
+    (d/listen! js/window :resize resize-handler)
+    
+    (swap! state update :run-unmount conj
+           #(d/unlisten! js/window :resize resize-handler)
+           #(d/unlisten! (d/sel1 :body) :keydown handle-keys))))
 
 
 
 
 (defn unmount-fabric [canvas]
   (some-> canvas .dispose)
-  (d/unlisten! (d/sel1 :body) :keydown handle-keys))
+  (doseq [f (:run-unmount @state)] (f))
+  (reset! state nil))
 
 
 
@@ -208,10 +226,7 @@
      {:component-did-mount
       (fn [_]
         (reset! canvas (Canvas. @canvas-dom))
-        
-        (doto @canvas
-          (init-fabric   @parent-dom)
-          (cover->fabric @cover)))
+        (init-fabric @canvas @parent-dom @cover))
 
       :component-did-update
       (fn [this]
