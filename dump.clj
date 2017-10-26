@@ -361,3 +361,8 @@ f
 #_(:foreign-libs  [{:file        "src/js/jsutils.js"
                     :provides    ["coverton.jsutil"]
                     :module-type :commonjs}])
+
+
+
+(defn click->relative [e]
+  [(.. e -layerX) (.. e -layerY)])

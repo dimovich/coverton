@@ -19,9 +19,9 @@
  ::initialize
  ed-interceptors
  (fn [db [cover]]
-   (let [;;cover (or cover (:cover db))
+   (let [ ;;cover (or cover (:cover db))
          _     (info "initializing with " cover)]
-     {:cover (merge default-db cover)
+     {:cover (or cover default-db)
       :t (inc (:t db))})))
 
 
@@ -179,7 +179,7 @@
   (dispatch [::merge-marks {id {:read-only? read-only?}}]))
 
 
-(defn initialize [cover]
+(defn initialize [& [cover]]
   (dispatch-sync [::initialize cover]))
 
 

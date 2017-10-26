@@ -29,34 +29,26 @@
 
 
 
-(defn resize [canvas parent [ox oy]]
-  (let [h (.. parent -clientHeight)
-        w (.. parent -clientWidth)
-        oy (or oy h)
-        sy (/ h oy)]
-    (info "resize" w h sy)
+(defn dom-size [dom]
+  [(.. dom -clientWidth)
+   (.. dom -clientHeight)])
+
+
+
+(defn resize [canvas newsize oldsize]
+  (let [[nx ny] newsize
+        [ox oy] oldsize
+        scale   (/ ny oy)]
+    (info "resize" nx ny scale)
     (doto canvas
-      (.setWidth h)
-      (.setHeight h)
-      (.setZoom sy))))
+      (.setWidth ny)
+      (.setHeight ny)
+      (.setZoom scale))))
 
-
-
-(defn click->relative [e]
-  (let [bounds (.. e -target getBoundingClientRect)
-        x (- (.. e -clientX) (.. bounds -left))
-        y (- (.. e -clientY) (.. bounds -top))]
-    [x y]))
-
-
-
-(defn attach-text-events [text]
-  (doto text
-    (.on (clj->js
-          {"editing:exited" identity}))))
 
 
 (defn add-mark [canvas [x y]]
+  (info "adding mark" x y)
   (->> {:left x :top y
         :fill (:color default-font) :cursorColor (:color default-font)
         :fontFamily (:font-family default-font) :fontSize 50}
@@ -72,7 +64,9 @@
 
 (defn on-click-add-mark [canvas evt]
   (->> (.. evt -e)
-       click->relative
+       (.getPointer canvas)
+       js->clj
+       (#(map % ["x" "y"]))
        (add-mark canvas)))
 
 
@@ -81,11 +75,13 @@
  ::fabric->cover
  cover-interceptors
  (fn [{db :db} [canvas]]
-   {:db (merge db {:cover/fabric
-                   {:size [(.getWidth canvas) (.getHeight canvas)]
-                    :json (js->clj (.toJSON canvas))
-                    :svg  (.toSVG canvas (clj->js {:width "100%"
-                                                   :height "100%"}))}})}))
+   (let [size (or (get-in db [:cover/fabric :size])
+                  [(.getWidth canvas) (.getHeight canvas)])]
+     {:db (merge db {:cover/fabric
+                     {:size size
+                      :json (js->clj (.toJSON canvas))
+                      :svg  (.toSVG canvas (clj->js {:width "100%"
+                                                     :height "100%"}))}})})))
 
 
 (defn fabric->cover [canvas]
@@ -98,7 +94,9 @@
   (info "setting background: " url)
   (fromURL url
            (fn [img]
-             (.scaleToWidth img (.. canvas -width))
+             (.scaleToWidth img (.. canvas getWidth);;(/  (.. canvas getWidth) (.. canvas getZoom))
+                            )
+             (info "scaled img width" (.getWidth img))
              (.setBackgroundImage canvas img
                                   #(do (.renderAll canvas)
                                        (fabric->cover canvas)
@@ -151,12 +149,12 @@
   (let [selecting? (atom false)]
     (doto canvas
       (.on (clj->js
-            {"object:modified" #(fabric->cover canvas)
+            {"object:modified"     #(fabric->cover canvas)
+             "text:editing:exited" #(handle-text-edit-exit canvas %)
+             "selection:created"   #(reset! selecting? true)
+             "mouse:down"          #(reset! selecting? false)
              ;;"object:added"    save
              ;;"object:removed"  #(fabric->cover canvas)
-             "text:editing:exited" #(handle-text-edit-exit canvas %)
-             "selection:created" #(reset! selecting? true)
-             "mouse:down" #(reset! selecting? false)
              "mouse:up"
              (fn [evt]
                ;; when clicking some empty space
@@ -185,24 +183,27 @@
 
 
 (defn init-fabric
-  [canvas parent-dom cover]
+  [canvas dom cover]
 
-  (let [origsize (:size (:cover/fabric cover))
-        resize-handler
-        #(do (resize canvas parent-dom origsize)
-             (.renderAll canvas)
-             (.calcOffset canvas))]
+  (let [newsize  (dom-size dom)
+        origsize (:size (:cover/fabric cover))
+        origsize (or origsize newsize)
+        resizer  #(doto canvas
+                    (resize (dom-size dom) origsize)
+                    .renderAll)]
 
     (doto canvas
-      (resize parent-dom origsize)
+      (resize newsize origsize)
       (cover->fabric cover)
       attach-events)
+
+    (set! window.fabric.Object.NUM_FRACTION_DIGITS 10)
   
     (d/listen! (d/sel1 :body) :keydown #(handle-keys canvas %))
-    (d/listen! js/window :resize resize-handler)
+    (d/listen! js/window :resize resizer)
     
     (swap! state update :run-unmount conj
-           #(d/unlisten! js/window :resize resize-handler)
+           #(d/unlisten! js/window :resize resizer)
            #(d/unlisten! (d/sel1 :body) :keydown handle-keys))))
 
 
@@ -217,15 +218,16 @@
 
 
 (defn fabric [{url :cover/background}]
-  (let [canvas     (atom nil)
-        canvas-dom (atom nil)
+  (let [canvas (atom nil)
+        dom    (atom nil)
         parent-dom (atom nil)
-        cover      (subscribe [::ed-sub/cover])]
+        cover  (subscribe [::ed-sub/cover])]
     
     (r/create-class
      {:component-did-mount
       (fn [_]
-        (reset! canvas (Canvas. @canvas-dom))
+        
+        (reset! canvas (Canvas. @dom))
         (init-fabric @canvas @parent-dom @cover))
 
       :component-did-update
@@ -245,10 +247,10 @@
         (unmount-fabric @canvas))
 
       :reagent-render
-      (fn []
+      (fn [opts]
         [:div.fabric-wrap
          [:div.editor-img {:ref #(reset! parent-dom %)}
-          [:canvas#canv {:ref #(reset! canvas-dom %)}]]])})))
+          [:canvas#canv {:ref #(reset! dom %)}]]])})))
 
 
 
@@ -256,9 +258,10 @@
 (defn editor []
   (r/with-let [cover (subscribe [::ed-sub/cover])
                auth? (subscribe [::index-sub/authenticated?])
-               url   (subscribe [::ed-sub/background])]
+               url   (subscribe [::ed-sub/background])
+               ed-t  (subscribe [::ed-sub/t])]
 
-    
+   
     [:div.editor
      [:div.header {:style {:text-align :center
                            :margin "0.5em auto"}}
@@ -269,6 +272,7 @@
          [:a {:on-click #(dispatch [::upload-cover])}
           "save"]))]
 
+     ;;^{:key @ed-t}
      [fabric {:cover/background @url}]
 
      #_([:br]
@@ -278,6 +282,17 @@
 
 ;; TODO:
 ;;
-;; scale
 ;; picker-block
 ;; controls
+
+
+
+
+#_(defn attach-text-events [text]
+    (doto text
+      (.on (clj->js
+            {"editing:exited" identity}))))
+
+
+;; mobile touch
+;; https://developer.mozilla.org/en-US/docs/Web/API/Touch_events#Example

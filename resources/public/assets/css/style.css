@@ -273,6 +273,7 @@ a {
 
     overflow: hidden;
     display: inline-block;
+    box-sizing: border-box;
 }
 
 .cover-block-clickable {

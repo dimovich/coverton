@@ -126,8 +126,7 @@
        [:span {:style {:float :right}}
         (apply cc/menu
                (cond
-                 @authenticated? [[:a {:on-click #(do (ed-evt/initialize {})
-                                                      ;;(evt/set-active-cover nil)
+                 @authenticated? [[:a {:on-click #(do (ed-evt/initialize)
                                                       (evt/set-page :fabric))}
                                    "N E W"]
                                   [:a {:on-click #(do (dispatch [::evt/logout])

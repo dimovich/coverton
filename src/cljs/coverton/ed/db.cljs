@@ -4,5 +4,5 @@
 
 ;;fixme move to higher function
 (def default-db
-  {:cover/image-url "assets/img/coverton.jpg"
-   :cover/font      default-font})
+  {:cover/background "assets/img/coverton.jpg"
+   :cover/font       default-font})
