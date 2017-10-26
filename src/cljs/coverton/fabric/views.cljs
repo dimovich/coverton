@@ -94,8 +94,7 @@
   (info "setting background: " url)
   (fromURL url
            (fn [img]
-             (.scaleToWidth img (.. canvas getWidth);;(/  (.. canvas getWidth) (.. canvas getZoom))
-                            )
+             (.scaleToWidth img (/  (.. canvas getWidth) (.. canvas getZoom)))
              (info "scaled img width" (.getWidth img))
              (.setBackgroundImage canvas img
                                   #(do (.renderAll canvas)
