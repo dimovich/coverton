@@ -288,6 +288,8 @@
 
 
 
+
+
 #_(defn attach-text-events [text]
     (doto text
       (.on (clj->js

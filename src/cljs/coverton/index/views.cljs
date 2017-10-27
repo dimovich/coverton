@@ -98,7 +98,7 @@
 
 
 
-(def page->header {:index #{:logo :fabric :request-invite :auth}
+(def page->header {:index #{:logo :motto :request-invite :auth}
                    :request-invite #{:logo}
                    :fabric #{:logo :auth}})
 
@@ -120,7 +120,7 @@
       
           [:img.logo {:src "assets/svg/logo.svg"}]
           [:span.logo-name "Coverton"]
-          "a publishing platform for cover makers."])
+          (when (:motto els) "a publishing platform for cover makers.")])
         
 
        [:span {:style {:float :right}}
