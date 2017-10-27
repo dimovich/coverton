@@ -8,7 +8,7 @@
             [coverton.ed.events    :as ed-evt]
             [coverton.components   :as cc]
             [coverton.ajax.events  :as ajax-evt]
-            [taoensso.timbre :refer-macros [info]]
+            [taoensso.timbre       :refer [info]]
             [coverton.validations  :as v]))
 
 
@@ -24,15 +24,14 @@
 
 
 (defn search-box [{:keys [tags]}]
-  (r/with-let [state (r/atom nil)
+  (r/with-let [text (r/atom nil)
                add-tag (fn [_]
-                         (when-not (empty? @state)
-                           (dispatch [::evt/update
-                                      :search-tags
+                         (when-not (empty? @text)
+                           (dispatch [::evt/update :search-tags
                                       #(-> (or %1 [])
                                            (conj %2))
-                                      (:text @state)])
-                           (reset! state nil)))
+                                      @text])
+                           (reset! text nil)))
                
                remove-tag (fn [idx]
                             (dispatch [::evt/update
@@ -52,13 +51,13 @@
       tags)
 
      ;; Search input
-     [cc/editable :input {:state (r/cursor state [:text])
+     [cc/editable :input {:state text
                           :auto-focus true
                           :class :search-input-field
                           :on-key-down (fn [e]
                                          (condp = (.. e -key)
                                            "Enter"     (add-tag)
-                                           "Backspace" (when (empty? @state)
+                                           "Backspace" (when (empty? @text)
                                                          (pop-tag))
                                            false))}]
 
@@ -99,7 +98,7 @@
 
 
 (def page->header {:index #{:logo :motto :request-invite :auth}
-                   :request-invite #{:logo}
+                   :request-invite #{:logo :motto}
                    :fabric #{:logo :auth}})
 
 
@@ -126,19 +125,25 @@
        [:span {:style {:float :right}}
         (apply cc/menu
                (cond
-                 @authenticated? [[:a {:on-click #(do (ed-evt/initialize)
-                                                      (evt/set-page :fabric))}
-                                   "N E W"]
-                                  [:a {:on-click #(do (dispatch [::evt/logout])
-                                                      (reset! show-login? false))}
-                                   "log out"]]
+                 @authenticated?
+                 [[:a {:on-click
+                       #(do (ed-evt/initialize)
+                            (evt/set-page :fabric))}
+                   "N E W"]
+                  [:a {:on-click
+                       #(do (dispatch [::evt/logout])
+                            (reset! show-login? false))}
+                   "log out"]]
                  @show-login? [[login-form]]
                  
-                 :default [(when (and (:request-invite els)
-                                      (not @request-sent?))
-                             [:a {:on-click #(evt/set-page :request-invite)} "request invitation"])
-                           (when (:auth els)
-                             [:a {:on-click #(reset! show-login? true)} "log in"])]))]])))
+                 :default
+                 [(when (and (:request-invite els)
+                             (not @request-sent?))
+                    [:a {:on-click #(evt/set-page :request-invite)}
+                     "request invitation"])
+                  (when (:auth els)
+                    [:a {:on-click #(reset! show-login? true)}
+                     "log in"])]))]])))
 
 
 
@@ -219,10 +224,11 @@
 
              ^{:key (:cover/id cover)}
              [css
-              [cc/cover-block cover
+              [cc/cover-block
                {:on-click #(do (dispatch [::evt/assoc :page-scroll window.scrollY])
                                (ed-evt/initialize (dissoc cover :cover/id))
-                               (evt/set-page :fabric))}]
+                               (evt/set-page :fabric))}
+               cover]
               
               [:div.cover-block-info
                [:div.cover-block-author (:cover/author cover)]]])

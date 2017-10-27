@@ -12,7 +12,7 @@
 
 
 (defn cover-block
-  [cover & [params]]
+  [params cover]
   
   [:div.cover-block {:ref #(when % (d/set-px! % :height (d/px % :width)))}
    [:div.cover-block-clickable params]
