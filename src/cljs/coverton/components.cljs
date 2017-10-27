@@ -26,7 +26,7 @@
 (defn dimmer []
   (r/with-let [this  (r/current-component)
                body  (sel1 :body)
-               close #(evt/set-dimmer nil)
+               close identity
                esc   #(when (= (.. % -keyCode) 27) (close))
                _     (d/listen! body :keyup esc)]
     (r/create-class

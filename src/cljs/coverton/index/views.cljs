@@ -246,10 +246,4 @@
         :fabric [fab/editor]
         
         ;; Index
-        [index-page])
-
-     
-      #_([:br] [:br]
-         [:div {:style {:text-align :left
-                        :font-size :18}}
-          (str @(subscribe [::sub/db]))])]]))
+        [index-page])]]))

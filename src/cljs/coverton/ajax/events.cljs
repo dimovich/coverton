@@ -9,14 +9,15 @@
 
 
 (def ajax-interceptors [(path :ajax) trim-v])
+(def token (subscribe [::sub/token]))
 
 
 
 (defn inject-token [request]
-  (if-let [token @(subscribe [::sub/token])]
+  (if @token
     (-> request
         (update :headers
-                #(merge % {"Authorization" (str "Token " token)})))
+                #(merge % {"Authorization" (str "Token " @token)})))
     request))
 
 (def token-ajax-interceptor

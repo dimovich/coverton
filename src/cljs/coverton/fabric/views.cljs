@@ -259,8 +259,7 @@
 
 
 (defn editor []
-  (r/with-let [cover (subscribe [::ed-sub/cover])
-               auth? (subscribe [::index-sub/authenticated?])
+  (r/with-let [auth? (subscribe [::index-sub/authenticated?])
                url   (subscribe [::ed-sub/background])]
    
     [:div.editor

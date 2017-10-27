@@ -1,7 +1,7 @@
 (ns coverton.db.schema)
 
 
-;;todo: need timestamp for covers (datomic has builtin
+;;todo: need timestamp for covers (datomic has builtin)
 
 (defonce cover->db [:cover/id :cover/tags :cover/author :cover/data])
 

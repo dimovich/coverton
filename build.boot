@@ -41,6 +41,7 @@
                  [re-frame "0.10.2"]
                  [cljs-ajax "0.7.2"]
                  [day8.re-frame/http-fx "0.1.4"]
+                 [day8.re-frame/trace "0.1.11"]
                  [com.taoensso/tengen "1.0.0-RC1"]
                  [jkkramer/verily "0.6.0"]
 
@@ -65,7 +66,9 @@
                                          :asset-path "out"
                                          ;;:main 'coverton.core
                                          ;;:pseudo-names true
-                                         :parallel-build true}})
+                                         :parallel-build true
+                                         :closure-defines      {"re_frame.trace.trace_enabled_QMARK_" true}
+                                         :preloads             ['day8.re-frame.trace.preload]}})
 
 
 (deftask production
