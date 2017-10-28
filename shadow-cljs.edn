@@ -1,0 +1,26 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/cljs" "src/cljc"]
+
+ :dependencies
+ [[com.taoensso/timbre "4.10.0"]
+  [prismatic/dommy "1.1.0"]
+  [reagent  "0.8.0-alpha2"]
+  [re-frame "0.10.2"]
+  [cljs-ajax "0.7.2"]
+  [day8.re-frame/http-fx "0.1.4"]
+  [com.taoensso/tengen "1.0.0-RC1"]
+  [jkkramer/verily "0.6.0"]]
+
+ :builds
+ {:prod {:target :browser
+         :output-dir "release/"
+         :asset-path "out/"
+         :modules {:coverton {:entries [coverton.core]}}
+         :compiler-options {:externs ["src/js/fabric.ext.js"]
+                            :pseudo-names true}
+         #_(:js-options
+            {:resolve
+             {"fabric"
+              {:target :global
+               :global "window.fabric"}}})}}}

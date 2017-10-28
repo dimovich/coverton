@@ -36,18 +36,21 @@
                remove-tag (fn [idx]
                             (dispatch [::evt/update
                                        :search-tags
-                                       #(vec (concat (subvec % 0 idx)
-                                                     (subvec % (inc idx))))]))
-               pop-tag #(dispatch [::evt/update
-                                   :search-tags (comp vec butlast)])]
+                                       #(vec (concat
+                                              (subvec % 0 idx)
+                                              (subvec % (inc idx))))]))
+               pop-tag #(dispatch
+                         [::evt/update
+                          :search-tags (comp vec butlast)])]
 
     [:div.search-bar
 
      ;; Tags
      (map-indexed
       (fn [idx tag]
-        ^{:key idx}
-        [search-tag {:on-click #(remove-tag idx)} tag])
+        [search-tag {:on-click #(remove-tag idx)
+                     :key idx}
+         tag])
       tags)
 
      ;; Search input

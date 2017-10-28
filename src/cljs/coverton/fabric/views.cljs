@@ -9,19 +9,19 @@
             [coverton.fonts      :refer [default-font]]
             [coverton.components :as cc]
             [coverton.util       :as util]
-            [cljsjs.fabric]))
-
+            [cljsjs.fabric]
+            ;;["fabric" :as fabric :refer (Canvas IText Image)]
+            ;;[fabric]
+            ))
 
 
 (def Canvas  window.fabric.Canvas)
 (def Rect    window.fabric.Rect)
-(def Text    window.fabric.Text)
 (def IText   window.fabric.IText)
 (def fromURL  window.fabric.Image.fromURL)
-(def StaticCanvas  window.fabric.StaticCanvas)
-(def loadSVGFromString window.fabric.loadSVGFromString)
-(def groupSVGElements window.fabric.util.groupSVGElements)
-(def enlivenObjects window.fabric.util.enlivenObjects)
+
+
+#_((def fromURL Image.fromURL))
 
 
 (def state (atom nil))

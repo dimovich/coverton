@@ -59,12 +59,14 @@
 (task-options! jar   {:main 'coverton.core :file "coverton.jar"}
                sift  {:include
                       #{#"coverton\.jar" #"coverton\.js" #"assets"
-                        #"config.edn$" #"namen\.js" #"uploads" #"db"}}
+                        #"config.edn$" #"namen\.js" #"uploads/" #"db/"}}
                aot   {:namespace #{'coverton.core}}
                cljs  {:compiler-options
                       {:output-to  "public/coverton.js"
                        :output-dir "public/out"
                        :asset-path "out"
+                       ;;:externs ["src/js/fabric.ext.js"]
+                       :warnings {:redef false}
                        ;;:main 'coverton.core
                        ;;:pseudo-names true
                        :parallel-build true
