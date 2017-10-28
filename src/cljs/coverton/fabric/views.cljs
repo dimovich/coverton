@@ -1,7 +1,7 @@
 (ns coverton.fabric.views
   (:require [reagent.core       :as r]
             [dommy.core         :as d]
-            [re-frame.core      :as rf :refer [reg-event-fx dispatch subscribe dispatch]]
+            [re-frame.core      :as rf :refer [reg-event-fx reg-event-db dispatch subscribe dispatch]]
             [taoensso.timbre    :refer [info]]
             [coverton.ed.subs   :as ed-sub]
             [coverton.ed.events :as ed-evt :refer [cover-interceptors]]
@@ -81,7 +81,7 @@
 
 
 (defn fabric->cover [canvas]
-  (info "saving...")
+  (info "saving cover...")
   (dispatch [::fabric->cover canvas]))
 
 
@@ -116,11 +116,21 @@
 
 
 (reg-event-fx
- ::done-uploading
+ ::upload-success
  cover-interceptors
  (fn [{db :db} [resp]]
+   (info "upload success")
    (swap! state dissoc :saving? :files)
    {:dispatch [::ed-evt/merge-cover resp]}))
+
+
+(reg-event-db
+ ::upload-failure
+ cover-interceptors
+ (fn [db [resp]]
+   (swap! state dissoc :saving?)
+   (info "upload fail:" resp)
+   db))
 
 
 
@@ -130,11 +140,15 @@
  (fn [{db :db} _]
    (swap! state assoc :saving? true)
    (if-let [files (:files @state)]
-     ;; after merge component will redraw and upload the cover with
-     ;; updated urls
-     {:dispatch [::ed-evt/upload-files files]}
+     ;; after post-upload cover merge, fabric component will redraw
+     ;; and upload the cover with updated urls
+     {:dispatch [::ed-evt/upload-files files
+                 {:on-success [::ed-evt/merge-cover]
+                  :on-failure [::upload-failure]}]}
      
-     {:dispatch [::ed-evt/upload-cover [::done-uploading]]})))
+     {:dispatch [::ed-evt/upload-cover
+                 {:on-success [::upload-success]
+                  :on-failure [::upload-failure]}]})))
 
 
 
@@ -247,7 +261,8 @@
          @canvas  (:cover/background (r/props this))
          
          (when (:saving? @state)
-           #(dispatch [::ed-evt/upload-cover [::done-uploading]]))))
+           #(dispatch [::ed-evt/upload-cover {:on-success [::upload-success]
+                                              :on-failure [::upload-failure]}]))))
       
       :component-will-unmount
       (fn [this]
@@ -264,8 +279,9 @@
 
 
 (defn editor []
-  (r/with-let [auth? (subscribe [::index-sub/authenticated?])
-               url   (subscribe [::ed-sub/background])]
+  (r/with-let [auth?   (subscribe [::index-sub/authenticated?])
+               url     (subscribe [::ed-sub/background])
+               saving? (r/cursor state [:saving?])]
    
     [:div.editor
      [:div.header {:style {:text-align :center
@@ -279,7 +295,7 @@
            (ed-evt/set-background url))}]
        
        (when @auth?
-         [:a (if (:saving? @state)
+         [:a (if @saving?
                {:style {:opacity "0.5"}}
                {:on-click #(dispatch [::cover->db])})
           "save"]))]

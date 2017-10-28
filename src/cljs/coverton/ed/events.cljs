@@ -52,14 +52,14 @@
 (reg-event-fx
  ::upload-cover
  cover-interceptors
- (fn [{cover :db} [cb-evt]]
+ (fn [{cover :db} [& [args]]]
    (info "uploading cover...")
    {:dispatch
-    [::ajax-evt/request-auth {:method :post
-                              :uri "/save-cover"
-                              :params cover
-                              :on-success (or cb-evt
-                                              [::merge-cover])}]}))
+    [::ajax-evt/request-auth (-> {:method :post
+                                  :uri "/save-cover"
+                                  :params cover
+                                  :on-success [::merge-cover]}
+                                 (merge args))]}))
 
 
 
@@ -67,15 +67,15 @@
 (reg-event-fx
  ::upload-files
  cover-interceptors
- (fn [_ [files cb-evt]]
+ (fn [_ [files & [args]]]
    (info "uploading files..." files)
    (let [data (util/form-data files)]
      {:dispatch
       [::ajax-evt/request-auth (-> {:method :post
                                     :uri "/upload-file"
                                     :body data
-                                    :on-success (or cb-evt
-                                                    [::merge-cover])})]})))
+                                    :on-success [::merge-cover]}
+                                   (merge args))]})))
 
 
 

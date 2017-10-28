@@ -78,15 +78,19 @@
 
 
 
-(reg-fx
+(reg-event-db
  ::good-response
- (fn [response]
-   (info "ajax success: " response)))
+ ajax-interceptors
+ (fn [db response]
+   (info "ajax success: " response)
+   db))
 
 
-(reg-fx
+(reg-event-db
  ::bad-response
- (fn [response]
-   (info "ajax error: " response)))
+ ajax-interceptors
+ (fn [db response]
+   (info "ajax error: " response)
+   db))
 
 
