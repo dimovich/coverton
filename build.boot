@@ -58,18 +58,18 @@
 
 (task-options! jar   {:main 'coverton.core :file "coverton.jar"}
                sift  {:include
-                      #{#"coverton\.jar" #"coverton\.js" #"assets"
-                        #"config.edn$" #"namen\.js" #"uploads/" #"db/"}}
+                      #{#"coverton[.]jar" #"coverton[.]js$" #"assets"
+                        #"config.edn$" #"uploads/.*jpg$" #"db/.*edn$"}}
                aot   {:namespace #{'coverton.core}}
                cljs  {:compiler-options
                       {:output-to  "public/coverton.js"
                        :output-dir "public/out"
                        :asset-path "out"
-                       ;;:externs ["src/js/fabric.ext.js"]
                        :warnings {:redef false}
+                       :parallel-build true
+                       ;;:externs ["src/js/fabric.ext.js"]
                        ;;:main 'coverton.core
                        ;;:pseudo-names true
-                       :parallel-build true
                        ;;:closure-defines      {"re_frame.trace.trace_enabled_QMARK_" true}
                        ;;:preloads             ['day8.re-frame.trace.preload]
                        }})

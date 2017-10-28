@@ -1,12 +1,5 @@
 {
   "dependencies": {
-    "@cljs-oss/module-deps": "^1.1.1",
-    "fabric": "^1.7.19",
-    "react": "15.6.2",
-    "react-dom": "15.6.2",
-    "shadow-cljs": "^2.0.48"
-  },
-  "devDependencies": {
-    "shadow-cljs": "^2.0.48"
+    "@cljs-oss/module-deps": "^1.1.1"
   }
 }
