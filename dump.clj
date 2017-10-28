@@ -366,3 +366,11 @@ f
 
 (defn click->relative [e]
   [(.. e -layerX) (.. e -layerY)])
+
+
+
+
+#_(defn attach-text-events [text]
+    (doto text
+      (.on (clj->js
+            {"editing:exited" identity}))))

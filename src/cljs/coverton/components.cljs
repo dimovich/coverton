@@ -85,7 +85,7 @@
 
 
 
-(defn image-picker [callback]
+(defn image-picker [{:keys [callback]}]
   (r/with-let [input-dom (atom nil)]
     [:span
      [:a {:on-click #(some-> @input-dom .click)}
@@ -95,9 +95,10 @@
        {:type "file"
         :accept "image/*"
         :ref #(some->> % (reset! input-dom))
-        :on-change #(->> (-> % .-target .-files (aget 0))
-                         (.createObjectURL js/URL)
-                         (callback))
+        :on-change #(let [file (-> % .-target .-files (aget 0))]
+                      (some->> file
+                               (.createObjectURL js/URL)
+                               (callback file)))
         :style {:display :none
                 :position :inline-block}}]]]))
 

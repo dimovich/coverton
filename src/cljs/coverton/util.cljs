@@ -24,11 +24,12 @@
 
 
 
-(defn form-data [id]
-  (info "getting form data")
-  (when-let [file (some-> (sel1 id)
-                          .-files
-                          (aget 0))]
-    (info "got" file)
-    (doto (js/FormData.)
-      (.append "file" file))))
+(defn form-data [files]
+  (let [form (js/FormData.)]
+    (->> files
+         (map (fn [[k file]]
+                (.append form
+                         (str (namespace k) "/" (name k))
+                         file)))
+         doall)
+    form))

@@ -77,15 +77,23 @@
 
 
 
-(defn handle-upload-file
-  [{{{:keys [filename tempfile]} "file"} :params :as request}]
+(defn handle-upload-files
+  [{params :params :as request}]
   
   (if (authenticated? request)
-
-    (let [id (random-uuid)
-          path (str "uploads/" id ".jpg")]
-      (io/copy tempfile (io/file path))
-      (ok {:cover/background path}))
+    (do
+      (info "uploading files...")
+      (->> params
+           (map (fn [[k file]]
+                  (let [id (random-uuid)
+                        ext (or (re-find #"[.].*$" (:filename file)) ".jpg")
+                        path (str "uploads/" id ext)
+                        resp {(keyword k) path}]
+                    (io/copy (:tempfile file) (io/file path))
+                    (info resp)
+                    resp)))
+           (apply merge)
+           ok))
     
     (throw-unauthorized)))
 
@@ -140,7 +148,7 @@
   (GET  "/approve-invite" [] handle-approve-invite)
 
 
-  (POST "/upload-file" [] handle-upload-file)
+  (POST "/upload-file" [] handle-upload-files)
   
   (files     "/" {:root "."}) ;; to serve static resources
   (resources "/" {:root "."}) ;; to serve anything else

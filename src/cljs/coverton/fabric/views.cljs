@@ -9,22 +9,19 @@
             [coverton.fonts      :refer [default-font]]
             [coverton.components :as cc]
             [coverton.util       :as util]
-            [cljsjs.fabric]
-            ;;["fabric" :as fabric :refer (Canvas IText Image)]
-            ;;[fabric]
-            ))
+            [cljsjs.fabric]))
 
 
 (def Canvas  window.fabric.Canvas)
 (def Rect    window.fabric.Rect)
 (def IText   window.fabric.IText)
-(def fromURL  window.fabric.Image.fromURL)
+(def fromURL window.fabric.Image.fromURL)
 
 
 #_((def fromURL Image.fromURL))
 
 
-(def state (atom nil))
+(def state (r/atom nil))
 
 
 
@@ -118,18 +115,26 @@
 
 
 
+(reg-event-fx
+ ::done-uploading
+ cover-interceptors
+ (fn [{db :db} [resp]]
+   (swap! state dissoc :saving? :files)
+   {:dispatch [::ed-evt/merge-cover resp]}))
+
+
 
 (reg-event-fx
- ::upload-cover
+ ::cover->db
  cover-interceptors
  (fn [{db :db} _]
-   (if-let [file (util/form-data :#image-input)]
-     (do
-       (swap! state assoc :upload-on-update? true)
-       {:dispatch [::ed-evt/upload-file file
-                   {:on-success [::ed-evt/merge-cover]}]})
+   (swap! state assoc :saving? true)
+   (if-let [files (:files @state)]
+     ;; after merge component will redraw and upload the cover with
+     ;; updated urls
+     {:dispatch [::ed-evt/upload-files files]}
      
-     {:dispatch [::ed-evt/upload-cover]})))
+     {:dispatch [::ed-evt/upload-cover [::done-uploading]]})))
 
 
 
@@ -236,13 +241,13 @@
       :component-did-update
       (fn [this]
         (info "updating fabric...")
-        
+
+        ;; set all images then upload cover
         (set-background
          @canvas  (:cover/background (r/props this))
          
-         (when (:upload-on-update? @state)
-           (swap! state dissoc :upload-on-update?)
-           #(dispatch [::ed-evt/upload-cover]))))
+         (when (:saving? @state)
+           #(dispatch [::ed-evt/upload-cover [::done-uploading]]))))
       
       :component-will-unmount
       (fn [this]
@@ -266,10 +271,17 @@
      [:div.header {:style {:text-align :center
                            :margin "0.5em auto"}}
       (cc/menu
-       [cc/image-picker ed-evt/set-background]
+
+       [cc/image-picker
+        {:callback
+         (fn [file url]
+           (swap! state update :files assoc :cover/background file)
+           (ed-evt/set-background url))}]
        
        (when @auth?
-         [:a {:on-click #(dispatch [::upload-cover])}
+         [:a (if (:saving? @state)
+               {:style {:opacity "0.5"}}
+               {:on-click #(dispatch [::cover->db])})
           "save"]))]
 
      [fabric {:cover/background @url}]
@@ -277,24 +289,3 @@
      #_([:br]
         [:div (str @cover)])]))
 
-
-
-;; TODO:
-;;
-;; picker-block
-;; controls
-;;
-
-
-
-
-
-
-#_(defn attach-text-events [text]
-    (doto text
-      (.on (clj->js
-            {"editing:exited" identity}))))
-
-
-;; mobile touch
-;; https://developer.mozilla.org/en-US/docs/Web/API/Touch_events#Example
