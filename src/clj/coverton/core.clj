@@ -6,6 +6,7 @@
 
 
 (defn -main [& args]
+  ;;(timbre/set-level! :error)
   (init {:path "config.edn"}))
 
 

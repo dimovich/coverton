@@ -243,7 +243,7 @@
 
 
 (defn index []
-  (r/with-let [_ (dispatch-sync [::evt/initialize])
+  (r/with-let [_    (dispatch-sync [::evt/initialize])
                page (subscribe [::sub/page])]
     [:div
      [header @page]

@@ -9,14 +9,6 @@
    (:ed db)))
 
 
-;; time (datomic shnizzle)
-(reg-sub
- ::t
- :<- [::ed]
- (fn [db _]
-   (:t db)))
-
-
 (reg-sub
  ::cover
  :<- [::ed]
@@ -57,7 +49,6 @@
  :<- [::cover]
  :<- [::active-mark]
  (fn [[cover active-id] _]
-   (or (get-in cover [:cover/marks active-id :color])
-       (get-in cover [:cover/font :color]))))
+   (or (get-in cover [:cover/font :color]))))
 
 

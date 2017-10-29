@@ -8,8 +8,8 @@
 
 
 
-(def ed-interceptors      [(path [:ed])               trim-v])
-(def cover-interceptors   [(path [:ed :cover])        trim-v])
+(def ed-interceptors      [(path [:ed])        trim-v])
+(def cover-interceptors   [(path [:ed :cover]) trim-v])
 
 
 
@@ -18,8 +18,7 @@
  ed-interceptors
  (fn [db [cover]]
    (info "initializing with " cover)
-   {:cover (or cover default-db)
-    :t (inc (:t db))}))
+   {:cover (or cover default-db)}))
 
 
 (reg-event-db
@@ -93,4 +92,5 @@
   (dispatch-sync [::initialize cover]))
 
 
-
+(defn add-files-to-upload [id file]
+  (dispatch [::update :files-to-upload assoc id file]))

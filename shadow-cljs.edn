@@ -14,13 +14,7 @@
 
  :builds
  {:prod {:target :browser
-         :output-dir "release/"
-         :asset-path "out/"
+         :output-dir "release"
+         :asset-path "out"
          :modules {:coverton {:entries [coverton.core]}}
-         :compiler-options {:externs ["src/js/fabric.ext.js"]
-                            :pseudo-names true}
-         #_(:js-options
-            {:resolve
-             {"fabric"
-              {:target :global
-               :global "window.fabric"}}})}}}
+         :compiler-options {}}}}

@@ -67,8 +67,6 @@
                        :asset-path "out"
                        :warnings {:redef false}
                        :parallel-build true
-                       ;;:externs ["src/js/fabric.ext.js"]
-                       ;;:main 'coverton.core
                        ;;:pseudo-names true
                        ;;:closure-defines      {"re_frame.trace.trace_enabled_QMARK_" true}
                        ;;:preloads             ['day8.re-frame.trace.preload]

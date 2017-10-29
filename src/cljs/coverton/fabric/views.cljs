@@ -1,28 +1,22 @@
 (ns coverton.fabric.views
   (:require [reagent.core       :as r]
             [dommy.core         :as d]
-            [re-frame.core      :as rf :refer [reg-event-fx reg-event-db dispatch subscribe dispatch]]
+            [re-frame.core      :refer [dispatch subscribe]]
             [taoensso.timbre    :refer [info]]
-            [coverton.ed.subs   :as ed-sub]
-            [coverton.ed.events :as ed-evt :refer [cover-interceptors]]
+            [coverton.fabric.events :as evt]
+            [coverton.ed.events  :as ed-evt :refer [cover-interceptors]]
+            [coverton.ed.subs    :as ed-sub]
             [coverton.index.subs :as index-sub]
             [coverton.fonts      :refer [default-font]]
             [coverton.components :as cc]
-            [coverton.util       :as util]
+            ;;["fabric"]
             [cljsjs.fabric]))
 
 
+
 (def Canvas  window.fabric.Canvas)
-(def Rect    window.fabric.Rect)
 (def IText   window.fabric.IText)
 (def fromURL window.fabric.Image.fromURL)
-
-
-#_((def fromURL Image.fromURL))
-
-
-(def state (r/atom nil))
-
 
 
 (defn dom-size [dom]
@@ -67,22 +61,9 @@
 
 
 
-(reg-event-fx
- ::fabric->cover
- cover-interceptors
- (fn [{db :db} [canvas]]
-   (let [size (or (get-in db [:cover/fabric :size])
-                  [(.getWidth canvas) (.getHeight canvas)])]
-     {:db (merge db {:cover/fabric
-                     {:size size
-                      :json (js->clj (.toJSON canvas))
-                      :svg  (.toSVG canvas (clj->js {:width "100%"
-                                                     :height "100%"}))}})})))
-
-
 (defn fabric->cover [canvas]
   (info "saving cover...")
-  (dispatch [::fabric->cover canvas]))
+  (dispatch [::evt/fabric->cover canvas]))
 
 
 
@@ -115,42 +96,9 @@
 
 
 
-(reg-event-fx
- ::upload-success
- cover-interceptors
- (fn [{db :db} [resp]]
-   (info "upload success")
-   (swap! state dissoc :saving? :files)
-   {:dispatch [::ed-evt/merge-cover resp]}))
 
-
-(reg-event-db
- ::upload-failure
- cover-interceptors
- (fn [db [resp]]
-   (swap! state dissoc :saving?)
-   (info "upload fail:" resp)
-   db))
-
-
-
-(reg-event-fx
- ::cover->db
- cover-interceptors
- (fn [{db :db} _]
-   (swap! state assoc :saving? true)
-   (if-let [files (:files @state)]
-     ;; after post-upload cover merge, fabric component will redraw
-     ;; and upload the cover with updated urls
-     {:dispatch [::ed-evt/upload-files files
-                 {:on-success [::ed-evt/merge-cover]
-                  :on-failure [::upload-failure]}]}
-     
-     {:dispatch [::ed-evt/upload-cover
-                 {:on-success [::upload-success]
-                  :on-failure [::upload-failure]}]})))
-
-
+(defn cover->db []
+  (dispatch [::evt/cover->db]))
 
 
 
@@ -224,50 +172,43 @@
       (cover->fabric cover)
       attach-events)
 
+    
     ;; Events
     (doseq [e evts] (apply d/listen! e))
-    (swap! state update :run-unmount concat
-           (for [e evts] #(apply d/unlisten! e)))))
 
-
-
-
-(defn unmount-fabric [canvas]
-  (some-> canvas .dispose)
-  (doseq [f (:run-unmount @state)] (f))
-  (reset! state nil))
-
+    ;; return an unmount function
+    (fn []
+      (info "cleaning up...")
+      (doseq [e evts] (apply d/unlisten! e))
+      (some-> canvas .dispose))))
 
 
 
 (defn fabric [{url :cover/background}]
-  (let [canvas (atom nil)
-        dom    (atom nil)
+  (let [canvas     (atom nil)
+        dom        (atom nil)
         parent-dom (atom nil)
-        cover  (subscribe [::ed-sub/cover])]
+        unmount-fn (atom nil)
+        cover      (subscribe [::ed-sub/cover])]
     
     (r/create-class
      {:component-did-mount
       (fn [_]
         (reset! canvas (Canvas. @dom))
-        (init-fabric @canvas @parent-dom @cover))
+        (->> (init-fabric @canvas @parent-dom @cover)
+             (reset! unmount-fn)))
 
       :component-did-update
       (fn [this]
         (info "updating fabric...")
-
-        ;; set all images then upload cover
-        (set-background
-         @canvas  (:cover/background (r/props this))
-         
-         (when (:saving? @state)
-           #(dispatch [::ed-evt/upload-cover {:on-success [::upload-success]
-                                              :on-failure [::upload-failure]}]))))
+        (->> (:cover/background (r/props this))
+             (set-background @canvas)))
       
       :component-will-unmount
       (fn [this]
         (info "unmounting fabric...")
-        (unmount-fabric @canvas))
+        (when @unmount-fn
+          (@unmount-fn)))
 
       :reagent-render
       (fn [opts]
@@ -281,7 +222,7 @@
 (defn editor []
   (r/with-let [auth?   (subscribe [::index-sub/authenticated?])
                url     (subscribe [::ed-sub/background])
-               saving? (r/cursor state [:saving?])]
+               uploading? (subscribe [::ed-sub/keys [:uploading?]])]
    
     [:div.editor
      [:div.header {:style {:text-align :center
@@ -291,13 +232,13 @@
        [cc/image-picker
         {:callback
          (fn [file url]
-           (swap! state update :files assoc :cover/background file)
+           (ed-evt/add-files-to-upload :cover/background file)
            (ed-evt/set-background url))}]
        
        (when @auth?
-         [:a (if @saving?
+         [:a (if @uploading?
                {:style {:opacity "0.5"}}
-               {:on-click #(dispatch [::cover->db])})
+               {:on-click #(cover->db)})
           "save"]))]
 
      [fabric {:cover/background @url}]

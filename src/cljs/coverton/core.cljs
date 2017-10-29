@@ -14,7 +14,7 @@
 
 
 (defn ^:export init [& args]
-  ;;(timbre/set-level! :error)
+  (timbre/set-level! :error)
   (reload))
 
 
