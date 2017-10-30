@@ -53,11 +53,11 @@
 
 
 (defn on-click-add-mark [canvas evt]
-  (->> (.. evt -e)
-       (.getPointer canvas)
-       js->clj
-       (#(map % ["x" "y"]))
-       (add-mark canvas)))
+  (as-> (.. evt -e) $
+    (.getPointer canvas $)
+    (js->clj $)
+    (map $ ["x" "y"])
+    (add-mark canvas $)))
 
 
 
@@ -67,7 +67,7 @@
 
 
 
-(defn set-background [canvas url & [cb]]
+(defn set-background [canvas url]
   (info "setting background: " url)
   (fromURL url
            (fn [img]
@@ -77,8 +77,7 @@
              (.setBackgroundImage
               canvas img
               #(do (.renderAll canvas)
-                   (fabric->cover canvas)
-                   (when cb (cb)))))))
+                   (fabric->cover canvas))))))
 
 
 
@@ -120,7 +119,7 @@
              "text:editing:exited" #(handle-text-edit-exit canvas %)
              "selection:created"   #(reset! selecting? true)
              "mouse:down"          #(reset! selecting? false)
-             ;;"object:added"    save
+             ;;"object:added"    #(fabric->cover canvas)
              ;;"object:removed"  #(fabric->cover canvas)
              "mouse:up"
              (fn [evt]

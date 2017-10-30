@@ -9,7 +9,7 @@
  ::fabric->cover
  ed-interceptors
  (fn [{db :db} [canvas]]
-   (let [size (or (get-in db [:cover/fabric :size])
+   (let [size (or (get-in db [:cover :cover/fabric :size])
                   [(.getWidth canvas) (.getHeight canvas)])]
 
      {:dispatch-n [[::ed-evt/merge-cover
@@ -28,7 +28,6 @@
                      [::ed-evt/upload-cover
                       {:on-success [::upload-success]
                        :on-failure [::upload-failure]}])]})))
-
 
 
 
@@ -68,5 +67,5 @@
  ::upload-failure
  ed-interceptors
  (fn [db [resp]]
-   (info "upload fail:" resp)
+   (info "upload failed:" resp)
    (dissoc db :uploading?)))

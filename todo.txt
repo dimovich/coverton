@@ -1,5 +1,4 @@
 
-
 ! fix absolute urls in svg to relative
 
 
@@ -9,12 +8,6 @@ https://pez.github.io/2016/03/01/Reagent-clientside-routing-with-Bidi-and-Accoun
 + server-side rendering
 http://tonsky.me/blog/datascript-chat/
 https://yogthos.net/posts/2015-11-24-Serverside-Reagent.html
-
-
-- ed
-  draggable https://news.ycombinator.com/item?id=15368104
-  interactjs
-  
 
 
 - spec
