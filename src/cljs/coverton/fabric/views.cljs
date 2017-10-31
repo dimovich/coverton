@@ -83,11 +83,11 @@
 
 (defn cover->fabric [canvas cover]
   (.clear canvas)
-  (let [url (:cover/background cover)
-        fabric (:cover/fabric cover)]
+  (let [fabric (:cover/fabric cover)
+        url    (:cover/background cover)]
     (if-let [json (clj->js (:json fabric))]
       (do
-        (info "loading from json..." (:size fabric) json)
+        (info "loading from json..." json (:size fabric))
         (.loadFromJSON canvas json #(.renderAll canvas)))
       (do
         (info "creating new canvas...")

@@ -1,7 +1,7 @@
 (ns coverton.fabric.events
-  (:require [re-frame.core :refer [reg-event-fx reg-event-db]]
-            [coverton.ed.events :as ed-evt :refer [cover-interceptors ed-interceptors]]
-            [taoensso.timbre    :refer [info]]))
+  (:require [re-frame.core      :refer [reg-event-fx reg-event-db]]
+            [taoensso.timbre    :refer [info]]
+            [coverton.ed.events :as ed-evt :refer [cover-interceptors ed-interceptors]]))
 
 
 
