@@ -1,13 +1,13 @@
 (ns coverton.fabric.views
   (:require [reagent.core       :as r]
             [dommy.core         :as d]
-            [re-frame.core      :refer [dispatch subscribe]]
+            [re-frame.core      :refer [dispatch dispatch-sync subscribe]]
             [taoensso.timbre    :refer [info]]
             [coverton.fabric.events :as evt]
             [coverton.ed.events  :as ed-evt :refer [cover-interceptors]]
             [coverton.ed.subs    :as ed-sub]
             [coverton.index.subs :as index-sub]
-            [coverton.fonts      :refer [default-font]]
+            [coverton.fabric.defaults :as defaults]
             [coverton.components :as cc]
             ;;["fabric"]
             [cljsjs.fabric]))
@@ -39,9 +39,8 @@
 
 (defn add-mark [canvas [x y]]
   (info "adding mark" x y)
-  (->> {:left x :top y
-        :fill (:color default-font) :cursorColor (:color default-font)
-        :fontFamily (:font-family default-font) :fontSize 50}
+  (->> {:left x :top y}
+       (merge defaults/mark)
        clj->js
        (IText. "")
        (#(do
@@ -67,6 +66,7 @@
 
 
 
+
 (defn set-background [canvas url]
   (info "setting background: " url)
   (fromURL url
@@ -78,6 +78,7 @@
               canvas img
               #(do (.renderAll canvas)
                    (fabric->cover canvas))))))
+
 
 
 
@@ -183,6 +184,52 @@
 
 
 
+(defn toolbar-item []
+  (r/with-let [this (r/current-component)]
+    (into
+     [:div.ed-toolbar-item.clickable
+      (r/props this)]
+     (r/children this))))
+
+
+
+(defn toolbar []
+  (r/with-let
+    [items [[[:object {:data "assets/svg/toolbar-preview.svg" :type "image/svg+xml"}]]
+
+            [[:object {:data "assets/svg/toolbar-background.svg" :type "image/svg+xml"}]
+             [cc/image-picker
+              {:callback
+               (fn [file url]
+                 (ed-evt/add-files-to-upload :cover/background file)
+                 (ed-evt/set-background url))}]]
+ 
+            [[:object {:data "assets/svg/toolbar-text.svg" :type "image/svg+xml"}]]]]
+
+    
+    [:div.ed-toolbar
+     (for [it items]
+       (into [toolbar-item] it))]))
+
+
+
+(defn text-settings []
+  [:div])
+
+
+
+(defn toolbar-settings []
+  (r/with-let [tool (subscribe [::ed-sub/keys [:tool]])]
+    [:div.fabric-settings
+     (condp = tool
+       :text [text-settings]
+       "")]))
+
+
+
+
+
+
 (defn fabric [{url :cover/background}]
   (let [canvas     (atom nil)
         dom        (atom nil)
@@ -212,6 +259,8 @@
       :reagent-render
       (fn [opts]
         [:div.fabric-wrap
+         [toolbar]
+         [toolbar-settings]
          [:div.editor-img {:ref #(reset! parent-dom %)}
           [:canvas#canv {:ref #(reset! dom %)}]]])})))
 
@@ -226,19 +275,13 @@
     [:div.editor
      [:div.header {:style {:text-align :center
                            :margin "0.5em auto"}}
-      (cc/menu
-
-       [cc/image-picker
-        {:callback
-         (fn [file url]
-           (ed-evt/add-files-to-upload :cover/background file)
-           (ed-evt/set-background url))}]
+      #_(cc/menu
        
-       (when @auth?
-         [:a (if @uploading?
-               {:style {:opacity "0.5"}}
-               {:on-click #(cover->db)})
-          "save"]))]
+         (when @auth?
+           [:a (if @uploading?
+                 {:style {:opacity "0.5"}}
+                 {:on-click #(cover->db)})
+            "save"]))]
 
      [fabric {:cover/background @url}]
 

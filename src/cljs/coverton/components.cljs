@@ -87,18 +87,17 @@
 
 (defn image-picker [{:keys [callback]}]
   (r/with-let [input-dom (atom nil)]
-    [:span
-     [:a {:on-click #(some-> @input-dom .click)}
-      "image"]
-     [:form {:style {:display :none}}
-      [:input#image-input
-       {:type "file"
-        :accept "image/*"
-        :ref #(some->> % (reset! input-dom))
-        :on-change #(let [file (-> % .-target .-files (aget 0))]
-                      (some->> file
-                               (.createObjectURL js/URL)
-                               (callback file)))
-        :style {:display :none
-                :position :inline-block}}]]]))
+    [:span.clickable {:on-click #(some-> @input-dom .click)
+                      :style {:width "100%" :height "100%"
+                              :position :absolute :top 0 :left 0}}
+     [:input#image-input
+      {:type "file"
+       :accept "image/*"
+       :ref #(some->> % (reset! input-dom))
+       :on-change #(let [file (-> % .-target .-files (aget 0))]
+                     (some->> file
+                              (.createObjectURL js/URL)
+                              (callback file)))
+       :style {:display :none
+               :position :inline-block}}]]))
 

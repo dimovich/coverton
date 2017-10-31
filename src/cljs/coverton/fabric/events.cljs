@@ -21,8 +21,9 @@
                                  clj->js
                                  (.toSVG canvas))}}]
                    
-                   ;; after post-upload cover merge, fabric component
-                   ;; has redrawn so we upload the cover with updated
+                   ;; after post-upload cover merge, component has
+                   ;; redrawn and merged the new data (the previous
+                   ;; dispatch), so we upload the cover with updated
                    ;; urls
                    (when (:uploading? db)
                      [::ed-evt/upload-cover
@@ -40,11 +41,15 @@
     {:db (assoc db :uploading? true)}
 
     (if-let [files (:files-to-upload db)]
-
+      ;;got some files to upload, so do that, then merge the server
+      ;;response back into the cover; the updated urls will trigger a
+      ;;redraw which will save the cover and then upload it to the
+      ;;server.
       {:dispatch [::ed-evt/upload-files files
                   {:on-success [::ed-evt/merge-cover]
                    :on-failure [::upload-failure]}]}
-     
+
+      ;;no files to upload, so just upload the cover as is
       {:dispatch [::ed-evt/upload-cover
                   {:on-success [::upload-success]
                    :on-failure [::upload-failure]}]}))))
