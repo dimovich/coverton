@@ -121,7 +121,7 @@
                                           (dispatch [::evt/refresh]))}
       
           [:img.logo {:src "assets/svg/logo.svg"}]
-          (when (:motto els) "a publishing platform for cover makers.")])
+          (when (:motto els) [:span "a publishing platform for cover makers."])])
         
 
        [:span {:style {:float :right}}

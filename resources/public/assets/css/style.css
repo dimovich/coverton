@@ -100,7 +100,7 @@ a {
 .logo {
     height: 2em;
     padding-right: 0.3em;
-    padding-bottom: -0.1em;
+    transform: translateY(0.4em);
 }
 
 
@@ -448,7 +448,7 @@ button a {
 
 .ed-toolbar-settings {
     position: absolute;
-    top: -40px;
+    top: -25px;
     left: 0;
     display: inline-block;
 }
