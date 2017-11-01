@@ -95,7 +95,7 @@
                                           "Enter" (login)
                                           false))}]]
      [:a {:on-click login}
-      "log in"])))
+      "Log in"])))
 
 
 
@@ -135,17 +135,17 @@
                   [:a {:on-click
                        #(do (dispatch [::evt/logout])
                             (reset! show-login? false))}
-                   "log out"]]
+                   "Log out"]]
                  @show-login? [[login-form]]
                  
                  :default
                  [(when (and (:request-invite els)
                              (not @request-sent?))
                     [:a {:on-click #(evt/set-page :request-invite)}
-                     "request invitation"])
+                     "Request Invitation"])
                   (when (:auth els)
                     [:a {:on-click #(reset! show-login? true)}
-                     "log in"])]))]])))
+                     "Log in"])]))]])))
 
 
 
@@ -194,8 +194,8 @@
         nstart (- all nend)]
     
     (concat
-     (repeat nstart :div.cover-block-box)
-     (repeat nend   :div.cover-block-box-end))))
+     (repeat nstart :div.cover-block-wrap)
+     (repeat nend   :div.cover-block-wrap-end))))
 
 
 

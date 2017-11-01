@@ -10,12 +10,11 @@
 
 
 
-
 (defn cover-block
   [params cover]
   
-  [:div.cover-block {:ref #(when % (d/set-px! % :height (d/px % :width)))}
-   [:div.cover-block-clickable params]
+  [:div.cover-block.clickable
+   [:div.cover-block-clickable params [:span "edit me"]]
    [:div.cover-block-svg
     {:dangerouslySetInnerHTML
      {:__html (get-in cover [:cover/fabric :svg])}}]])

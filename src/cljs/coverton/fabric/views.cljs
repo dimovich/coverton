@@ -210,7 +210,8 @@
                       :margin "-10px 0 0 0"}}
              [:img {:src "assets/svg/h-separator.svg"}]]
 
-            [[:img.clickable {:src "assets/svg/toolbar-preview.svg"}]]]]
+            [{:on-click #(cover->db)}
+             [:img.clickable {:src "assets/svg/toolbar-preview.svg"}]]]]
 
     
     [:div.ed-toolbar

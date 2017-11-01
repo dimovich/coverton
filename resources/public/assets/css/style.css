@@ -124,7 +124,6 @@ a {
 
 
 .covers-container, .picker-container {
-/*    clear: both;*/
     padding-top: 1em;
     display: flex;
     flex-wrap: wrap;
@@ -132,12 +131,12 @@ a {
 }
 
 
-.cover-block-box {
+.cover-block-wrap {
     padding-bottom: 2em;
     width: 30%;
 }
 
-.cover-block-box-end {
+.cover-block-wrap-end {
     padding-bottom: 2em;
     margin: auto;
     width: 30%;
@@ -162,14 +161,11 @@ a {
 
 .cover-block, .picker-block {
     position: relative;
-    border: 1px solid black;
+    border: 0;
     padding: 0;
-
     width: 100%;
-
     overflow: hidden;
     display: inline-block;
-    box-sizing: border-box;
 }
 
 .cover-block-clickable {
@@ -178,31 +174,17 @@ a {
     height: 100%;
     top: 0;
     left: 0;
-}
-
-.cover-block {
-    cursor: pointer;
-}
-
-.cover-image, .picker-img {
-    width: 100%;
-}
-
-
-.cover-mark, .picker-mark {
-    position: absolute;
-    margin: 16px;
-    padding: 0;
-    border: 0px solid black;
-    background-color: transparent;
-    white-space: nowrap;
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    background-color: white;
+    font-size: 3vw;
 }
 
 
-
-.picker-mark:hover {
-    opacity: 0.8;
+.cover-block-clickable:hover {
+    opacity: 0.6;
 }
 
 
@@ -217,9 +199,6 @@ a {
     margin: auto;
 }
 
-
-.slider-picker {
-}
 
 .auth-box {
     position: absolute;
