@@ -85,114 +85,9 @@ a {
     margin-bottom: 1em;
 }
 
-.mark {
-    position: absolute;
-    display: inline-block;
-    height: 0;
-    width: 0;
-}
-
-
-.mark-resize {
-    display: inline-block;
-    border: 2px solid transparent;
-    transition : border .2s ease-in;
-    transition-delay: 0;
-    margin: 0;
-    padding: 10px;
-}
-
-
-.mark-toolbox {
-    position: absolute;
-    overflow: visible;
-    top: -20px;
-    left: 13px;
-    height: 24px;
-    width: 55px;
-    border: 0px solid silver;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    cursor: default;
-    display: none;
-    transition: display 2s ease-out;
-}
-
-
-.mark-toolbox-wrap {
-    display: inline-block;
-    width: 38%;
-    height: 90%;
-    background: gray;
-    border: 1px solid silver;
-    padding: 0;
-    margin: 0px;
-    cursor: pointer;
-    position: relative;
-}
-
-
-.react-draggable:hover .mark-toolbox {
-    display: inline-block;
-}
-
-
-.border .mark-resize, .react-draggable:hover .mark-resize {
-    border: 2px solid grey;
-    transition-delay: 0;
-}
-
-
-.mark-input {
-    white-space: nowrap;
-    font-size: 1em;
-    font-family: 'GothaPro';
-    color: orange;
-    outline: none;
-    border: 0;
-    background-color: transparent;
-    user-select: none;
-    width: 1em;
-    margin: 0;
-    padding: 0;
-    text-align: left;
-}
-
-.mark-static {
-    border: 0;
-    margin: 0;
-    padding: 0;
-    text-align: left;
-    background-color: transparent;
-    white-space: nowrap;
-}
 
 .cursor-move {
     cursor: move;
-}
-
-
-.mark-input:focus {
-    user-select: default;
-}
-
-
-.react-draggable {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-    cursor: move;
-    padding: 15px;
-    margin: 0;
-    box-sizing: border-box;
-    display: inline-block;
-}
-
-
-.react-draggable-child {
 }
 
 
@@ -203,8 +98,9 @@ a {
 
 
 .logo {
-    height: 1em;
+    height: 2em;
     padding-right: 0.3em;
+    padding-bottom: -0.1em;
 }
 
 
@@ -537,23 +433,30 @@ button a {
 
 .ed-toolbar-item {
     position: relative;
-    opacity: 0.6;
+    opacity: 0.7;
     width: 30px;
     height: 30px;
-    margin: 0 0 15px 0;
+    border: 1px solid lightgray;
+    margin: 0 0 10px 0;
     padding: 0;
 }
 
-
-.ed-toolbar-item-fill {
-    fill: pink;
+.ed-toolbar-item:hover, .ed-toolbar-settings-item:hover {
+    opacity: 1;
 }
 
 
 .ed-toolbar-settings {
     position: absolute;
-    border: 1px solid green;
-    top: -45px;
+    top: -40px;
     left: 0;
     display: inline-block;
+}
+
+
+.ed-toolbar-settings-item {
+    display: inline-block;
+    color: #9E9E9E;
+    opacity: 0.7;
+    margin-left: 1em;
 }

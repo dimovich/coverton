@@ -187,7 +187,7 @@
 (defn toolbar-item []
   (r/with-let [this (r/current-component)]
     (into
-     [:div.ed-toolbar-item.clickable
+     [:div.ed-toolbar-item
       (r/props this)]
      (r/children this))))
 
@@ -195,37 +195,39 @@
 
 (defn toolbar []
   (r/with-let
-    [items [[[:object {:data "assets/svg/toolbar-preview.svg" :type "image/svg+xml"}]]
-
-            [[:object {:data "assets/svg/toolbar-background.svg" :type "image/svg+xml"}]
+    [items [[[:img.clickable {:src "assets/svg/toolbar-background.svg"}]
              [cc/image-picker
               {:callback
                (fn [file url]
                  (ed-evt/add-files-to-upload :cover/background file)
                  (ed-evt/set-background url))}]]
  
-            [[:object {:data "assets/svg/toolbar-text.svg" :type "image/svg+xml"}]]]]
+            [[:img.clickable {:src "assets/svg/toolbar-text.svg"}]]
+
+            [{:style {:border 0
+                      :opacity 1
+                      :height :auto
+                      :margin "-10px 0 0 0"}}
+             [:img {:src "assets/svg/h-separator.svg"}]]
+
+            [[:img.clickable {:src "assets/svg/toolbar-preview.svg"}]]]]
 
     
     [:div.ed-toolbar
      (for [it items]
-       (into [toolbar-item] it))]))
-
-
-
-(defn text-settings []
-  [:div])
+       ^{:key it} (into [toolbar-item] it))]))
 
 
 
 (defn toolbar-settings []
-  (r/with-let [tool (subscribe [::ed-sub/keys [:tool]])]
-    [:div.fabric-settings
-     (condp = tool
-       :text [text-settings]
-       "")]))
-
-
+  (r/with-let [tool  (subscribe [::ed-sub/keys [:tool]])
+               items {:text [[:a {:on-click identity} "font"]
+                             [:a {:on-click identity} "bold"]]}]
+    (into
+     [:div.ed-toolbar-settings
+      (for [it (get items @tool)]
+        ^{:key it}
+        [:div.ed-toolbar-settings-item it])])))
 
 
 

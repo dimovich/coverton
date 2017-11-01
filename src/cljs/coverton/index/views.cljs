@@ -121,7 +121,6 @@
                                           (dispatch [::evt/refresh]))}
       
           [:img.logo {:src "assets/svg/logo.svg"}]
-          [:span.logo-name "Coverton"]
           (when (:motto els) "a publishing platform for cover makers.")])
         
 

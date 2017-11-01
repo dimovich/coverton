@@ -18,7 +18,8 @@
  ed-interceptors
  (fn [db [cover]]
    (info "initializing with " cover)
-   {:cover (or cover default-db)}))
+   {:cover (or cover default-db)
+    :tool :text}))
 
 
 (reg-event-db
