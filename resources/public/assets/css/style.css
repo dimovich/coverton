@@ -1,8 +1,15 @@
 @import url('fonts.css');
 
 @font-face {
-    font-family: 'GothaPro';
-    src:url('../fonts/GothaProReg.otf');
+    font-family: 'GothamRegular';
+    src:url('../fonts/GothamRegular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'GothamMedium';
+    src:url('../fonts/GothamMedium.otf');
     font-weight: normal;
     font-style: normal;
 }
@@ -14,11 +21,11 @@ body {
     padding: 0;
     overflow-x: hidden;
     overflow-y: scroll;
-    font-family: 'GothaPro';
+    font-family: 'GothamRegular';
 }
 
 input, textarea, a {
-    font-family: 'GothaPro';
+    font-family: 'GothamRegular';
 }
 
 input, textarea {
@@ -34,7 +41,7 @@ input, textarea {
 .motto {
     margin: auto;
     width: 455px;
-    font-family : 'GothaPro';
+    font-family : 'GothamRegular';
     font-size : 20px;
     font-weight: normal;
     font-style: normal;    
@@ -55,7 +62,7 @@ input, textarea {
 }
 
 .editor {
-    margin: 0 auto;
+    margin: 1em auto;
     border: 0px solid green;
     position: relative;
     width: 100%;
@@ -100,9 +107,12 @@ a {
 .logo {
     height: 2em;
     padding-right: 0.3em;
-    transform: translateY(0.4em);
 }
 
+.logo-info {
+    display: inline-block;
+    transform: translateY(-0.4em);
+}
 
 .text {
     color : #1A1A1A;
@@ -179,12 +189,17 @@ a {
     justify-content: center;
     opacity: 0;
     background-color: white;
-    font-size: 3vw;
+    font-size: 2.5vw;
+    font-family: 'GothamMedium'
 }
 
 
 .cover-block-clickable:hover {
-    opacity: 0.6;
+    opacity: 0.7;
+}
+
+.cover-block-clickable>span {
+    text-decoration: underline;
 }
 
 
@@ -215,7 +230,7 @@ a {
 .header {
     position: relative;
     margin: auto;
-    margin-top: 2em;
+    margin-top: 1em;
     text-align: left;
 }
 
@@ -227,14 +242,18 @@ a {
     color: #1a1a1a;
 }
 
+.top-menu {
+    float: right;
+}
+
 .menu a {
     color: #1a1a1a;
-    vertical-align: top;
 }
 
 .menu a:hover {
     color: #050505;
 }
+
 
 a {
     position: relative;
@@ -250,13 +269,14 @@ a:after {
 
     border-width: 0 0 1px;
     border-style: solid;
-
 }
 
 
 .separator {
+    display: inline-block;
     font-size: 1.3em;
-    margin: 0.5em;
+    padding: 0.5em;
+    transform: translateY(0.1em);
 }
 
 
@@ -286,7 +306,7 @@ a:after {
     border: 0;
     background-color: transparent;
     font-size: 1em;
-    font-family: 'GothaPro';
+    font-family: 'GothamRegular';
 }
 
 
@@ -407,6 +427,7 @@ button a {
     top: 0;
     left: -45px;
     display: inline-block;
+    text-align: center;
 }
 
 

@@ -195,28 +195,40 @@
 
 (defn toolbar []
   (r/with-let
-    [items [[[:img.clickable {:src "assets/svg/toolbar-background.svg"}]
-             [cc/image-picker
-              {:callback
-               (fn [file url]
-                 (ed-evt/add-files-to-upload :cover/background file)
-                 (ed-evt/set-background url))}]]
+    [authenticated? (subscribe [::index-sub/authenticated?])
+     uploading? (subscribe [::ed-sub/keys [:uploading?]])
+
+     items (fn []
+             [[[:img.clickable {:src "assets/svg/toolbar-background.svg"}]
+               [cc/image-picker
+                {:callback
+                 (fn [file url]
+                   (ed-evt/add-files-to-upload :cover/background file)
+                   (ed-evt/set-background url))}]]
  
-            [[:img.clickable {:src "assets/svg/toolbar-text.svg"}]]
+              [[:img.clickable {:src "assets/svg/toolbar-text.svg"}]]
 
-            [{:style {:border 0
-                      :opacity 1
-                      :height :auto
-                      :margin "-10px 0 0 0"}}
-             [:img {:src "assets/svg/h-separator.svg"}]]
+              [{:style {:border 0
+                        :padding 1
+                        :height :auto
+                        :margin "-10px 0 0 0"}}
+               [:img {:src "assets/svg/h-separator.svg"}]]
 
-            [{:on-click #(cover->db)}
-             [:img.clickable {:src "assets/svg/toolbar-preview.svg"}]]]]
+              [[:img.clickable {:src "assets/svg/toolbar-preview.svg"}]]
+
+              (when @authenticated?
+                [(if @uploading?
+                   {:style {:opacity 0.2}}
+                   {:on-click #(cover->db)})
+                 [:img.clickable {:src "assets/svg/toolbar-save.svg"}]])])]
 
     
-    [:div.ed-toolbar
-     (for [it items]
-       ^{:key it} (into [toolbar-item] it))]))
+    (into
+     [:div.ed-toolbar]
+     (map-indexed
+      (fn [idx item]
+        (into ^{:key idx} [toolbar-item] item))
+      (filter identity (items))))))
 
 
 
@@ -271,21 +283,10 @@
 
 
 (defn editor []
-  (r/with-let [auth?   (subscribe [::index-sub/authenticated?])
-               url     (subscribe [::ed-sub/background])
-               uploading? (subscribe [::ed-sub/keys [:uploading?]])]
+  (r/with-let [
+               url     (subscribe [::ed-sub/background])]
    
     [:div.editor
-     [:div.header {:style {:text-align :center
-                           :margin "0.5em auto"}}
-      #_(cc/menu
-       
-         (when @auth?
-           [:a (if @uploading?
-                 {:style {:opacity "0.5"}}
-                 {:on-click #(cover->db)})
-            "save"]))]
-
      [fabric {:cover/background @url}]
 
      #_([:br]

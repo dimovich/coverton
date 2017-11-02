@@ -22,7 +22,3 @@ https://yogthos.net/posts/2015-11-24-Serverside-Reagent.html
 - fonts
   https://www.filamentgroup.com/lab/font-events.html
 
-
-+ auth  https://github.com/lambdaisland/booklog
-
-+ image crop / zoom

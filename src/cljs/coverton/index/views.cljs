@@ -109,22 +109,24 @@
 (defn header [page]
   (r/with-let [show-login?  (r/atom false)
                authenticated? (subscribe [::sub/authenticated?])
-               request-sent?  (subscribe [::sub/key :request-invite-sent])]
+               request-sent?  (subscribe [::sub/key :request-invite-sent])
+               on-click-logo #(do (evt/set-page :index)
+                                  (reset! show-login? false)
+                                  (dispatch [::evt/refresh]))]
 
     (let [els (get page->header page)]
       
       [:div.header
        (when (:logo els)
-         [:span.clickable {:style {:left 0}
-                           :on-click #(do (evt/set-page :index)
-                                          (reset! show-login? false)
-                                          (dispatch [::evt/refresh]))}
-      
+         [:span.clickable  {:style {:left 0}
+                            :on-click on-click-logo}
+                        
           [:img.logo {:src "assets/svg/logo.svg"}]
-          (when (:motto els) [:span "a publishing platform for cover makers."])])
+          (when (:motto els) [:span.logo-info
+                              "a publishing platform for cover makers."])])
         
 
-       [:span {:style {:float :right}}
+       [:span.top-menu
         (apply cc/menu
                (cond
                  @authenticated?
@@ -139,10 +141,11 @@
                  @show-login? [[login-form]]
                  
                  :default
-                 [(when (and (:request-invite els)
-                             (not @request-sent?))
+                 [(if (and (:request-invite els)
+                           (not @request-sent?))
                     [:a {:on-click #(evt/set-page :request-invite)}
-                     "Request Invitation"])
+                     "request invitation"]
+                    "") ;;fixme lone Log In sticks to the top?
                   (when (:auth els)
                     [:a {:on-click #(reset! show-login? true)}
                      "Log in"])]))]])))
