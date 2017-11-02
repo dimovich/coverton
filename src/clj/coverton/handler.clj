@@ -6,7 +6,9 @@
             [ring.util.response              :refer [response file-response redirect not-found content-type]]
             [ring.middleware.session         :refer [wrap-session]]
             [ring.middleware.params          :refer [wrap-params]]
+            [ring.middleware.gzip            :refer [wrap-gzip]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
+            
 
             [compojure.core     :refer [defroutes GET POST]]
             [compojure.route    :refer [files resources]]
@@ -180,6 +182,7 @@
     (wrap-multipart-params $)
     (wrap-resource       $ "public")
     (wrap-content-type   $)
+    (wrap-gzip           $)))
     ;;(wrap-info-response  $)
-    ))
+    
 

@@ -1,7 +1,7 @@
 (set-env!
  :source-paths    #{"src/cljs" "src/clj" "src/cljc"}
- :resource-paths  #{"resources" }
- :dependencies '[[org.clojure/clojure "1.9.0-beta3"]
+ :resource-paths  #{"resources"}
+ :dependencies '[[org.clojure/clojure "1.9.0-beta4"]
                  [org.clojure/clojurescript "1.9.946"]
 
                  [adzerk/boot-cljs-repl     "0.3.3"  :scope "test"]
@@ -15,14 +15,15 @@
                  [cider/cider-nrepl         "0.15.1"]
                  
                  [compojure      "1.6.0"]
-                 [ring/ring-core "1.6.2"]
-                 [ring-transit   "0.1.6"]
                  [hiccup         "2.0.0-alpha1"]
                  [http-kit       "2.2.0"]
                  [com.taoensso/timbre       "4.10.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
 
+                 [ring/ring-core "1.6.2"]
+                 [ring-transit   "0.1.6"]
                  [ring-middleware-format "0.7.2"]
+                 [bk/ring-gzip "0.2.1"]
 
                  [buddy/buddy-auth "2.1.0"]
                  [buddy/buddy-hashers "1.3.0"]
@@ -66,11 +67,11 @@
                        :output-dir "public/out"
                        :asset-path "out"
                        :warnings {:redef false}
-                       :parallel-build true
+                       :parallel-build true}})
                        ;;:pseudo-names true
                        ;;:closure-defines      {"re_frame.trace.trace_enabled_QMARK_" true}
                        ;;:preloads             ['day8.re-frame.trace.preload]
-                       }})
+                       
 
 
 (deftask production
