@@ -199,28 +199,31 @@
      uploading? (subscribe [::ed-sub/keys [:uploading?]])
 
      items (fn []
-             [[[:img.clickable {:src "assets/svg/toolbar-background.svg"}]
+             [[[:img.clickable {:src "assets/svg/ed/text.svg"}]]
+              
+              [[:img.clickable {:src "assets/svg/ed/image.svg"}]
                [cc/image-picker
                 {:callback
                  (fn [file url]
                    (ed-evt/add-files-to-upload :cover/background file)
                    (ed-evt/set-background url))}]]
  
-              [[:img.clickable {:src "assets/svg/toolbar-text.svg"}]]
+              [{:style {:opacity 1}}
+               [:img {:src "assets/svg/ed/separator.svg"}]]
 
-              [{:style {:border 0
-                        :padding 1
-                        :height :auto
-                        :margin "-10px 0 0 0"}}
-               [:img {:src "assets/svg/h-separator.svg"}]]
+              [[:img.clickable {:src "assets/svg/ed/preview.svg"}]]
 
-              [[:img.clickable {:src "assets/svg/toolbar-preview.svg"}]]
+              [{:style {:opacity 1
+                        :margin-top "-10px"}}
+               [:img {:src "assets/svg/ed/separator.svg"}]]
 
               (when @authenticated?
                 [(if @uploading?
                    {:style {:opacity 0.2}}
                    {:on-click #(cover->db)})
-                 [:img.clickable {:src "assets/svg/toolbar-save.svg"}]])])]
+                 [:img.clickable {:src "assets/svg/ed/save.svg"}]])
+
+              [[:img.clickable {:src "assets/svg/ed/new.svg"}]]])]
 
     
     (into
@@ -234,14 +237,23 @@
 
 (defn toolbar-settings []
   (r/with-let [tool  (subscribe [::ed-sub/keys [:tool]])
-               items {:text [[:a {:on-click identity} "font"]
-                             [:a {:on-click identity} "bold"]]}]
+               items [[[:img.clickable {:src "assets/svg/ed/undo.svg"}]]
+                      [[:img.clickable {:src "assets/svg/ed/redo.svg"}]]]]
     (into
-     [:div.ed-toolbar-settings
-      (for [it (get items @tool)]
-        ^{:key it}
-        [:div.ed-toolbar-settings-item it])])))
+     [:div.ed-toolbar-settings]
+     (for [it items]
+       (into ^{:key it} [:div.ed-toolbar-settings-item] it)))))
 
+
+
+(defn tags []
+  (r/with-let [state (r/atom nil)]
+    [:div.ed-tags
+     [:span "#tag"]
+     [:img.clickable {:src "assets/svg/ed/plus.svg"
+                      :style {:height "1.3em"
+                              :padding-left "0.6em"
+                              :transform "translateY(0.3em)"}}]]))
 
 
 
@@ -277,14 +289,14 @@
          [toolbar]
          [toolbar-settings]
          [:div.editor-img {:ref #(reset! parent-dom %)}
-          [:canvas#canv {:ref #(reset! dom %)}]]])})))
+          [:canvas#canv {:ref #(reset! dom %)}]]
+         [tags]])})))
 
 
 
 
 (defn editor []
-  (r/with-let [
-               url     (subscribe [::ed-sub/background])]
+  (r/with-let [url (subscribe [::ed-sub/background])]
    
     [:div.editor
      [fabric {:cover/background @url}]

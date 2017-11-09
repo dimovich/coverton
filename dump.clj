@@ -374,3 +374,16 @@ f
     (doto text
       (.on (clj->js
             {"editing:exited" identity}))))
+
+
+
+
+#_(defn toolbar-settings []
+    (r/with-let [tool  (subscribe [::ed-sub/keys [:tool]])
+                 items {:text [[:a {:on-click identity} "font"]
+                               [:a {:on-click identity} "bold"]]}]
+      (into
+       [:div.ed-toolbar-settings
+        (for [it (get items @tool)]
+          ^{:key it}
+          [:div.ed-toolbar-settings-item it])])))
