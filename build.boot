@@ -124,7 +124,7 @@
   []
   (comp
    (production)
-   (cljs)
+   ;;(cljs)
    (build-jar)
    (target)))
 
