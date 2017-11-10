@@ -219,11 +219,12 @@
 
               (when @authenticated?
                 [(if @uploading?
-                   {:style {:opacity 0.2}}
+                   {:style {:opacity 0.3}}
                    {:on-click #(cover->db)})
                  [:img.clickable {:src "assets/svg/ed/save.svg"}]])
 
-              [[:img.clickable {:src "assets/svg/ed/new.svg"}]]])]
+              [{:on-click #(ed-evt/initialize)}
+               [:img.clickable {:src "assets/svg/ed/new.svg"}]]])]
 
     
     (into
@@ -246,14 +247,76 @@
 
 
 
-(defn tags []
-  (r/with-let [state (r/atom nil)]
-    [:div.ed-tags
-     [:span "#tag"]
-     [:img.clickable {:src "assets/svg/ed/plus.svg"
-                      :style {:height "1.3em"
-                              :padding-left "0.6em"
-                              :transform "translateY(0.3em)"}}]]))
+
+
+(defn tag [opts tg]
+  [:div.ed-tag
+   [:span.helper-valign]
+   [:span.clickable opts (str "#" tg)]])
+
+
+
+(defn tags [tgs]
+  (r/with-let [text           (r/atom nil)
+               input-visible? (r/atom false)
+               add-tag (fn [_]
+                         (when-not (empty? @text)
+                           (dispatch [::ed-evt/update-cover :cover/tags
+                                      #(-> (or %1 [])
+                                           (conj %2))
+                                      @text])
+                           (reset! text nil)))
+               
+               remove-tag (fn [idx]
+                            (dispatch [::ed-evt/update-cover :cover/tags
+                                       #(vec (concat
+                                              (subvec % 0 idx)
+                                              (subvec % (inc idx))))]))
+               pop-tag #(dispatch [::ed-evt/update-cover :cover/tags
+                                   (comp vec butlast)])]
+
+    (into
+     [:div.ed-tags
+
+      ;; Tags
+      (map-indexed
+       (fn [idx tg]
+         [tag {:on-click #(remove-tag idx)
+               :key idx}
+          tg])
+       tgs)]
+     
+     (if @input-visible?
+       ;; Tag Input
+       [[:span {:style {:margin-top :auto
+                        :margin-bottom :auto
+                        :margin-right "0.1em"}} "#"]
+        [cc/editable :input {:state text
+                             :class :ed-tag-input
+                             :auto-focus true
+                             :on-key-down (fn [e]
+                                            (condp = (.. e -key)
+                                              "Escape"    (reset! input-visible? false)
+                                              "Enter"     (do (add-tag)
+                                                              (reset! input-visible? false))
+                                              "Backspace" (when (empty? @text)
+                                                            (pop-tag))
+                                              false))}]]
+
+       ;; + button
+       [[:img.clickable.ed-tag-plus
+         {:src "assets/svg/ed/plus.svg"
+          :on-click #(reset! input-visible? true)}]]))))
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -290,7 +353,7 @@
          [toolbar-settings]
          [:div.editor-img {:ref #(reset! parent-dom %)}
           [:canvas#canv {:ref #(reset! dom %)}]]
-         [tags]])})))
+         [tags (:cover/tags @cover)]])})))
 
 
 

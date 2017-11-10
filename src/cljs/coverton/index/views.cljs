@@ -100,7 +100,7 @@
 
 
 
-(def page->header {:index #{:logo :motto :request-invite :auth}
+(def page->header {:index #{:logo :motto :request-invite :auth :new}
                    :request-invite #{:logo :motto}
                    :fabric #{:logo :auth}})
 
@@ -130,10 +130,12 @@
         (apply cc/menu
                (cond
                  @authenticated?
-                 [[:a {:on-click
-                       #(do (ed-evt/initialize)
-                            (evt/set-page :fabric))}
-                   "N E W"]
+                 [(if (:new els)
+                    [:a {:on-click
+                         #(do (ed-evt/initialize)
+                              (evt/set-page :fabric))}
+                     "N E W"]
+                    "")
                   [:a {:on-click
                        #(do (dispatch [::evt/logout])
                             (reset! show-login? false))}
@@ -231,7 +233,7 @@
              [css
               [cc/cover-block
                {:on-click #(do (dispatch [::evt/assoc :page-scroll window.scrollY])
-                               (ed-evt/initialize (dissoc cover :cover/id))
+                               (ed-evt/initialize cover) ;;(dissoc cover :cover/id)
                                (evt/set-page :fabric))}
                cover]
               
