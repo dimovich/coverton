@@ -9,8 +9,8 @@
             [coverton.index.subs :as index-sub]
             [coverton.fabric.defaults :as defaults]
             [coverton.components :as cc]
-            ;;[cljsjs.fabric]
-            ["fabric"]))
+            ;;["fabric"]
+            [cljsjs.fabric]))
 
 
 
@@ -256,6 +256,8 @@
 
 
 
+
+;;todo: retract tags from db cover
 (defn tags [tgs]
   (r/with-let [text           (r/atom nil)
                input-visible? (r/atom false)
@@ -320,18 +322,19 @@
 
 
 
-(defn fabric [{url :cover/background}]
+(defn fabric [cover]
   (let [canvas     (atom nil)
         dom        (atom nil)
         parent-dom (atom nil)
         unmount-fn (atom nil)
-        cover      (subscribe [::ed-sub/cover])]
+        ;;cover      (subscribe [::ed-sub/cover])
+        ]
     
     (r/create-class
      {:component-did-mount
       (fn [_]
         (reset! canvas (Canvas. @dom))
-        (->> (init-fabric @canvas @parent-dom @cover)
+        (->> (init-fabric @canvas @parent-dom cover)
              (reset! unmount-fn)))
 
       :component-did-update
@@ -347,22 +350,23 @@
           (@unmount-fn)))
 
       :reagent-render
-      (fn [opts]
+      (fn [cover]
         [:div.fabric-wrap
          [toolbar]
          [toolbar-settings]
          [:div.editor-img {:ref #(reset! parent-dom %)}
           [:canvas#canv {:ref #(reset! dom %)}]]
-         [tags (:cover/tags @cover)]])})))
+         [tags (:cover/tags cover)]])})))
 
 
 
 
 (defn editor []
-  (r/with-let [url (subscribe [::ed-sub/background])]
+  (r/with-let [url (subscribe [::ed-sub/background])
+               cover (subscribe [::ed-sub/cover])]
    
     [:div.editor
-     [fabric {:cover/background @url}]
+     [fabric @cover]
 
      #_([:br]
         [:div (str @cover)])]))

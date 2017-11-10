@@ -25,7 +25,7 @@
                    ;; redrawn and merged the new data (the previous
                    ;; dispatch), so we upload the cover with updated
                    ;; urls
-                   (when (:uploading? db)
+                   (when (and (:uploading? db))
                      [::ed-evt/upload-cover
                       {:on-success [::upload-success]
                        :on-failure [::upload-failure]}])]})))
