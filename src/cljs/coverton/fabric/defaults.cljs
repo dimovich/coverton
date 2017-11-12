@@ -4,5 +4,5 @@
 
 (def mark
   {:fill (:color default-font) :cursorColor (:color default-font)
-   :fontFamily (:font-family default-font) :fontSize 50})
+   :fontFamily (:font-family default-font) :fontSize 80})
 

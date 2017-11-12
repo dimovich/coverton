@@ -118,39 +118,35 @@
       
       [:div.header
        (when (:logo els)
-         [:span.clickable  {:style {:left 0}
-                            :on-click on-click-logo}
-                        
+         [:span.logo-wrap.clickable
+          {:on-click on-click-logo}
           [:img.logo {:src "assets/svg/logo.svg"}]
           (when (:motto els) [:span.logo-info
                               "a publishing platform for cover makers."])])
         
 
-       [:span.top-menu
-        (apply cc/menu
-               (cond
-                 @authenticated?
-                 [(if (:new els)
-                    [:a {:on-click
-                         #(do (ed-evt/initialize)
-                              (evt/set-page :fabric))}
-                     "N E W"]
-                    "")
-                  [:a {:on-click
-                       #(do (dispatch [::evt/logout])
-                            (reset! show-login? false))}
-                   "Log out"]]
-                 @show-login? [[login-form]]
-                 
-                 :default
-                 [(if (and (:request-invite els)
-                           (not @request-sent?))
-                    [:a {:on-click #(evt/set-page :request-invite)}
-                     "request invitation"]
-                    "") ;;fixme lone Log In sticks to the top?
-                  (when (:auth els)
-                    [:a {:on-click #(reset! show-login? true)}
-                     "Log in"])]))]])))
+       (apply cc/menu
+              (cond
+                @authenticated?
+                [(if (:new els)
+                   [:a {:on-click
+                        #(do (ed-evt/initialize)
+                             (evt/set-page :fabric))}
+                    "N E W"])
+                 [:a {:on-click
+                      #(do (dispatch [::evt/logout])
+                           (reset! show-login? false))}
+                  "Log out"]]
+                @show-login? [[login-form]]
+                
+                :default
+                [(if (and (:request-invite els)
+                          (not @request-sent?))
+                   [:a {:on-click #(evt/set-page :request-invite)}
+                    "request invitation"]) ;;fixme lone Log In sticks to the top?
+                 (when (:auth els)
+                   [:a {:on-click #(reset! show-login? true)}
+                    "Log in"])]))])))
 
 
 
@@ -218,12 +214,11 @@
       
       :reagent-render
       (fn []
+        (when @search-tags
+          (dispatch [::evt/refresh]))
+        
         [:div.index
          [search-box {:tags @search-tags}]
-
-         (when @search-tags
-           (dispatch [::evt/refresh]))
-       
        
          [:div.covers-container
           (map
@@ -233,7 +228,7 @@
              [css
               [cc/cover-block
                {:on-click #(do (dispatch [::evt/assoc :page-scroll window.scrollY])
-                               (ed-evt/initialize cover) ;;(dissoc cover :cover/id)
+                               (ed-evt/initialize cover)
                                (evt/set-page :fabric))}
                cover]
               

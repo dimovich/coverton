@@ -37,17 +37,19 @@
 
 
 
-(defn add-mark [canvas [x y]]
-  (info "adding mark" x y)
-  (->> {:left x :top y}
-       (merge defaults/mark)
+(defn add-mark [canvas]
+  (info "adding mark...")
+  (->> defaults/mark
        clj->js
-       (IText. "")
+       (IText. "edit me")
        (#(do
            (doto canvas
              (.add %)
+             (.centerObject %)
              (.setActiveObject %))
-           (.enterEditing %)))))
+           (doto %
+             ;;(.selectAll)
+             (.enterEditing))))))
 
 
 
@@ -56,13 +58,14 @@
     (.getPointer canvas $)
     (js->clj $)
     (map $ ["x" "y"])
-    (add-mark canvas $)))
+    ;;(add-mark canvas)
+    ))
 
 
 
-(defn fabric->cover [canvas]
+(defn fabric->cover []
   (info "saving cover...")
-  (dispatch [::evt/fabric->cover canvas]))
+  (dispatch [::evt/fabric->cover]))
 
 
 
@@ -71,13 +74,16 @@
   (info "setting background: " url)
   (fromURL url
            (fn [img]
+             (dispatch [::ed-evt/update :images
+                        assoc :cover/background img])
+             
              (.scaleToWidth
               img (/  (.. canvas getWidth)
                       (.. canvas getZoom)))
              (.setBackgroundImage
               canvas img
               #(do (.renderAll canvas)
-                   (fabric->cover canvas))))))
+                   (fabric->cover))))))
 
 
 
@@ -89,7 +95,8 @@
     (if-let [json (clj->js (:json fabric))]
       (do
         (info "loading from json..." json (:size fabric))
-        (.loadFromJSON canvas json #(.renderAll canvas)))
+        (.loadFromJSON canvas json #(do (.renderAll canvas)
+                                        (fabric->cover))))
       (do
         (info "creating new canvas...")
         (set-background canvas url)))))
@@ -116,7 +123,7 @@
   (let [selecting? (atom false)]
     (doto canvas
       (.on (clj->js
-            {"object:modified"     #(fabric->cover canvas)
+            {"object:modified"     #(fabric->cover)
              "text:editing:exited" #(handle-text-edit-exit canvas %)
              "selection:created"   #(reset! selecting? true)
              "mouse:down"          #(reset! selecting? false)
@@ -135,10 +142,11 @@
 (defn handle-keys [canvas e]
   (condp = (.. e -keyCode)
     ;;Delete
-    46  (some->> canvas
-                 .getActiveObject
-                 (.remove canvas)
-                 fabric->cover)
+    46  (do
+          (some->> canvas
+                   .getActiveObject
+                   (.remove canvas))
+          (fabric->cover))
 
     ;;Esc
     27  (some->> canvas
@@ -184,6 +192,7 @@
 
 
 
+
 (defn toolbar-item []
   (r/with-let [this (r/current-component)]
     (into
@@ -193,20 +202,23 @@
 
 
 
-(defn toolbar []
+(defn toolbar-left []
   (r/with-let
     [authenticated? (subscribe [::index-sub/authenticated?])
      uploading? (subscribe [::ed-sub/keys [:uploading?]])
+     canvas (subscribe [::ed-sub/keys [:fabric :canvas]])
 
      items (fn []
-             [[[:img.clickable {:src "assets/svg/ed/text.svg"}]]
+             [[{:style {:width "85%"}
+                :on-click #(add-mark @canvas)}
+               [:img.clickable {:src "assets/svg/ed/text.svg"}]]
               
               [[:img.clickable {:src "assets/svg/ed/image.svg"}]
                [cc/image-picker
                 {:callback
                  (fn [file url]
                    (ed-evt/add-files-to-upload :cover/background file)
-                   (ed-evt/set-background url))}]]
+                   (set-background @canvas url))}]]
  
               [{:style {:opacity 1}}
                [:img {:src "assets/svg/ed/separator.svg"}]]
@@ -236,23 +248,26 @@
 
 
 
-(defn toolbar-settings []
-  (r/with-let [tool  (subscribe [::ed-sub/keys [:tool]])
-               items [[[:img.clickable {:src "assets/svg/ed/undo.svg"}]]
-                      [[:img.clickable {:src "assets/svg/ed/redo.svg"}]]]]
+
+
+(defn toolbar-top []
+  (r/with-let [snapshots (subscribe [::ed-sub/keys [:fabric :snapshots]])
+               snapshot-idx (subscribe [::ed-sub/keys [:fabric :snapshot-idx]])
+               items (fn []
+                       [[(when (some-> @snapshot-idx
+                                       (< (dec (count @snapshots))))
+                           {:on-click #(dispatch [::evt/undo])
+                            :style {:opacity 1}})
+                         [:img.clickable {:src "assets/svg/ed/undo.svg"}]]
+                        [[:img.clickable {:src "assets/svg/ed/redo.svg"}]]])]
     (into
      [:div.ed-toolbar-settings]
-     (for [it items]
+     (for [it (items)]
        (into ^{:key it} [:div.ed-toolbar-settings-item] it)))))
 
 
 
 
-
-(defn tag [opts tg]
-  [:div.ed-tag
-   [:span.helper-valign]
-   [:span.clickable opts (str "#" tg)]])
 
 
 
@@ -261,21 +276,27 @@
 (defn tags [tgs]
   (r/with-let [text           (r/atom nil)
                input-visible? (r/atom false)
+               set-visible (fn [b]
+                             (reset! input-visible? b)
+                             (reset! text nil))
+
+               tag (fn [opts tg]
+                     [:div.ed-tag
+                      [:span.helper-valign]
+                      [:span.clickable opts (str "#" tg)]])
+
                add-tag (fn [_]
                          (when-not (empty? @text)
                            (dispatch [::ed-evt/update-cover :cover/tags
                                       #(-> (or %1 [])
                                            (conj %2))
-                                      @text])
-                           (reset! text nil)))
+                                      @text])))
                
                remove-tag (fn [idx]
                             (dispatch [::ed-evt/update-cover :cover/tags
                                        #(vec (concat
                                               (subvec % 0 idx)
-                                              (subvec % (inc idx))))]))
-               pop-tag #(dispatch [::ed-evt/update-cover :cover/tags
-                                   (comp vec butlast)])]
+                                              (subvec % (inc idx))))]))]
 
     (into
      [:div.ed-tags
@@ -296,19 +317,18 @@
         [cc/editable :input {:state text
                              :class :ed-tag-input
                              :auto-focus true
+                             :on-blur #(set-visible false)
                              :on-key-down (fn [e]
                                             (condp = (.. e -key)
-                                              "Escape"    (reset! input-visible? false)
+                                              "Escape"    (set-visible false)
                                               "Enter"     (do (add-tag)
-                                                              (reset! input-visible? false))
-                                              "Backspace" (when (empty? @text)
-                                                            (pop-tag))
+                                                              (set-visible false))
                                               false))}]]
 
        ;; + button
        [[:img.clickable.ed-tag-plus
          {:src "assets/svg/ed/plus.svg"
-          :on-click #(reset! input-visible? true)}]]))))
+          :on-click #(set-visible true)}]]))))
 
 
 
@@ -323,37 +343,37 @@
 
 
 (defn fabric [cover]
-  (let [canvas     (atom nil)
-        dom        (atom nil)
+  (let [dom        (atom nil)
         parent-dom (atom nil)
-        unmount-fn (atom nil)
-        ;;cover      (subscribe [::ed-sub/cover])
-        ]
+        unmount-fn (atom nil)]
     
     (r/create-class
      {:component-did-mount
       (fn [_]
-        (reset! canvas (Canvas. @dom))
-        (->> (init-fabric @canvas @parent-dom cover)
-             (reset! unmount-fn)))
+        (let [canvas (Canvas. @dom)]
+          (dispatch [::ed-evt/update :fabric assoc :canvas canvas])
+          (->> (init-fabric canvas @parent-dom cover)
+               (reset! unmount-fn))))
 
       :component-did-update
       (fn [this]
         (info "updating fabric...")
-        (->> (:cover/background (r/props this))
-             (set-background @canvas)))
+        #_(cover->fabric @canvas (r/props this))
+        #_(->> (:cover/background (r/props this))
+               (set-background @canvas)))
       
       :component-will-unmount
       (fn [this]
         (info "unmounting fabric...")
+        (dispatch [::ed-evt/update :fabric (fn [_] nil)])
         (when @unmount-fn
           (@unmount-fn)))
 
       :reagent-render
       (fn [cover]
         [:div.fabric-wrap
-         [toolbar]
-         [toolbar-settings]
+         [toolbar-left]
+         [toolbar-top]
          [:div.editor-img {:ref #(reset! parent-dom %)}
           [:canvas#canv {:ref #(reset! dom %)}]]
          [tags (:cover/tags cover)]])})))
@@ -366,8 +386,5 @@
                cover (subscribe [::ed-sub/cover])]
    
     [:div.editor
-     [fabric @cover]
-
-     #_([:br]
-        [:div (str @cover)])]))
+     [fabric @cover]]))
 

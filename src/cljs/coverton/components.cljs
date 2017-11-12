@@ -64,7 +64,8 @@
 
 (defn menu [& args]
   (into
-   [:span.menu]
+   [:span.menu
+    [:span.helper-valign]]
    (some->> args
             (filter identity)
             (interpose [:span.separator "|"]))))
