@@ -12,6 +12,12 @@
             ;;["fabric"]
             [cljsjs.fabric]))
 
+(comment
+  ;; TODO
+  ;; undo/redo -> try re-frame undo/redo (maybe full db is better logic?)
+)
+
+
 
 
 (def Canvas  window.fabric.Canvas)

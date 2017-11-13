@@ -52,8 +52,10 @@
  ed-interceptors
  (fn [{db :db} _]
    {:db (-> db
+            ;;save fabric json
             (update-in [:fabric :snapshots]
                        conj (get-in db [:cover :cover/fabric]))
+            ;;reset current snapshot index
             (update-in [:fabric :snapshot-idx]
                        (fn [_] 0)))}))
 
@@ -68,12 +70,16 @@
          pending (atom (count images))
          canvas (get-in db [:fabric :canvas])]
 
-     ;; update image sources
+     ;; update image sources (async, so make sure we keep track when
+     ;; they finish loading)
      (doseq [[id url] urls]
        (.setSrc (get images id) url
                 #(swap! pending dec)))
 
      ;; wait for canvas to update, and then upload cover
+     ;; (is there a better way?)
+     ;; https://github.com/vimsical/re-frame-utils/blob/master/src/vimsical/re_frame/fx/track.cljc
+     
      (js/setTimeout
       (fn check []
         (if (< 0 @pending)
