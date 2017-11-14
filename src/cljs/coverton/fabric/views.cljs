@@ -46,7 +46,6 @@
 (defn add-mark [canvas]
   (info "adding mark...")
   (->> defaults/mark
-       clj->js
        (IText. "edit me")
        (#(do
            (doto canvas
@@ -59,13 +58,12 @@
 
 
 
-(defn on-click-add-mark [canvas evt]
-  (as-> (.. evt -e) $
-    (.getPointer canvas $)
-    (js->clj $)
-    (map $ ["x" "y"])
-    ;;(add-mark canvas)
-    ))
+#_(defn on-click-add-mark [canvas evt]
+    (as-> (.. evt -e) $
+      (.getPointer canvas $)
+      (js->clj $)
+      (map $ ["x" "y"])
+      (add-mark canvas)))
 
 
 
@@ -139,7 +137,7 @@
              (fn [evt]
                ;; clicking some empty space
                (when-not (or @selecting? (.. evt -target))
-                 (on-click-add-mark canvas evt)))})))))
+                 #_(on-click-add-mark canvas evt)))})))))
 
 
 

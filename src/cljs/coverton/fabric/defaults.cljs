@@ -3,6 +3,6 @@
 
 
 (def mark
-  {:fill (:color default-font) :cursorColor (:color default-font)
-   :fontFamily (:font-family default-font) :fontSize 80})
+  (clj->js {:fill (:color default-font) :cursorColor (:color default-font)
+            :fontFamily (:font-family default-font) :fontSize 80}))
 

@@ -61,37 +61,59 @@
 
 
 
-
+;; we're gonna do some pending async canvas operations, so keep track
+;; when they finish and then dispatch a "next-op"
+;;
 (reg-event-db
+ ::start-pending
+ ed-interceptors
+ (fn [db [counter next-op]]
+   (assoc db :pending {:counter counter
+                       :next-op next-op})))
+
+
+(reg-event-fx
+ ::update-pending
+ ed-interceptors
+ (fn [{db :db} _]
+   (let [counter (->> [:pending :counter] (get-in db) dec)]
+     (if (< 0 counter)
+       {:db (assoc-in db [:pending :counter] counter)}
+       {:db (dissoc db :pending)
+        :dispatch (get-in db [:pending :next-op])}))))
+
+
+
+;; (is there a better way?)
+;; https://github.com/vimsical/re-frame-utils/blob/master/src/vimsical/re_frame/fx/track.cljc
+(reg-event-fx
+ ::upload-files-success
+ ed-interceptors
+ (fn [{db :db} [urls]]
+   {:db (dissoc db :files-to-upload)
+    :dispatch-n [[::start-pending
+                  (count urls)
+                  [::fabric->cover
+                   [::ed-evt/upload-cover
+                    {:on-success [::upload-success]
+                     :on-failure [::upload-failure]}]]]
+
+                 [::update-urls urls]]}))
+
+
+
+(reg-event-fx
  ::update-urls
  ed-interceptors
- (fn [db [urls]]
+ (fn [{db :db} [urls]]
    (let [images (:images db)
-         pending (atom (count images))
          canvas (get-in db [:fabric :canvas])]
 
      ;; update image sources (async, so make sure we keep track when
      ;; they finish loading)
      (doseq [[id url] urls]
        (.setSrc (get images id) url
-                #(swap! pending dec)))
-
-     ;; wait for canvas to update, and then upload cover
-     ;; (is there a better way?)
-     ;; https://github.com/vimsical/re-frame-utils/blob/master/src/vimsical/re_frame/fx/track.cljc
-     
-     (js/setTimeout
-      (fn check []
-        (if (< 0 @pending)
-          (js/setTimeout check 2)
-          (dispatch [::fabric->cover
-                     [::ed-evt/upload-cover
-                      {:on-success [::upload-success]
-                       :on-failure [::upload-failure]}]])))
-      5)
-     
-     (dissoc db :files-to-upload))))
-
+                #(dispatch [::update-pending]))))))
 
 
 
@@ -108,7 +130,7 @@
       ;;redraw which will save the cover and then upload it to the
       ;;server.
       {:dispatch [::ed-evt/upload-files files
-                  {:on-success [::update-urls]
+                  {:on-success [::upload-files-success]
                    :on-failure [::upload-failure]}]}
 
       ;;no files to upload, so just upload the cover as is
