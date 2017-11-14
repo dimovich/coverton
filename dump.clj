@@ -387,3 +387,16 @@ f
         (for [it (get items @tool)]
           ^{:key it}
           [:div.ed-toolbar-settings-item it])])))
+
+
+
+
+
+
+#_(defn on-click-add-mark [canvas evt]
+    (as-> (.. evt -e) $
+      (.getPointer canvas $)
+      (js->clj $)
+      (map $ ["x" "y"])
+      (add-mark canvas)))
+

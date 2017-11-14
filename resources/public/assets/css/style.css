@@ -106,15 +106,14 @@ a {
 
 
 .logo {
-    height: 2.5em;
+    height: 2.3em;
     padding-right: 0.3em;
+    z-index: 10;
 }
 
 .logo-info {
-    line-height: 2em;
-    vertical-align: bottom;
     display: inline-block;
-    /*transform: translateY(-0.4em);*/
+    margin-top: auto;
 }
 
 .logo-wrap {

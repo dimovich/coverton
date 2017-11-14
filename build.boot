@@ -9,7 +9,6 @@
                  [adzerk/boot-reload        "0.5.2"  :scope "test"]
                  [com.cemerick/piggieback   "0.2.2"  :scope "test"]
                  [weasel                    "0.7.0"  :scope "test"]
-                 [tolitius/boot-check       "0.1.5"  :scope "test"]
 
                  [org.clojure/tools.nrepl   "0.2.13"]
                  [cider/cider-nrepl         "0.15.1"]
@@ -20,7 +19,7 @@
                  [com.taoensso/timbre       "4.10.0"]
                  [javax.servlet/servlet-api "3.0-alpha-1"]
 
-                 [ring/ring-core "1.6.2"]
+                 [ring/ring-core "1.6.3"]
                  [ring-transit   "0.1.6"]
                  [ring-middleware-format "0.7.2"]
                  [bk/ring-gzip "0.2.1"]
@@ -30,7 +29,7 @@
                  [buddy/buddy-sign "2.2.0"]
                  [buddy/buddy-core "1.4.0"]
 
-                 [clj-time "0.14.0"]
+                 [clj-time "0.14.2"]
                  [com.draines/postal "2.0.2"]
                  [integrant "0.6.1"]
                  [com.datomic/clj-client "0.8.606"]
@@ -40,11 +39,11 @@
                  [prismatic/dommy "1.1.0"]
                  [reagent  "0.8.0-alpha2"]
                  [re-frame "0.10.2"]
-                 [cljs-ajax "0.7.2"]
+                 [cljs-ajax "0.7.3"]
                  [day8.re-frame/http-fx "0.1.4"]
-                 ;; [day8.re-frame/trace "0.1.11"]
+                 ;;[day8.re-frame/trace "0.1.11"]
                  [com.taoensso/tengen "1.0.0-RC1"]
-                 [jkkramer/verily "0.6.0"]
+                 [jkkramer/verily "0.6.1"]
 
                  [cljsjs/fabric "1.7.19-1"]])
 
@@ -53,7 +52,6 @@
  '[adzerk.boot-cljs      :refer [cljs]]
  '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
  '[adzerk.boot-reload    :refer [reload]]
- '[tolitius.boot-check   :as    check]
  '[coverton.system       :as    system])
 
 
@@ -130,12 +128,3 @@
    ;;(cljs)
    (build-jar)
    (target)))
-
-
-(deftask check-sources
-  []
-  (comp
-    (check/with-yagni)
-    (check/with-eastwood)
-    (check/with-kibit)
-    (check/with-bikeshed)))

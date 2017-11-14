@@ -58,19 +58,9 @@
 
 
 
-#_(defn on-click-add-mark [canvas evt]
-    (as-> (.. evt -e) $
-      (.getPointer canvas $)
-      (js->clj $)
-      (map $ ["x" "y"])
-      (add-mark canvas)))
-
-
-
 (defn fabric->cover []
   (info "saving cover...")
   (dispatch [::evt/fabric->cover]))
-
 
 
 
@@ -261,9 +251,10 @@
                        [[(when (some-> @snapshot-idx
                                        (< (dec (count @snapshots))))
                            {:on-click #(dispatch [::evt/undo])
+                            :class :clickable
                             :style {:opacity 1}})
-                         [:img.clickable {:src "assets/svg/ed/undo.svg"}]]
-                        [[:img.clickable {:src "assets/svg/ed/redo.svg"}]]])]
+                         [:img {:src "assets/svg/ed/undo.svg"}]]
+                        [[:img {:src "assets/svg/ed/redo.svg"}]]])]
     (into
      [:div.ed-toolbar-settings]
      (for [it (items)]

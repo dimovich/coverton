@@ -1,11 +1,15 @@
 (ns coverton.fabric.events
-  (:require [re-frame.core      :refer [reg-event-fx reg-event-db dispatch]]
+  (:require [re-frame.core      :refer [reg-event-fx reg-event-db dispatch path trim-v]]
             [taoensso.timbre    :refer [info]]
             [coverton.ed.events :as ed-evt :refer [cover-interceptors ed-interceptors]]))
 
 
+(def pending-interceptors [(path [:ed :pending]) trim-v])
 
 
+;;
+;; save fabric data to app-db, and then run "next-op" if specified
+;;
 (reg-event-fx
  ::fabric->cover
  ed-interceptors
@@ -29,6 +33,7 @@
                      next-op)]})))
 
 
+
 (reg-event-db
  ::undo
  ed-interceptors
@@ -40,7 +45,6 @@
                       rest
                       (nth idx))
          json (clj->js (:json snapshot))]
-     (info json)
      (.clear canvas)
      (.loadFromJSON canvas json #(.renderAll canvas))
      (update-in db [:fabric :snapshot-idx] inc))))
@@ -56,36 +60,33 @@
             (update-in [:fabric :snapshots]
                        conj (get-in db [:cover :cover/fabric]))
             ;;reset current snapshot index
-            (update-in [:fabric :snapshot-idx]
-                       (fn [_] 0)))}))
+            (assoc-in [:fabric :snapshot-idx] 0))}))
 
 
 
 ;; we're gonna do some pending async canvas operations, so keep track
-;; when they finish and then dispatch a "next-op"
+;; when they finish and then dispatch a "next-op".
 ;;
 (reg-event-db
  ::start-pending
- ed-interceptors
+ pending-interceptors
  (fn [db [counter next-op]]
-   (assoc db :pending {:counter counter
-                       :next-op next-op})))
+   {:counter counter
+    :next-op next-op}))
 
 
 (reg-event-fx
  ::update-pending
- ed-interceptors
+ pending-interceptors
  (fn [{db :db} _]
-   (let [counter (->> [:pending :counter] (get-in db) dec)]
+   (let [counter (-> (:counter db) dec)]
      (if (< 0 counter)
-       {:db (assoc-in db [:pending :counter] counter)}
-       {:db (dissoc db :pending)
-        :dispatch (get-in db [:pending :next-op])}))))
+       {:db (assoc db :counter counter)}
+       {:db nil
+        :dispatch (:next-op db)}))))
 
 
 
-;; (is there a better way?)
-;; https://github.com/vimsical/re-frame-utils/blob/master/src/vimsical/re_frame/fx/track.cljc
 (reg-event-fx
  ::upload-files-success
  ed-interceptors
@@ -106,9 +107,9 @@
  ::update-urls
  ed-interceptors
  (fn [{db :db} [urls]]
+   (info "updating urls...")
    (let [images (:images db)
          canvas (get-in db [:fabric :canvas])]
-
      ;; update image sources (async, so make sure we keep track when
      ;; they finish loading)
      (doseq [[id url] urls]

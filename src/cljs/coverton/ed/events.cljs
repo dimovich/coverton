@@ -8,8 +8,8 @@
 
 
 
-(def ed-interceptors      [(path [:ed])        trim-v])
-(def cover-interceptors   [(path [:ed :cover]) trim-v])
+(def ed-interceptors    [(path [:ed])        trim-v])
+(def cover-interceptors [(path [:ed :cover]) trim-v])
 
 
 
