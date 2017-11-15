@@ -301,7 +301,8 @@ a:after {
 
 
 .search-bar {
-    border: 1px solid #1a1a1a;
+    /*border: 0px solid #1a1a1a;*/
+    border: 0;
     margin-top: 2em;
     margin-bottom: 2em;
     padding: 0.5em;

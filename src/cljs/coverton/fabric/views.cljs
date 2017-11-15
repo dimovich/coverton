@@ -9,8 +9,8 @@
             [coverton.index.subs :as index-sub]
             [coverton.fabric.defaults :as defaults]
             [coverton.components :as cc]
-            ;;[cljsjs.fabric]
-            ["fabric"]))
+            ;;["fabric"]
+            [cljsjs.fabric]))
 
 (comment
   ;; TODO
