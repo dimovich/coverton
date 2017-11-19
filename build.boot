@@ -33,7 +33,7 @@
                  [com.draines/postal "2.0.2"]
                  [integrant "0.6.1"]
                  [com.datomic/clj-client "0.8.606"]
-                 [org.clojure/core.async "0.3.443"]
+                 [org.clojure/core.async "0.3.465"]
                  [org.clojure/data.fressian "0.2.1"]
                  
                  [prismatic/dommy "1.1.0"]

@@ -281,11 +281,14 @@
                       [:span.clickable opts (str "#" tg)]])
 
                add-tag (fn [_]
-                         (when-not (empty? @text)
-                           (dispatch [::ed-evt/update-cover :cover/tags
-                                      #(-> (or %1 [])
-                                           (conj %2))
-                                      @text])))
+                         (if (empty? @text)
+                           (set-visible false)
+                           (do
+                             (dispatch [::ed-evt/update-cover :cover/tags
+                                        #(-> (or %1 [])
+                                             (conj %2))
+                                        @text])
+                             (reset! text nil))))
                
                remove-tag (fn [idx]
                             (dispatch [::ed-evt/update-cover :cover/tags
@@ -316,8 +319,7 @@
                              :on-key-down (fn [e]
                                             (condp = (.. e -key)
                                               "Escape"    (set-visible false)
-                                              "Enter"     (do (add-tag)
-                                                              (set-visible false))
+                                              "Enter"     (add-tag)
                                               false))}]]
 
        ;; + button
