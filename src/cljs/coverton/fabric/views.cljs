@@ -15,6 +15,7 @@
 (comment
   ;; TODO
   ;; undo/redo -> try re-frame undo/redo (maybe full db is better logic?)
+  ;;              disable fabric rendering on object add
 )
 
 
