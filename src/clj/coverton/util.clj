@@ -26,10 +26,9 @@
 
 (defmacro when-read [[name fname] & body]
   `(let [file# (io/file ~fname)]
-     (if (.exists file#)
+     (when (.exists file#)
        (with-open [rdr# (io/reader file#)]
          (let [~name (slurp rdr#)]
-           ~@body))
-       (info ~fname " doesn't exist."))))
+           ~@body)))))
 
 
