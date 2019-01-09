@@ -1,0 +1,4 @@
+{:css-dirs ["resources/public/css"]
+ :watch-dirs ["src/cljs" "src/cljc"]
+ :open-url false
+ :log-level :error}

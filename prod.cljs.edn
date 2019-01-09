@@ -1,0 +1,7 @@
+{:main          "coverton.core"
+ :output-to     "resources/public/js/coverton.js"
+ :output-dir    "resources/public/js/out"
+ :asset-path    "js/out"
+ :optimizations :advanced
+ :pretty-print  false
+ :parallel-build true}

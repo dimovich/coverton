@@ -9,7 +9,6 @@
             [coverton.index.subs :as index-sub]
             [coverton.fabric.defaults :as defaults]
             [coverton.components :as cc]
-            ;;["fabric"]
             [cljsjs.fabric]))
 
 (comment

@@ -1,0 +1,3 @@
+{:main coverton.core
+ :output-to "resources/public/js/coverton.js"
+ :output-dir "resources/public/js/out"}

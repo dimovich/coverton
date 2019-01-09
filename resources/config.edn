@@ -1,2 +1,0 @@
-{:adapter/server {:port 5000}
- :repl/repl      {:port 33000}}
