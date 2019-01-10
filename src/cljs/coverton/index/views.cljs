@@ -18,7 +18,7 @@
    [:span.helper-valign]
    [:span.search-tag-text {} tag]
    [:img.search-tag-close
-    (merge {:src "assets/svg/x.svg"}
+    (merge {:src "/svg/x.svg"}
            opts)]])
 
 
@@ -64,7 +64,7 @@
                                                          (pop-tag))
                                            false))}]
 
-     [:img.search-image {:src "assets/svg/search.svg"}]]))
+     [:img.search-image {:src "/svg/search.svg"}]]))
 
 
 
@@ -120,7 +120,7 @@
        (when (:logo els)
          [:span.logo-wrap.clickable
           {:on-click on-click-logo}
-          [:img.logo {:src "assets/svg/logo.svg"}]
+          [:img.logo {:src "/svg/logo.svg"}]
           (when (:motto els) [:span.logo-info
                               "a publishing platform for cover makers."])])
         

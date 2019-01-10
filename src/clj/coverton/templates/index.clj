@@ -8,14 +8,14 @@
    {:lang "en"}
    [:head
     [:title "Coverton"]
-    (include-css "assets/css/style.css")
+    (include-css "/css/style.css")
     [:link {:rel "shortcut icon"
-            :href "assets/img/f.ico"
+            :href "/img/f.ico"
             :type "image/x-icon"}]]
    [:body
     [:div.wrap
      [:div#app]]
-    (include-js "coverton.js")
+    (include-js "/js/coverton.js")
     [:script "coverton.core.init();"]]))
 
 
@@ -26,14 +26,14 @@
    [:head
     [:title "Coverton"]
     [:meta {:charset "utf-8"}]
-    (include-css "assets/css/style.css")
+    (include-css "/css/style.css")
     [:link {:rel "shortcut icon"
-            :href "assets/img/f.ico"
+            :href "/img/f.ico"
             :type "image/x-icon"}]]
    [:body
     [:div {:class "content vcenter"}
      [:div.motto
-      [:img.logo {:src "assets/svg/logo.svg"}]
+      [:img.logo {:src "/svg/logo.svg"}]
       [:p.text
        "a publishing platform for cover makers"
        [:br]

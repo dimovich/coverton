@@ -23,7 +23,7 @@
        (map #(dissoc % :db/id))))
 
 
-(def message-body "Hello\nSomeone wants to join Coverton.\n\nEmail: %s\n\nStory:\n%s\n\nApprove:\n%s")
+(def message-body "Hello\nSomeone wants to join Coverton.\n\nEmail: %s\n\nStory:\n%s\n\nConfirm:\n%s")
 
 ;;(def hostname "http://localhost:5000/")
 (def hostname "https://coverton.co")
@@ -33,7 +33,7 @@
 (defn request-invite [{:keys [email story]}]
   ;;todo: check if already present
   (let [secret (gen-code)
-        url (-> (str hostname "/approve-invite?email=%s&secret=%s")
+        url (-> (str hostname "/confirm-invite?email=%s&secret=%s")
                 (format email secret))
         msg (-> message-body
                 (format email story url))
@@ -75,16 +75,16 @@
 
 
 
-(defn approve-invite [{:keys [email secret] :as args}]
+(defn confirm-invite [{:keys [email secret] :as args}]
   (if (check-invite email secret)
     (let [url (-> (str hostname "/register?email=%s&secret=%s")
                   (format email secret))
           msg (-> "Follow this link to register: %s"
                   (format url))]
 
-      ;; update entity to :approved
+      ;; update entity to :confirmed
       (-> {:invite/email  email
-           :invite/status :approved}
+           :invite/status :confirmed}
           db/transact)
 
       ;; send registration

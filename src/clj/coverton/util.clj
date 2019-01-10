@@ -19,16 +19,7 @@
 
 
 
+;; check HN post for semantic uuids
 (defn random-uuid []
   (java.util.UUID/randomUUID))
-
-
-
-(defmacro when-read [[name fname] & body]
-  `(let [file# (io/file ~fname)]
-     (when (.exists file#)
-       (with-open [rdr# (io/reader file#)]
-         (let [~name (slurp rdr#)]
-           ~@body)))))
-
 

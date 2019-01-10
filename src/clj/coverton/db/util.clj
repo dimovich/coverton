@@ -4,7 +4,7 @@
             [coverton.db.users :as users]
             [coverton.db.invite :as invite]
             [clojure.data.fressian :as fress]
-            [coverton.util :refer [when-read]]))
+            [roll.util :refer [when-read]]))
 
 
 

@@ -205,9 +205,9 @@
      items (fn []
              [[{:style {:width "85%"}
                 :on-click #(add-mark @canvas)}
-               [:img.clickable {:src "assets/svg/ed/text.svg"}]]
+               [:img.clickable {:src "/svg/ed/text.svg"}]]
               
-              [[:img.clickable {:src "assets/svg/ed/image.svg"}]
+              [[:img.clickable {:src "/svg/ed/image.svg"}]
                [cc/image-picker
                 {:callback
                  (fn [file url]
@@ -215,22 +215,22 @@
                    (set-background @canvas url))}]]
  
               [{:style {:opacity 1}}
-               [:img {:src "assets/svg/ed/separator.svg"}]]
+               [:img {:src "/svg/ed/separator.svg"}]]
 
-              [[:img.clickable {:src "assets/svg/ed/preview.svg"}]]
+              [[:img.clickable {:src "/svg/ed/preview.svg"}]]
 
               [{:style {:opacity 1
                         :margin-top "-10px"}}
-               [:img {:src "assets/svg/ed/separator.svg"}]]
+               [:img {:src "/svg/ed/separator.svg"}]]
 
               (when @authenticated?
                 [(if @uploading?
                    {:style {:opacity 0.3}}
                    {:on-click #(cover->db)})
-                 [:img.clickable {:src "assets/svg/ed/save.svg"}]])
+                 [:img.clickable {:src "/svg/ed/save.svg"}]])
 
               [{:on-click #(ed-evt/initialize)}
-               [:img.clickable {:src "assets/svg/ed/new.svg"}]]])]
+               [:img.clickable {:src "/svg/ed/new.svg"}]]])]
 
     
     (into
@@ -253,8 +253,8 @@
                            {:on-click #(dispatch [::evt/undo])
                             :class :clickable
                             :style {:opacity 1}})
-                         [:img {:src "assets/svg/ed/undo.svg"}]]
-                        [[:img {:src "assets/svg/ed/redo.svg"}]]])]
+                         [:img {:src "/svg/ed/undo.svg"}]]
+                        [[:img {:src "/svg/ed/redo.svg"}]]])]
     (into
      [:div.ed-toolbar-settings]
      (for [it (items)]
@@ -324,7 +324,7 @@
 
        ;; + button
        [[:img.clickable.ed-tag-plus
-         {:src "assets/svg/ed/plus.svg"
+         {:src "/svg/ed/plus.svg"
           :on-click #(set-visible true)}]]))))
 
 

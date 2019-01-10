@@ -79,11 +79,11 @@
  ::get-covers
  index-interceptors
  (fn [_ [opts]]
-   {:dispatch
-    [::ajax-evt/request-auth {:method :post
-                              :uri "/get-covers"
-                              :params opts
-                              :on-success [::merge]}]}))
+   #_{:dispatch
+      [::ajax-evt/request-auth {:method :post
+                                :uri "/get-covers"
+                                :params opts
+                                :on-success [::merge]}]}))
 
 
 

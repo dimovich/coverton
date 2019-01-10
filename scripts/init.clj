@@ -1,2 +1,2 @@
-(require 'coverton.system)
-(coverton.system/init)
+(require 'coverton.core)
+(coverton.core/init)

@@ -4,8 +4,6 @@
             [ring.util.response              :refer [response file-response redirect not-found content-type]]
             [ring.middleware.session         :refer [wrap-session]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
-            
-            [compojure.response :refer [render]]
 
             [hiccup.page :refer [html5]]
 
@@ -21,7 +19,7 @@
             [coverton.auth :refer [auth-backend login]]
             [coverton.util :refer [ok bad-request random-uuid]]
             [coverton.templates.index :refer [index static-promo]]
-            [coverton.db.schema :refer [cover->db]]
+            [coverton.schema :refer [cover->db]]
 
             [coverton.db.core   :as db]
             [coverton.db.util   :as db-util]
@@ -107,7 +105,7 @@
 
 (defn handle-confirm-invite
   [{{email "email" secret "secret"} :params}]
-  (invite/approve-invite {:email email
+  (invite/confirm-invite {:email email
                           :secret secret})
   (html5
    [:body [:h1 "Success!"]]))
@@ -127,7 +125,7 @@
 
 
 (defn handle-get-index [req]
-  (index))
+  (ok (index)))
 
 
 (def routes
@@ -176,6 +174,6 @@
   (-> handler
       (wrap-authorization auth-backend)
       (wrap-authentication auth-backend)
-      (wrap-restful-format {:formats [:transit-json]})
-      (wrap-multipart-params)
+      ;;(wrap-restful-format {:formats [:transit-json]})
+      ;;(wrap-multipart-params)
       #_(wrap-content-type)))
