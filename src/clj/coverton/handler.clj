@@ -1,17 +1,10 @@
 (ns coverton.handler
-  (:require [ring.middleware.resource        :refer [wrap-resource]]
-            [ring.middleware.content-type    :refer [wrap-content-type]]
-            [ring.middleware.not-modified    :refer [wrap-not-modified]]
+  (:require [ring.middleware.content-type    :refer [wrap-content-type]]
             [ring.middleware.format          :refer [wrap-restful-format]]
             [ring.util.response              :refer [response file-response redirect not-found content-type]]
             [ring.middleware.session         :refer [wrap-session]]
-            [ring.middleware.params          :refer [wrap-params]]
-            [ring.middleware.gzip            :refer [wrap-gzip]]
             [ring.middleware.multipart-params :refer [wrap-multipart-params]]
             
-
-            [compojure.core     :refer [defroutes GET POST]]
-            [compojure.route    :refer [files resources]]
             [compojure.response :refer [render]]
 
             [hiccup.page :refer [html5]]
@@ -112,12 +105,12 @@
 
 
 
-(defn handle-approve-invite
+(defn handle-confirm-invite
   [{{email "email" secret "secret"} :params}]
   (invite/approve-invite {:email email
                           :secret secret})
   (html5
-   [:body [:h1 "Approved."]]))
+   [:body [:h1 "Success!"]]))
 
 
 
@@ -133,28 +126,35 @@
    [:body [:h1 "Under construction."]]))
 
 
-
-(defroutes handler
-  (GET  "/"           [] (static-promo))
-  (GET  "/index"      [] (index))
-
-  (POST "/save-cover" [] handle-save-cover)
-  ;;(POST "/get-cover"  [] get-cover)
-
-  (POST "/get-covers" [] handle-get-covers)
-
-  (GET  "/register"   [] handle-register)
-  (POST "/login"      [] handle-login)
-
-  (POST "/request-invite" [] handle-request-invite)
-  (GET  "/approve-invite" [] handle-approve-invite)
+(defn handle-get-index [req]
+  (index))
 
 
-  (POST "/upload-file" [] handle-upload-files)
-  
-  (files     "/" {:root "."}) ;; to serve static resources
-  (resources "/" {:root "."}) ;; to serve anything else
-  (compojure.route/not-found "Page Not Found")) ;; page not found
+(def routes
+  [["/" {:name :index
+         :get handle-get-index}]
+
+   ["/save-cover" {:name :save-cover
+                   :post handle-save-cover}]
+
+   ["/get-covers" {:name :get-covers
+                   :post handle-get-covers}]
+
+   ["/register" {:name :register
+                 :get handle-register}]
+
+   ["/login" {:name :login
+              :post handle-login}]
+
+   ["/request-invite" {:name :request-invite
+                       :post handle-request-invite}]
+
+   ["/confirm-invite" {:name :confirm-invite
+                       :get handle-confirm-invite}]
+
+   ["/upload-file" {:name :upload-file
+                    :post handle-upload-files}]])
+
 
 
 
@@ -172,17 +172,10 @@
 
 
 
-(def app
-  (as-> handler $
-    ;;(wrap-info-request $)
-    (wrap-authorization  $ auth-backend)
-    (wrap-authentication $ auth-backend)
-    (wrap-restful-format $ {:formats [:transit-json]})
-    (wrap-params         $)
-    (wrap-multipart-params $)
-    (wrap-resource       $ "public")
-    (wrap-content-type   $)
-    (wrap-gzip           $)))
-    ;;(wrap-info-response  $)
-    
-
+(defn middleware-wrapper [handler]
+  (-> handler
+      (wrap-authorization auth-backend)
+      (wrap-authentication auth-backend)
+      (wrap-restful-format {:formats [:transit-json]})
+      (wrap-multipart-params)
+      #_(wrap-content-type)))

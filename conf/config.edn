@@ -1,0 +1,18 @@
+{:roll/repl    {:port 3311}
+ 
+ :roll/nginx   {:config "conf/nginx.conf"}
+ 
+ :roll/handler {:routes coverton.handler/routes
+                :middleware [coverton.handler/middleware-wrapper]
+                ;;:sente  #ig/ref :roll/sente
+                }
+ 
+ ;;:roll/sente   {:handshake-data-fn descryptors.data/handshake-data-fn}
+ 
+ ;;:roll/file
+ #_{:path "clean.edn"
+    :init descryptors.data/init!
+    :watch true}
+
+ ;;:descryptors/router {:save? true}
+ }
