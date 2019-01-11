@@ -112,8 +112,7 @@
 
 
 
-(defn handle-login
-  [req]
+(defn handle-login [req]
   (login req))
 
 
@@ -170,10 +169,10 @@
 
 
 
-(defn middleware-wrapper [handler]
-  (-> handler
-      (wrap-authorization auth-backend)
-      (wrap-authentication auth-backend)
-      ;;(wrap-restful-format {:formats [:transit-json]})
-      ;;(wrap-multipart-params)
-      #_(wrap-content-type)))
+(def middlewares
+  [#(wrap-authorization % auth-backend)
+   #(wrap-authentication % auth-backend)
+
+   ;;(wrap-restful-format {:formats [:transit-json]})
+   ;;(wrap-multipart-params)
+   #_(wrap-content-type)])

@@ -3,7 +3,7 @@
  :roll/nginx   {:config "conf/nginx.conf"}
  
  :roll/handler {:routes coverton.handler/routes
-                :middleware [coverton.handler/middleware-wrapper]
+                :middleware coverton.handler/middlewares
                 ;;:sente  #ig/ref :roll/sente
                 }
  

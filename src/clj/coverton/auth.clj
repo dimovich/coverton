@@ -18,7 +18,7 @@
 
 
 (defn login [{{:keys [email password]} :params :as request}]
-
+  (info "logging in with" request)
   (let [valid? (some->> email
                         db-users/get-user-by-email
                         :user/password
@@ -47,7 +47,7 @@
 
 
 
-(def auth-backend
+(defonce auth-backend
   (jws-backend {:unauthorized-handler unauthorized-handler
                 :secret secret :options {:alg :hs512}}))
 

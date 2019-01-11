@@ -32,10 +32,12 @@
    
    :cover/author {:db/valueType :db.type/ref
                   :db/cardinality :db.cardinality/one}
+
+   :cover/tags {:db/cardinality :db.cardinality/many}
+
+   :cover/sbls {:db/cardinality :db.cardinality/many}
    
-   :cover/image-url {:db/cardinality :db.cardinality/one}
-   
-   :cover/tags {:db/cardinality :db.cardinality/many}})
+   :cover/image-url {:db/cardinality :db.cardinality/one}})
 
 
 

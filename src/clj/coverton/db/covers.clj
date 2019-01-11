@@ -4,28 +4,25 @@
 
 
 
-(defn get-covers [{:keys [tags]}]
-  (as-> '[:find (pull ?e [*])
-          :in $ [?tag ...]
-          :where
-          (or [?e :cover/tags ?tag]
-              [?e :cover/author ?tag])] $
-    
-    (db/query-db $ tags)
-
-    (map #(-> %
-              first
-              (update :cover/data fress/read)
-              (dissoc :db/id)) $)))
+(defn get-covers [{:keys [sbls]}]
+  (->> sbls
+       (db/query-db
+        '[:find (pull ?e [*])
+          :in $ [?sbl ...]
+          :where [?e :cover/sbls ?sbl]])
+       
+       (map #(-> (first %)
+                 (update :cover/data fress/read)
+                 (dissoc :db/id)))))
 
 
 
 (defn get-all-covers []
   (->> '[:find (pull ?e [*])
+         :in $
          :where [?e :cover/id]]
        db/query-db
-       (map #(-> %
-                 first
+       (map #(-> (first %)
                  (update :cover/data fress/read)
                  (dissoc :db/id)))))
 
@@ -34,8 +31,7 @@
 (defn get-cover [id]
   (-> '[:find (pull ?e [*])
         :in $ ?id
-        :where
-        [?e :cover/id ?id]]
+        :where [?e :cover/id ?id]]
       (db/query-db id)
       ffirst))
 

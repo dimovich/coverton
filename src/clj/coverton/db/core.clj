@@ -1,58 +1,18 @@
 (ns coverton.db.core
-  (:require [clojure.core.async :refer [<!!]]
-            ;;[datomic.client     :as    client]
-            [taoensso.timbre    :refer [info]]
-            ;;[coverton.db.schema :refer [coverton-schema]]
-            [coverton.util      :refer [random-uuid]]))
-
-
-(defonce db-state (atom {}))
-
-
-(defn connect []
-  (-> {:db-name "hello"
-       ;;:account-id client/PRO_ACCOUNT
-       :secret "admin"
-       :region "none"
-       :endpoint "localhost:8998"
-       :service "peer-server"
-       :access-key "admin"}
-      
-      ;;client/connect
-      <!!))
-
-
-
-(defn get-connection []
-  (if-let [conn (:conn @db-state)]
-    conn
-    (let [conn (connect)]
-      (swap! db-state assoc :conn conn)
-      conn)))
-
-
-(defn current-db []
-  ;;(client/db (get-connection))
-  )
+  (:require [re-frame.core :refer [dispatch subscribe]]
+            [datascript.core :as ds]
+            [taoensso.timbre :refer [info]]
+            [coverton.db :as db]))
 
 
 
 (defn transact [data]
-  (let [data (if (sequential? data) data [data])]
-    (let [res (-> (get-connection)
-                  ;;(client/transact {:tx-data data})
-                  <!!)]
-      (info res))))
+  (dispatch [::db/load-data (if (sequential? data) data [data])]))
 
 
 
-(defn query-db [q & args]
-  (let [db (current-db)
-        conn (get-connection)]
-    (->> {:query q
-          :args (into [db] args)}
-         ;;(client/q conn)
-         <!!)))
+(defn query-db [query & args]
+  (apply ds/q query @(subscribe [::db/db-value]) args))
 
 
 
@@ -60,14 +20,9 @@
   (transact [[:db.fn/retractEntity id]]))
 
 
+
 (defn retract-attr [id attr-id attr]
   (transact [[:db/retract id attr-id attr]]))
-
-(defn init []
-  ;; add schema
-  ;;(transact coverton-schema)
-  
-  (info "db initialized"))
 
 
 

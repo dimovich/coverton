@@ -1,9 +1,8 @@
 (ns coverton.util
-  (:require [taoensso.timbre :as timbre :refer [info]]
-            [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]))
 
 
-(timbre/set-config!
+#_(timbre/set-config!
  {:level :info
   :output-fn (fn [{:keys [timestamp_ level msg_]}]
                (str

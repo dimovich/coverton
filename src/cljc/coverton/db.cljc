@@ -32,7 +32,6 @@
  (fn [f] (when f (f))))
 
 
-
 (reg-sub
  ::db
  (fn [db _]
@@ -98,6 +97,8 @@
                   (mapv :e))))))
 
 
+
+
 (reg-sub
  ::default-db-syms
  (fn [_ [_ index]]
@@ -128,7 +129,7 @@
 
 
 (reg-event-fx
- ::load
+ ::load-data
  db-interceptors
  (fn [{:keys [db]} [data]]
   (when-let [conn (:db-conn db)]
@@ -154,13 +155,13 @@
   (dispatch [::load data]))
 
 
+
 (defn load-db [new-db]
   (dispatch [::load-db (ds/conn-from-db new-db)]))
 
 
-(defn init [& [{:keys [db-conn] :as db}]]
+
+(defn init [& [{:as db-opts :keys [db-conn]}]]
   (let [conn (or db-conn (ds/create-conn schema))]
     (dispatch-sync
-     [::init (-> {:db-conn conn
-                  :tick 0}
-                 (merge db))])))
+     [::init (merge {:db-conn conn :tick 0} db-opts)])))

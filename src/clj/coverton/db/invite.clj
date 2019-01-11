@@ -17,6 +17,7 @@
 
 (defn get-all-invites []
   (->> '[:find (pull ?e [*])
+         :in $
          :where [?e :invite/email]]
        db/query-db
        (apply concat)
