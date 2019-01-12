@@ -1,10 +1,9 @@
 (ns coverton.handler
-  (:require [ring.middleware.content-type    :refer [wrap-content-type]]
-            [ring.middleware.format          :refer [wrap-restful-format]]
+  (:require [ring.middleware.format          :refer [wrap-restful-format]]
             [ring.util.response              :refer [response file-response redirect not-found content-type]]
-            [ring.middleware.session         :refer [wrap-session]]
-            [ring.middleware.multipart-params :refer [wrap-multipart-params]]
 
+            [reitit.ring.middleware.multipart :as multipart]
+            
             [hiccup.page :refer [html5]]
 
             [buddy.sign.jwt :as jwt]
@@ -25,12 +24,14 @@
             [coverton.db.util   :as db-util]
             [coverton.db.covers :as db-covers]
             [coverton.db.users  :as db-users]
-            [coverton.db.invite :as invite]))
+            [coverton.db.invite :as invite])
+  
+  (:import [nginx.clojure NginxRequest]))
 
 
 
 (defn handle-save-cover
-  [{{:keys [cover/id] :as cover} :params :as request}]
+  [{{:keys [cover/id] :as cover} :body-params :as request}]
   (if (authenticated? request)
     (let [author (:email (:identity request))
           id     (or id (random-uuid))
@@ -61,7 +62,7 @@
 
 
 (defn handle-get-covers
-  [{{:keys [tags size skip] :as params} :params :as request}]
+  [{{:keys [tags size skip] :as params} :body-params :as request}]
   (ok {:covers
        (->> (cond
               (not (empty? tags)) (db-covers/get-covers {:tags tags})
@@ -122,6 +123,7 @@
   (html5
    [:body [:h1 "Under construction."]]))
 
+(defonce req-trap (atom nil))
 
 (defn handle-get-index [req]
   (ok (index)))
@@ -169,10 +171,9 @@
 
 
 
-(def middlewares
-  [#(wrap-authorization % auth-backend)
-   #(wrap-authentication % auth-backend)
-
-   ;;(wrap-restful-format {:formats [:transit-json]})
-   ;;(wrap-multipart-params)
-   #_(wrap-content-type)])
+(def middleware
+  [[wrap-authorization auth-backend]
+   [wrap-authentication auth-backend]
+   [multipart/multipart-middleware]
+   ;;[wrap-restful-format {:formats [:transit-json]}]
+   ])

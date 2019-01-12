@@ -1,9 +1,10 @@
 {:roll/repl    {:port 3311}
  
- :roll/nginx   {:config "conf/nginx.conf"}
+ ;;:roll/nginx   {:config "conf/nginx.conf"}
+ :roll/httpkit {:handler #ig/ref :roll/handler}
  
  :roll/handler {:routes coverton.handler/routes
-                :middleware coverton.handler/middlewares
+                :middleware coverton.handler/middleware
                 ;;:sente  #ig/ref :roll/sente
                 }
  

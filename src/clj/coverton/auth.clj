@@ -17,8 +17,8 @@
                     (codecs/bytes->hex)))
 
 
-(defn login [{{:keys [email password]} :params :as request}]
-  (info "logging in with" request)
+(defn login [{:as req {:keys [email password]} :body-params}]
+  (info "!!!!" email password)
   (let [valid? (some->> email
                         db-users/get-user-by-email
                         :user/password
