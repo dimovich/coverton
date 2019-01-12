@@ -24,9 +24,7 @@
             [coverton.db.util   :as db-util]
             [coverton.db.covers :as db-covers]
             [coverton.db.users  :as db-users]
-            [coverton.db.invite :as invite])
-  
-  (:import [nginx.clojure NginxRequest]))
+            [coverton.db.invite :as invite]))
 
 
 
@@ -123,7 +121,6 @@
   (html5
    [:body [:h1 "Under construction."]]))
 
-(defonce req-trap (atom nil))
 
 (defn handle-get-index [req]
   (ok (index)))
@@ -175,5 +172,4 @@
   [[wrap-authorization auth-backend]
    [wrap-authentication auth-backend]
    [multipart/multipart-middleware]
-   ;;[wrap-restful-format {:formats [:transit-json]}]
-   ])
+   #_[wrap-restful-format {:formats [:transit-json]}]])
